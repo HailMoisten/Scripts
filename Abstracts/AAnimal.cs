@@ -27,6 +27,14 @@ public abstract class AAnimal : MonoBehaviour {
         mains[0] = VIT; mains[1] = STR; mains[2] = AGI; mains[3] = INT; mains[4] = MND;
         return mains;
     }
+    /// <summary>
+    /// Return Sub States.
+    /// 0: AD; 1: MD; 2: AR; 3: MR;
+    /// 4: MindSlots; 5: MovementSpeed; 6: RunRatio;
+    /// 7: HP; 8: HPRegen; 9: MAXHP;
+    /// 10: SP; 11: SPRegen; 12: MAXSP;
+    /// 13: Poise;
+    /// </summary>
     public float[] GetSubStatus()
     {
         float[] subs = new float[14];
@@ -37,12 +45,9 @@ public abstract class AAnimal : MonoBehaviour {
         subs[13] = Poise;
         return subs;
     }
-    public int[] GetHPSP()
-    {
-        int[] hpsp = new int[2];
-        hpsp[0] = HP; hpsp[1] = SP;
-        return hpsp;
-    }
+    public int GetHP(){ return HP; }
+    public int GetSP() { return SP; }
+
     public void SetLevelUpReward(int n, int incORdec)
     {
         if (n >= 0 && n <= 4)
@@ -70,43 +75,56 @@ public abstract class AAnimal : MonoBehaviour {
             int sum = 0;
             for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
             if (sum == 0) { VIT++; VIT++; MND++; } else if (sum == 1) { VIT++; MND++; } else if (sum == 2) { VIT++; }
-            setStatus(calcStatus());
+            setStatus(calcStatus(GetMainStatus()));
         }
     }
-    /**
-    *for Debug or Reallocation(Soul Vessel)
-    */
+
+    /// <summary>
+    /// For debug or Reallocation(Soul Vessel)
+    /// </summary>
+    /// <returns></returns>
     protected void setMainStatus(int lv, int v, int s, int a, int i, int m)
     {
         Lv = lv; VIT = v; STR = s; AGI = a; INT = i; MND = m;
-        setStatus(calcStatus());
+        setStatus(calcStatus(GetMainStatus()));
     }
-    protected float[] calcStatus()
+
+    /// <summary>
+    /// Calculate sub states. In addition, calculate buffs.
+    /// </summary>
+    /// <returns></returns>
+    protected float[] calcStatus(int[] mains)
     {
-        float[] st = new float[statusGenus];
+        // Calculate buffs against to mains for sub states. Main status must not be buffed.
+
+        // Calculate sub states.
+        float[] subs = new float[statusGenus];
         // first step
-        st[0] = (4 * STR) + (AGI);// AD
-        st[1] = (4 * INT) + (AGI);// MD
-        st[2] = Mathf.RoundToInt(STR * Mathf.Sqrt(VIT / 50));// AR
-        st[3] = Mathf.RoundToInt(INT * Mathf.Sqrt(VIT / 50));// MR
-        st[4] = 1 + (MND / 10);// MindSlots
-        st[5] = ((float)AGI + 50) / 50;// MovementSpeed
-        st[6] = 2 + ((float)AGI / 50);// RunRatio
+        subs[0] = (4 * STR) + (AGI);// AD
+        subs[1] = (4 * INT) + (AGI);// MD
+        subs[2] = Mathf.RoundToInt(STR * Mathf.Sqrt(VIT / 50));// AR
+        subs[3] = Mathf.RoundToInt(INT * Mathf.Sqrt(VIT / 50));// MR
+        subs[4] = 1 + (MND / 10);// MindSlots
+        subs[5] = ((float)AGI + 100) / 100;// MovementSpeed
+        subs[6] = 2 + ((float)AGI / 25);// RunRatio
         // second step
-        st[7] = 1.0f + (STR / (100 + (float)STR));// HPGainRatio
-        st[8] = 1.0f + ((STR + VIT) / (100 + (float)VIT));// HPRegenRatio
-        st[9] = 1.0f + (INT / (100 + (float)INT));// SPGainRatio
-        st[10] = 1.0f + (AGI / (100 + (float)AGI));// SPRegenRatio
+        subs[7] = 1.0f + (STR / (100 + (float)STR));// HPGainRatio
+        subs[8] = 1.0f + ((STR + VIT) / (100 + (float)VIT));// HPRegenRatio
+        subs[9] = 1.0f + (INT / (100 + (float)INT));// SPGainRatio
+        subs[10] = 1.0f + (AGI / (100 + (float)AGI));// SPRegenRatio
         // third step
-        st[11] = Mathf.RoundToInt(((15 * Mathf.Sqrt(VIT + Lv)) + (5 * (float)VIT) + 30) * st[7]);// MAXHP
-        st[12] = Mathf.RoundToInt((VIT + MND + 58) * st[9]);// MAXSP
+        subs[11] = Mathf.RoundToInt(((15 * Mathf.Sqrt(VIT + Lv)) + (5 * (float)VIT) + 30) * subs[7]);// MAXHP
+        subs[12] = Mathf.RoundToInt((VIT + MND + 58) * subs[9]);// MAXSP
         // fourth step
-        st[13] = Mathf.RoundToInt((st[11] / 60) * st[8]);// HPRegen
-        st[14] = Mathf.RoundToInt((st[12] / 60) * st[10]);// SPRegen
-        st[15] = st[11];// HP
-        st[16] = st[12];// SP
-        st[17] = (st[11] * MND) / (100 + (float)MND);// Poise
-        return st;
+        subs[13] = Mathf.RoundToInt((subs[11] / 60) * subs[8]);// HPRegen
+        subs[14] = Mathf.RoundToInt((subs[12] / 60) * subs[10]);// SPRegen
+        subs[15] = subs[11];// HP
+        subs[16] = subs[12];// SP
+        subs[17] = (subs[11] * MND) / (100 + (float)MND);// Poise
+
+        // Calculate buffs against to subs.
+
+        return subs;
     }
     protected void setStatus(float[] status)
     {
@@ -156,6 +174,8 @@ public abstract class AAnimal : MonoBehaviour {
             else
             {
                 doRotate();
+                if (actionStack[0].CanDoAction(this)) { }
+                else { actionStack[0] = new IdleAction(); Debug.Log("I can NOT do it."); }
                 actionStack[0].Action(this);
             }
         }
@@ -222,9 +242,17 @@ public abstract class AAnimal : MonoBehaviour {
     }
 
     // Utility
-    public void TakeDamage(int value, bool AorM)
+    public void TakeDamage(int value, bool isAnotM)
     {
-        HP = 1;
+        int damage = 0;
+        if (isAnotM) { damage = value * (1 - (AR / (100 + AR))); }
+        else { damage = value * (1 - (MR / (100 + MR))); }
+        HP = HP - damage;
+    }
+    public void UseHPSP(int hpvalue, int spvalue, int hppercent, int sppercent)
+    {
+        HP = HP - hpvalue; SP = SP - spvalue;
+        HP = HP - (MAXHP * (hppercent / 100)); SP = SP - (MAXSP * (sppercent / 100));
     }
     public abstract void YouDied();
 }
