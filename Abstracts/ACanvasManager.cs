@@ -38,7 +38,7 @@ public abstract class ACanvasManager : MonoBehaviour {
     protected void inclementPointa() { if (pointa >= pointaNUM) { } else { pointa++; } setTarget();}
     protected void declementPointa() { if (pointa <= 1) { } else { pointa--; } setTarget(); }
     protected void setPointa(int n) { if (n <= 0 || n >= pointaNUM+1) { } else { pointa = n; setTarget(); } }
-    protected void initPointaAndKersol() { pointa = 0; myKersolRect.localPosition = new Vector3(); }
+    protected void initPointaAndKersol() { pointa = 0; myKersolRect.localPosition = firstKersolPOS; }
     protected void setTarget()
     {
         lastTarget = target;
