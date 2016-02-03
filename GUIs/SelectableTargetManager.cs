@@ -42,15 +42,15 @@ public class SelectableTargetManager : AIcon {
     {
         if (isSelected)
         {
-//            if (changeImageAuto) { }
-//            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightYellow; }
-//            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 22; }
+            if (changeImageAuto) { }
+            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightYellow; }
+            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 22; }
         }
         else
         {
-//            if (changeImageAuto) { }
-//            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightBlue; }
-//            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 16; }
+            if (changeImageAuto) { }
+            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightBlue; }
+            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 16; }
         }
     }
 
