@@ -26,7 +26,7 @@ public class EquipmentMenuCanvasManager : ACanvasManager
     {
         float[] subs = playerManager.GetSubStatus();
 
-        AMind[] minds = playerManager.gameObject.transform.FindChild("Minds").GetComponentsInChildren<AMind>();
+        AMind[] minds = playerManager.gameObject.transform.FindChild("Equipments/Minds").GetComponentsInChildren<AMind>();
         for (int n = 0; n <= minds.Length-1; n++)
         {
             if (n > subs[4]) { }
