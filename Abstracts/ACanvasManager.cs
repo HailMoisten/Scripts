@@ -13,11 +13,12 @@ public abstract class ACanvasManager : MonoBehaviour {
     public bool YesNoAnswerOfNextPopUpTextCanvas = false;
 
     // About Kersol
-    protected int pointa = 1;
+    protected int pointa = 0;
     public int GetPointa() { return pointa; }
-    protected int pointaNUM = 1;
-    protected int kersolPOSfixX = 0;
-    protected int kersolPOSfixY = 0;
+    protected int pointaNUM = 0;
+    protected Vector3 kersolPOSfix = new Vector3();
+    protected int firstpointa = 0;
+    protected Vector3 firstKersolPOS = new Vector3(-1280, -720, 0);
 
     // At least, please set myKersolRect.
     // Can we access to protected constracters from Prefabs?
@@ -37,6 +38,7 @@ public abstract class ACanvasManager : MonoBehaviour {
     protected void inclementPointa() { if (pointa >= pointaNUM) { } else { pointa++; } setTarget();}
     protected void declementPointa() { if (pointa <= 1) { } else { pointa--; } setTarget(); }
     protected void setPointa(int n) { if (n <= 0 || n >= pointaNUM+1) { } else { pointa = n; setTarget(); } }
+    protected void initPointaAndKersol() { pointa = 0; myKersolRect.localPosition = new Vector3(); }
     protected void setTarget()
     {
         lastTarget = target;
@@ -52,7 +54,7 @@ public abstract class ACanvasManager : MonoBehaviour {
         }
         if (target != null)
         {
-            myKersolRect.localPosition = target.GetComponent<RectTransform>().localPosition + new Vector3(kersolPOSfixX, kersolPOSfixY, 0);
+            myKersolRect.localPosition = target.GetComponent<RectTransform>().localPosition + kersolPOSfix;
             target.GetComponent<SelectableTargetManager>().OnKersol();
         }
     }

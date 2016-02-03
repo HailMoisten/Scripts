@@ -8,11 +8,13 @@ public class PlayerCanvasManager : ACanvasManager {
     protected override void Start()
     {
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
-//        myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
+        myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 0;
-        kersolPOSfixX = -4;
-        kersolPOSfixY = -4;
+        kersolPOSfix = new Vector3(-4, -4, 0);
+        firstpointa = 0;
+
+        initPointaAndKersol();
     }
 
     // Update is called once per frame

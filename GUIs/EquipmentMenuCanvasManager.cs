@@ -11,14 +11,15 @@ public class EquipmentMenuCanvasManager : ACanvasManager
     protected override void Start()
     {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
-        pointa = 1;
+        pointa = 0;
         pointaNUM = 21;
-        kersolPOSfixX = -4;
-        kersolPOSfixY = -4;
+        kersolPOSfix = new Vector3(-4, -4, 0);
+        firstpointa = 0;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
 
         setupEquipmentMenu();
+        initPointaAndKersol();
     }
 
     private void setupEquipmentMenu()
@@ -43,8 +44,6 @@ public class EquipmentMenuCanvasManager : ACanvasManager
             Target.SetActive(false);
         }
         pointaNUM = 10 + (int)subs[4];
-        setPointa(1);
-
     }
 
     // Update is called once per frame

@@ -8,9 +8,10 @@ public class ControlsMenuCanvasManager : ACanvasManager {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 0;
-        kersolPOSfixX = 0;
-        kersolPOSfixY = 0;
+        kersolPOSfix = new Vector3(-4, -4, 0);
+        firstpointa = 0;
 
+        initPointaAndKersol();
     }
 
     // Update is called once per frame

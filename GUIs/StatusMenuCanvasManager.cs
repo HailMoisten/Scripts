@@ -14,12 +14,13 @@ public class StatusMenuCanvasManager : ACanvasManager
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 15;
-        kersolPOSfixX = 44;
-        kersolPOSfixY = 0;
+        kersolPOSfix = new Vector3(44, 0, 0);
+        firstpointa = 0;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
 
         setupStatusMenu();
+        initPointaAndKersol();
     }
     private void setupStatusMenu()
     {
