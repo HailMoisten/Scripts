@@ -42,6 +42,6 @@ public abstract class AMind : AIcon {
     protected abstract void Start();
 
     public void GrowProficiency(int addp) { PROFICIENCY = PROFICIENCY + addp; }
-    public abstract AMindSkill GetMindSkill(int n);
+    public abstract AMindSkill GetMindSkill(int index);
 
 }
