@@ -8,8 +8,8 @@ public class ControlsMenuCanvasManager : ACanvasManager {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 0;
-        targetPOSfixX = 0;
-        targetPOSfixY = 0;
+        kersolPOSfixX = 0;
+        kersolPOSfixY = 0;
 
     }
 

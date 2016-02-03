@@ -54,7 +54,7 @@ public class PlayerManager : AChild {
     void Start () {
         this.transform.tag = "Player";
         // 3*(Lv-1) + 5
-        setMainStatus(165, 100, 100, 100, 100, 1);
+        setMainStatus(165, 100, 100, 100, 100, 50);
 
         nextPOS = RoundToIntVector3XZ(this.transform.position);
         cam = GameObject.Find("Camera");

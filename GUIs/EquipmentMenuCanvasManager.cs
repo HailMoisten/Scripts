@@ -13,8 +13,8 @@ public class EquipmentMenuCanvasManager : ACanvasManager
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 1;
         pointaNUM = 21;
-        targetPOSfixX = -4;
-        targetPOSfixY = -4;
+        kersolPOSfixX = -4;
+        kersolPOSfixY = -4;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
 
@@ -25,20 +25,16 @@ public class EquipmentMenuCanvasManager : ACanvasManager
     {
         float[] subs = playerManager.GetSubStatus();
 
-        GameObject minds = playerManager.gameObject.transform.FindChild("Minds").gameObject;
-        int count = 0;
-        foreach (Transform mt in minds.transform)
+        AMind[] minds = playerManager.gameObject.transform.FindChild("Minds").GetComponentsInChildren<AMind>();
+        for (int n = 0; n <= minds.Length-1; n++)
         {
-            count++;
-            AMind em = mt.gameObject.GetComponent<AMind>();
-            if (count > subs[4]) { }
-            else if (em != null)
+            if (n > subs[4]) { }
+            else if (minds[n] != null)
             {
-                setPointa(10 + count);
-                GameObject gm = Instantiate(mt.gameObject);
+                setPointa(11+n);
+                GameObject gm = Instantiate(minds[n].gameObject);
                 gm.transform.SetParent(Target.transform);
-                Target.GetComponent<AIcon>().Icon = em.Icon;
-//                gm.SetActive(false);
+                Target.GetComponent<AIcon>().Icon = minds[n].Icon;
             }
         }
         for (int n = 21; n >= 11 + subs[4]; n--)

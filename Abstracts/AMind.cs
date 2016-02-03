@@ -14,9 +14,10 @@ public abstract class AMind : AIcon {
         get { return FLAVOR; }
     }
 
-    public override ACanvasManager Clicked()
+    public override ACanvasManager Clicked(Vector3 clickedpos)
     {
         GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpTextCanvas"));
+        inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
         PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
         ptcm.Title = Name;
         ptcm.Content = Flavor;

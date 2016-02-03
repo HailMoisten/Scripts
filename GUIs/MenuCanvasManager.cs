@@ -11,8 +11,8 @@ public class MenuCanvasManager : ACanvasManager {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 1;
         pointaNUM = 4;
-        targetPOSfixX = 0;
-        targetPOSfixY = -8;
+        kersolPOSfixX = 0;
+        kersolPOSfixY = -8;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         playerCanvas = GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>();

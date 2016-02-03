@@ -24,8 +24,8 @@ public class YesNoPopUpTextCanvasManager : ACanvasManager {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 1;
         pointaNUM = 2;
-        targetPOSfixX = -4;
-        targetPOSfixY = -4;
+        kersolPOSfixX = -4;
+        kersolPOSfixY = -4;
     }
 
     // dont make Update

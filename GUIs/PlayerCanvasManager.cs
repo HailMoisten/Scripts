@@ -11,8 +11,8 @@ public class PlayerCanvasManager : ACanvasManager {
 //        myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 0;
-        targetPOSfixX = -4;
-        targetPOSfixY = -4;
+        kersolPOSfixX = -4;
+        kersolPOSfixY = -4;
     }
 
     // Update is called once per frame

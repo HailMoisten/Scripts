@@ -14,8 +14,8 @@ public class StatusMenuCanvasManager : ACanvasManager
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 15;
-        targetPOSfixX = 44;
-        targetPOSfixY = 0;
+        kersolPOSfixX = 44;
+        kersolPOSfixY = 0;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
 

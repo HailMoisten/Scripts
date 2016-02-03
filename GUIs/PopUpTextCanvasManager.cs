@@ -8,14 +8,14 @@ public class PopUpTextCanvasManager : ACanvasManager {
     {
         set
         {
-            transform.FindChild("Panel").transform.FindChild("TitleText").GetComponent<Text>().text = value;
+            transform.GetChild(0).transform.FindChild("TitleText").GetComponent<Text>().text = value;
         }
     }
     public string Content
     {
         set
         {
-            transform.FindChild("Panel").transform.FindChild("ContentText").GetComponent<Text>().text = value;
+            transform.GetChild(0).transform.FindChild("ContentText").GetComponent<Text>().text = value;
         }
     }
 
@@ -24,8 +24,6 @@ public class PopUpTextCanvasManager : ACanvasManager {
     {
         pointa = 0;
         pointaNUM = 0;
-        targetPOSfixX = 40;
-        targetPOSfixY = 40;
     }
 
     // Update is called once per frame

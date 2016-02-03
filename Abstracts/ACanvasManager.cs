@@ -16,8 +16,8 @@ public abstract class ACanvasManager : MonoBehaviour {
     protected int pointa = 1;
     public int GetPointa() { return pointa; }
     protected int pointaNUM = 1;
-    protected int targetPOSfixX = 0;
-    protected int targetPOSfixY = 0;
+    protected int kersolPOSfixX = 0;
+    protected int kersolPOSfixY = 0;
 
     // At least, please set myKersolRect.
     // Can we access to protected constracters from Prefabs?
@@ -40,7 +40,9 @@ public abstract class ACanvasManager : MonoBehaviour {
     protected void setTarget()
     {
         lastTarget = target;
-        target = transform.FindChild("SelectableTarget (" + pointa + ")").gameObject;
+        Component[] selectables = GetComponentsInChildren<SelectableTargetManager>();
+        if (pointa <= 0 || pointa >= selectables.Length + 1) { }
+        else { target = selectables[pointa - 1].gameObject; }
     }
     protected void moveKersol()
     {
@@ -50,16 +52,13 @@ public abstract class ACanvasManager : MonoBehaviour {
         }
         if (target != null)
         {
-            Vector3 p = target.GetComponent<RectTransform>().position + new Vector3(targetPOSfixX, targetPOSfixY, 0);
-            myKersolRect.position = p;
+            myKersolRect.localPosition = target.GetComponent<RectTransform>().localPosition + new Vector3(kersolPOSfixX, kersolPOSfixY, 0);
             target.GetComponent<SelectableTargetManager>().OnKersol();
         }
     }
     protected ACanvasManager clickTarget()
     {
-        AIcon ai = target.transform.GetChild(0).GetComponent<AIcon>();
-        if (ai != null) { return ai.Clicked(); }
-        return null;
+        return target.GetComponent<SelectableTargetManager>().Clicked(target.transform.position);
     }
     public void SetBackCanvas(ACanvasManager backC) { backCanvas = backC; }
     public void DestroyThisCanvas() {

@@ -42,20 +42,22 @@ public class SelectableTargetManager : AIcon {
     {
         if (isSelected)
         {
-            if (changeImageAuto) { }
-            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightYellow; }
-            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 22; }
+//            if (changeImageAuto) { }
+//            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightYellow; }
+//            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 22; }
         }
         else
         {
-            if (changeImageAuto) { }
-            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightBlue; }
-            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 16; }
+//            if (changeImageAuto) { }
+//            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightBlue; }
+//            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 16; }
         }
     }
 
-    public override ACanvasManager Clicked()
+    public override ACanvasManager Clicked(Vector3 clickedpos)
     {
-        return null;
+        AIcon child = transform.GetChild(0).GetComponent<AIcon>();
+        if (child != null) { return child.Clicked(clickedpos); }
+        else { return null; }
     }
 }
