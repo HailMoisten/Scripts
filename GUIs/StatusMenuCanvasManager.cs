@@ -42,7 +42,7 @@ public class StatusMenuCanvasManager : ACanvasManager
             floatsubs[0] + "\n" + floatsubs[1] + "\n" +
             subs[7] + " + " + floatsubs[2] + " / " + subs[9] + "\n" +
             subs[10] + " + " + floatsubs[3] + " / " + subs[12] + "\n" +
-            subs[13] + "\n";
+            subs[13] + "\n" + subs[14];
     }
 
     void Update()

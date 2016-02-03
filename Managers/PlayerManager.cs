@@ -24,13 +24,6 @@ public class PlayerManager : AChild {
         DIR = Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0))*DIR;
         DIR = RoundToIntVector3XZ(DIR);
     }
-    private void RunFix()
-    {
-        Vector3 dir2 = new Vector3(nextnextPOS.x - nextPOS.x, 0, nextnextPOS.z - nextPOS.z);
-        dir2 = RoundToIntVector3XZ(dir2);
-        dir2 = dir2 * Mathf.RoundToInt(RunRatio);
-        nextnextPOS = nextPOS + dir2;
-    }
     private void CameraRotateClockwise()
     {
         camAngle++; camAngle = camAngle % 8;
@@ -56,13 +49,15 @@ public class PlayerManager : AChild {
     void Start () {
         this.transform.tag = "Player";
         // 3*(Lv-1) + 5
-        setMainStatus(165, 100, 100, 100, 100, 50);
+        setMainStatus(165, 100, 100, 100, 100, 80);
 
         nextPOS = RoundToIntVector3XZ(this.transform.position);
         cam = GameObject.Find("Camera");
         playerCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<ACanvasManager>();
 
         // in progress
+        actiondummy = new GameObject("actiondummy");
+        actiondummy.transform.SetParent(transform);
         ActionShortcuts[1] = transform.FindChild("Equipments/Minds/MageMind").GetComponent<AMind>().GetMindSkill(1);
     }
 	
@@ -94,25 +89,16 @@ public class PlayerManager : AChild {
                     SetnextnextPOS();
                     if (Input.GetKey(KeyCode.Space)) // Action : Run
                     {
-                        RunFix();
-                        if (CanMoveToThere())
-                        {
-                            AddAction(new RunAction());
-                        }
-                        else { AddAction(new IdleAction()); }// need any SE // Cant walk.
+                        AddAction(actiondummy.AddComponent<RunAction>());
                     }
                     else if (Input.GetKey(KeyCode.LeftShift))
                     {
                         // Only doRotate();
-                        AddAction(new IdleAction());
+                        AddAction(actiondummy.AddComponent<IdleAction>());
                     }
                     else // Action : Walk
                     {
-                        if (CanMoveToThere())
-                        {
-                            AddAction(new WalkAction());
-                        }
-                        else { AddAction(new IdleAction()); }// need any SE // Cant walk.
+                        AddAction(actiondummy.AddComponent<WalkAction>());
                     }
                 }
                 if (Input.GetButton("Action_1"))

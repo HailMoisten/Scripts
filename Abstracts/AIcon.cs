@@ -8,6 +8,11 @@ public abstract class AIcon : MonoBehaviour {
     public string Name { get { return NAME; } }
     protected string TYPE = ""; // mind, item, action, etc...
     public string Type { get { return TYPE; } }
+    protected string FLAVOR = "";
+    public string Flavor
+    {
+        get { return FLAVOR; }
+    }
     protected Sprite ICON = null; // const
     public Sprite Icon
     {

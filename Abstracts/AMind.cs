@@ -14,31 +14,27 @@ public abstract class AMind : AIcon {
     {
         get { return MINDLEVEL; }
     }
-    protected string FLAVOR = "";
-    public string Flavor {
-        get { return FLAVOR; }
-    }
+
     protected int NUMofMindSkills = 1;
     protected AMindSkill[] skills;
-
+    protected GameObject actiondummy;
 
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
         GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpTextCanvas"));
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
         PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
-        ptcm.Title = Name;
-        ptcm.Content = Flavor;
+        ptcm.Title = NAME;
+        ptcm.Content = FLAVOR;
 
         return ptcm;
     }
-
-    /** 
-    *Please definite these at inheriting constracter.
-    *- string Name
-    *- Image ICON
-    *- int Proficiency
-    */
+    /// <summary>
+    /// * Please definite these at inheriting constracter.
+    ///  - string Name
+    ///  - Image ICON
+    ///  - int Proficiency
+    /// </summary>
     protected abstract void Start();
 
     public void GrowProficiency(int addp) { PROFICIENCY = PROFICIENCY + addp; }

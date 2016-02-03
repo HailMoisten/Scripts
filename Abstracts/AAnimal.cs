@@ -7,7 +7,7 @@ public abstract class AAnimal : MonoBehaviour {
     public Vector3 RoundToIntVector3XZ(Vector3 pos) { return new Vector3(Mathf.RoundToInt(pos.x), pos.y, Mathf.RoundToInt(pos.z)); }
 
     // Status
-    private const int statusGenus = 18;
+    private const int statusGenus = 19;
     protected int Lv = 1, VIT = 1, STR = 1, AGI = 1, INT = 1, MND = 1;
     protected int AD = 1, MD = 1, AR = 1, MR = 1;
     protected int MindSlots = 1;
@@ -18,7 +18,7 @@ public abstract class AAnimal : MonoBehaviour {
     protected int MAXHP = 1, MAXSP = 1;
     protected int HPRegen = 1, SPRegen = 1;
     protected int HP = 1, SP = 1;
-    protected int Poise;
+    protected int VitalPoise = 0, MentalPoise = 0;
     protected int[] LevelUpReward = {0, 0, 0, 0, 0};
     public int GetLevel() { return Lv; }
     public int[] GetMainStatus()
@@ -33,16 +33,16 @@ public abstract class AAnimal : MonoBehaviour {
     /// 4: MindSlots; 5: MovementSpeed; 6: RunRatio;
     /// 7: HP; 8: HPRegen; 9: MAXHP;
     /// 10: SP; 11: SPRegen; 12: MAXSP;
-    /// 13: Poise;
+    /// 13: VitalPoise; 14:MentalPoise;
     /// </summary>
     public float[] GetSubStatus()
     {
-        float[] subs = new float[14];
+        float[] subs = new float[15];
         subs[0] = AD; subs[1] = MD; subs[2] = AR; subs[3] = MR;
         subs[4] = MindSlots; subs[5] = MovementSpeed; subs[6] = RunRatio;
         subs[7] = HP; subs[8] = HPRegen; subs[9] = MAXHP;
         subs[10] = SP; subs[11] = SPRegen; subs[12] = MAXSP;
-        subs[13] = Poise;
+        subs[13] = VitalPoise; subs[14] = MentalPoise;
         return subs;
     }
     public int GetHP(){ return HP; }
@@ -120,7 +120,8 @@ public abstract class AAnimal : MonoBehaviour {
         subs[14] = Mathf.RoundToInt((subs[12] / 60) * subs[10]);// SPRegen
         subs[15] = subs[11];// HP
         subs[16] = subs[12];// SP
-        subs[17] = (subs[11] * MND) / (100 + (float)MND);// Poise
+        subs[17] = (subs[11] * MND) / (100 + (float)MND);// VitalPoise
+        subs[18] = (subs[12] * ((10 - ((float)MND / 5)) / 100));// MentalPoise
 
         // Calculate buffs against to subs.
 
@@ -139,7 +140,8 @@ public abstract class AAnimal : MonoBehaviour {
         MAXHP = Mathf.RoundToInt(status[status.Length - fix + 11]); MAXSP = Mathf.RoundToInt(status[status.Length - fix + 12]);
         HPRegen = Mathf.RoundToInt(status[status.Length - fix + 13]); SPRegen = Mathf.RoundToInt(status[status.Length - fix + 14]);
         HP = Mathf.RoundToInt(status[status.Length - fix + 15]); SP = Mathf.RoundToInt(status[status.Length - fix + 16]);
-        Poise = Mathf.RoundToInt(status[status.Length - fix + 17]);
+        VitalPoise = Mathf.RoundToInt(status[status.Length - fix + 17]);
+        MentalPoise = Mathf.RoundToInt(status[status.Length - fix + 18]);
     }
 
     // ActionManagement
@@ -150,6 +152,7 @@ public abstract class AAnimal : MonoBehaviour {
     public Vector3 nextnextPOS = new Vector3();
     private bool IsActing = false;
     private AAction[] actionStack = new AAction[3];
+    protected GameObject actiondummy;
 
     public void AddAction(AAction AnyAction)
     {
@@ -157,13 +160,13 @@ public abstract class AAnimal : MonoBehaviour {
         if (actionStack[0] == null)
         {
             actionStack[0] = AnyAction;
-            actionStack[1] = new IdleAction();
+            actionStack[1] = actiondummy.AddComponent<IdleAction>();
             actionStack[2] = null;
         }
         else
         {
             actionStack[1] = AnyAction;
-            actionStack[2] = new IdleAction();
+            actionStack[2] = actiondummy.AddComponent<IdleAction>();
         }
     }
     public void DoAction()
@@ -175,7 +178,7 @@ public abstract class AAnimal : MonoBehaviour {
             {
                 doRotate();
                 if (actionStack[0].CanDoAction(this)) { }
-                else { actionStack[0] = new IdleAction(); Debug.Log("I can NOT do it."); }
+                else { actionStack[0] = actiondummy.AddComponent<IdleAction>(); Debug.Log("I can NOT do it."); }
                 actionStack[0].Action(this);
             }
         }
@@ -184,41 +187,7 @@ public abstract class AAnimal : MonoBehaviour {
     {
         iTween.RotateTo(this.gameObject, iTween.Hash("y", Quaternion.LookRotation(DIR).eulerAngles.y, "time", CD*2));
     }
-    public bool CanMoveToThere()
-    {
-        Vector3 dir2 = new Vector3(nextnextPOS.x - nextPOS.x, 0, nextnextPOS.z - nextPOS.z);
-        dir2 = RoundToIntVector3XZ(dir2);
-        float maxd = 1.0f;
-        if (dir2.x != 0 && dir2.z != 0) { maxd = 1.5f; }
-        RaycastHit hitFront; RaycastHit hitDown;
-        Ray rayFront = new Ray(nextPOS + new Vector3(0, 1.5f, 0), dir2);
-        Ray rayDown = new Ray(nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
-        if (Physics.Raycast(nextPOS + new Vector3(0, 1.5f, 0), dir2, out hitFront, maxd))
-        {
-            //            Debug.Log("hitsFront:" + hitFront.distance);
-            if (hitFront.collider.tag == "Terrain" ||
-                hitFront.collider.tag == "Environment" ||
-                hitFront.collider.tag == "LifeSeed")
-            {
-                return false;
-            }
-        }
-        if (Physics.Raycast(nextnextPOS + new Vector3(0, 1.5f, 0), -Vector3.up, out hitDown, 3.0f))
-        {
-            //            Debug.Log("hitDown:" + hitDown.distance);
-            if (hitDown.collider.tag == "Environment" ||
-                hitDown.collider.tag == "LifeSeed")
-            {
-                nextnextPOS.y = nextnextPOS.y + 1.5f - hitDown.distance;
-            }
-            else if (hitDown.collider.tag == "Terrain")
-            {
-                nextnextPOS.y = Terrain.activeTerrain.SampleHeight(nextnextPOS);
-            }
-            return true;
-        }
-        return false;
-    }
+
     private void endAction()
     {
         IsActing = false;
@@ -249,10 +218,10 @@ public abstract class AAnimal : MonoBehaviour {
         else { damage = value * (1 - (MR / (100 + MR))); }
         HP = HP - damage;
     }
-    public void UseHPSP(int hpvalue, int spvalue, int hppercent, int sppercent)
+    public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
     {
-        HP = HP - hpvalue; SP = SP - spvalue;
-        HP = HP - (MAXHP * (hppercent / 100)); SP = SP - (MAXSP * (sppercent / 100));
+        HP = HP - hpcost; SP = SP - spcost;
+        HP = HP - (MAXHP * (hppercentcost / 100)); SP = SP - (MAXSP * (sppercentcost / 100));
     }
     public abstract void YouDied();
 }
