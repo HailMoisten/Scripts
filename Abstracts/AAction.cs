@@ -11,14 +11,15 @@ using System.Collections;
 public abstract class AAction/* : IAction */
 {
     protected int ACTIONCODE = 0; // const
-    protected float DURATION = 0.0f; // const
-    // have to definite ACTIONCODE and DURATION at inheriting constracter
+    protected float duration = 0.0f; // const
+    protected string NAME = "";
+    // have to definite ACTIONCODE, DURATION and NAME at inheriting constracter
     protected AAction() { }
     public abstract void Action(AAnimal target);
     protected void SetMotionAndDuration(AAnimal target)
     {
         target.GetAnimator().SetInteger("ActionCode", ACTIONCODE);
-        target.StartCoroutine(target.DoingAction(DURATION));
+        target.StartCoroutine(target.DoingAction(duration));
     }
 }
 public class IdleAction : AAction
@@ -26,7 +27,8 @@ public class IdleAction : AAction
     public IdleAction()
     {
         ACTIONCODE = 0;
-        DURATION = 0.0f;
+        NAME = "Idle";
+        duration = 0.0f;
     }
     public override void Action(AAnimal target)
     {
@@ -38,7 +40,8 @@ public class WalkAction : AAction
     public WalkAction()
     {
         ACTIONCODE = 1;
-        DURATION = 1.0f;
+        NAME = "Walk";
+        duration = 1.0f;
     }
     public override void Action(AAnimal target)
     {
@@ -48,11 +51,11 @@ public class WalkAction : AAction
         else { diag = 1.0f; }
         float[] subs = target.GetSubStatus();
         if (subs[5] == 0) { }
-        else { DURATION = (diag) / (subs[5]); }//time
+        else { duration = (diag) / (subs[5]); }//time
         target.nextPOS = target.nextnextPOS;
         iTween.MoveTo(target.gameObject,
             iTween.Hash("position", target.nextPOS,
-            "time", DURATION,
+            "time", duration,
             "easetype", "linear"
             ));
         SetMotionAndDuration(target);
@@ -63,7 +66,8 @@ public class RunAction : AAction
     public RunAction()
     {
         ACTIONCODE = 2;
-        DURATION = 1.0f;
+        NAME = "Run";
+        duration = 1.0f;
     }
     public override void Action(AAnimal target)
     {
@@ -74,11 +78,11 @@ public class RunAction : AAction
         else { diag = 1.0f; }
         float[] subs = target.GetSubStatus();
         if (subs[5] * subs[6] == 0) { }// *(1/RunRatio)
-        else { DURATION = (diag) / (subs[5]/* * target.RunRatio */); }//time
+        else { duration = (diag) / (subs[5]/* * target.RunRatio */); }//time
         target.nextPOS = target.nextnextPOS;
         iTween.MoveTo(target.gameObject,
             iTween.Hash("position", target.nextPOS,
-            "time", DURATION,
+            "time", duration,
             "easetype", "linear"
             ));
         SetMotionAndDuration(target);

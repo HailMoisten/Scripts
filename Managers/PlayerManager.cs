@@ -50,6 +50,8 @@ public class PlayerManager : AChild {
 
     private ACanvasManager playerCanvas;
 
+    private AAction[] ActionShortcuts = new AAction[9];
+
     // Use this for initialization
     void Start () {
         this.transform.tag = "Player";
@@ -59,7 +61,10 @@ public class PlayerManager : AChild {
         nextPOS = RoundToIntVector3XZ(this.transform.position);
         cam = GameObject.Find("Camera");
         playerCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<ACanvasManager>();
-	}
+
+        // in progress
+        ActionShortcuts[1] = transform.FindChild("Equipments/Minds/MageMind").GetComponent<AMind>().GetMindSkill(1);
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -110,8 +115,9 @@ public class PlayerManager : AChild {
                         else { AddAction(new IdleAction()); }// need any SE // Cant walk.
                     }
                 }
-                if (Input.GetButton("Fire1"))
+                if (Input.GetButton("Action_1"))
                 {
+                    AddAction(ActionShortcuts[1]);
                 }
             }
             // Update every flame

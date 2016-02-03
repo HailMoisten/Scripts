@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class MageMind : AMind {
@@ -9,11 +10,42 @@ public class MageMind : AMind {
         TYPE = "Mind"; // const
         FLAVOR = "Mage is a Nuker.";
         ICON = GetComponent<Image>().sprite; // const
-        Proficiency = 0;
+        PROFICIENCY = 0;
+        NUMofMindSkills = 10+1;
+        skills = new AMindSkill[NUMofMindSkills];
+        skills[1] = new Pressure();
+
+        initSkills();
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
+    private void initSkills()
+    {
+        // get from savedata
+        PROFICIENCY = 0;
+        MINDLEVEL = 1 + (PROFICIENCY/100);
+    }
+
+    public override AMindSkill GetMindSkill(int n)
+    {
+        if (MINDLEVEL >= n) { return skills[n]; }
+        else { Debug.Log("Need more MindLevel."); }
+        return null;
+    }
+
+    protected class Pressure : AMindSkill
+    {
+        public Pressure()
+        {
+            ACTIONCODE = 5;
+            NAME = "Pressure";
+            duration = 0.0f;
+            isPassive = false;
+        }
+        public override void Action(AAnimal target)
+        {
+            Debug.Log("Pressure!");
+            SetMotionAndDuration(target);
+        }
+    }
+
 }

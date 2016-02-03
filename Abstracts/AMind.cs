@@ -9,10 +9,18 @@ public abstract class AMind : AIcon {
         get { return PROFICIENCY; }
         set { PROFICIENCY = value; }
     }
+    protected int MINDLEVEL = 0;
+    public int MindLevel
+    {
+        get { return MINDLEVEL; }
+    }
     protected string FLAVOR = "";
     public string Flavor {
         get { return FLAVOR; }
     }
+    protected int NUMofMindSkills = 1;
+    protected AMindSkill[] skills;
+
 
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
@@ -33,7 +41,7 @@ public abstract class AMind : AIcon {
     */
     protected abstract void Start();
 
-
     public void GrowProficiency(int addp) { PROFICIENCY = PROFICIENCY + addp; }
+    public abstract AMindSkill GetMindSkill(int n);
 
 }
