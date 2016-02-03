@@ -42,6 +42,11 @@ public abstract class AMind : AIcon {
     protected abstract void Start();
 
     public void GrowProficiency(int addp) { PROFICIENCY = PROFICIENCY + addp; }
-    public abstract AMindSkill GetMindSkill(int index);
+    public AMindSkill GetMindSkill(int index)
+    {
+        if (MINDLEVEL >= index) { return skills[index]; }
+        else { Debug.Log("Need more MindLevel."); }
+        return null;
+    }
 
 }

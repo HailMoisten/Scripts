@@ -25,13 +25,6 @@ public class MageMind : AMind {
         MINDLEVEL = 1 + (PROFICIENCY/100);
     }
 
-    public override AMindSkill GetMindSkill(int index)
-    {
-        if (MINDLEVEL >= index) { return skills[index]; }
-        else { Debug.Log("Need more MindLevel."); }
-        return null;
-    }
-
     protected class Pressure : AMindSkill
     {
         public Pressure()
