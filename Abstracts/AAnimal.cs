@@ -145,18 +145,23 @@ public abstract class AAnimal : MonoBehaviour {
     }
 
     // ActionManagement
-    protected float CD = 0.15f;
-    public bool IsCD = false;
+    private float gcd = 0.15f; public float GCD { get { return gcd; } }
+    protected bool isInput = false;
+    protected IEnumerator InputCD()
+    {
+        yield return new WaitForSeconds(gcd);
+        isInput = false;
+    }
     public Vector3 DIR = new Vector3();
     public Vector3 nextPOS = new Vector3();
     public Vector3 nextnextPOS = new Vector3();
-    private bool IsActing = false;
+    private bool isActing = false;
     private AAction[] actionStack = new AAction[3];
     protected GameObject actiondummy;
 
     public void AddAction(AAction AnyAction)
     {
-        IsCD = true;
+        isInput = true;
         if (actionStack[0] == null)
         {
             actionStack[0] = AnyAction;
@@ -171,7 +176,14 @@ public abstract class AAnimal : MonoBehaviour {
     }
     public void DoAction()
     {
-        if (!IsActing)
+        // Calc. buffs and regens. Check DOA.
+        if (isPassed) { StartCoroutine(passedCD()); }
+        else { passed(); }
+        if (checkDOA()) { YouDied(); }
+
+        // Do action.
+        if (isActing) { }
+        else
         {
             if (actionStack[0] == null) { }
             else
@@ -183,14 +195,21 @@ public abstract class AAnimal : MonoBehaviour {
             }
         }
     }
+    public IEnumerator DoingAction(float waittime)
+    {
+        isActing = true;
+        yield return new WaitForSeconds(waittime);
+        endAction();
+    }
+
     private void doRotate()
     {
-        iTween.RotateTo(this.gameObject, iTween.Hash("y", Quaternion.LookRotation(DIR).eulerAngles.y, "time", CD*2));
+        iTween.RotateTo(this.gameObject, iTween.Hash("y", Quaternion.LookRotation(DIR).eulerAngles.y, "time", gcd*2));
     }
 
     private void endAction()
     {
-        IsActing = false;
+        isActing = false;
         if (actionStack[1] != null)
         {
             actionStack[0] = actionStack[1];
@@ -203,14 +222,35 @@ public abstract class AAnimal : MonoBehaviour {
             actionStack[0] = null;
         }
     }
-    public IEnumerator DoingAction(float waittime)
-    {
-        IsActing = true;
-        yield return new WaitForSeconds(waittime);
-        endAction();
-    }
 
     // Utility
+    private bool isPassed = false;
+    private IEnumerator passedCD()
+    {
+        yield return new WaitForSeconds(1.0f);
+        isPassed = false;
+    }
+    /// <summary>
+    /// Calc regens and buffs.
+    /// </summary>
+    private void passed()
+    {
+        // Regens
+        HP = HP + HPRegen; if (HP > MAXHP) { HP = MAXHP; }
+        SP = SP + SPRegen; if (SP > MAXSP) { SP = MAXSP; }
+        // Buffs
+    }
+    /// <summary>
+    /// Return Dead or Alive.
+    /// Dead: return true; Alive: return false;
+    /// </summary>
+    /// <returns></returns>
+    private bool checkDOA()
+    {
+        if (HP <= 0) { return true; }
+        return false;
+    }
+
     public void TakeDamage(int value, bool isAnotM)
     {
         int damage = 0;
@@ -222,6 +262,7 @@ public abstract class AAnimal : MonoBehaviour {
     {
         HP = HP - hpcost; SP = SP - spcost;
         HP = HP - (MAXHP * (hppercentcost / 100)); SP = SP - (MAXSP * (sppercentcost / 100));
+        if (HP < 0) { HP = 0; }
     }
     public abstract void YouDied();
 }

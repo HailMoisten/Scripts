@@ -69,6 +69,7 @@ public class IdleAction : AAction
     }
     public override void Action(AAnimal target)
     {
+        duration = target.GCD;
         SetMotionAndDurationAndUseHPSP(target);
     }
 

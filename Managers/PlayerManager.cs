@@ -4,11 +4,6 @@ using UnityStandardAssets.Utility;
 
 public class PlayerManager : AChild {
 
-    private IEnumerator GCD(float waittime)
-    {
-        yield return new WaitForSeconds(waittime);
-        IsCD = false;
-    }
     private void SetnextnextPOS()
     {
         nextPOS = RoundToIntVector3XZ(nextPOS);
@@ -44,6 +39,7 @@ public class PlayerManager : AChild {
     private ACanvasManager playerCanvas;
 
     private AAction[] ActionShortcuts = new AAction[9];
+    public bool isMenuAwake = false;
 
     // Use this for initialization
     void Start () {
@@ -80,7 +76,7 @@ public class PlayerManager : AChild {
         else
         {
             // Inputs(On Charactor)
-            if (IsCD) { StartCoroutine(GCD(CD)); }
+            if (isInput) { StartCoroutine(InputCD()); }
             else {
                 if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow)
                     || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
@@ -108,17 +104,10 @@ public class PlayerManager : AChild {
             }
             // Update every flame
             DoAction();
-            UIUpdate();
         }
 
     }
 
-    public bool isMenuAwake = false;
-
-    private void UIUpdate()
-    {
-        //HPBar, SPBar
-    }
     public override void YouDied()
     {
 
