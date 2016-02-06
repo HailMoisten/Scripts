@@ -8,23 +8,33 @@ public abstract class AAnimal : MonoBehaviour {
 
     // Status
     private const int statusGenus = 19;
-    protected int Lv = 1, VIT = 1, STR = 1, AGI = 1, INT = 1, MND = 1;
-    protected int AD = 1, MD = 1, AR = 1, MR = 1;
-    protected int MindSlots = 1;
-    protected float MovementSpeed = 1.0f;
-    protected float RunRatio = 2.0f;
-    protected float HPGainRatio = 1.0f, HPRegenRatio = 1.0f;
-    protected float SPGainRatio = 1.0f, SPRegenRatio = 1.0f;
-    protected int MAXHP = 1, MAXSP = 1;
-    protected int HPRegen = 1, SPRegen = 1;
-    protected int HP = 1, SP = 1;
-    protected int VitalPoise = 0, MentalPoise = 0;
+    private int lv = 1; public int Lv { get { return lv; } }
+    private int vit = 1; public int VIT { get { return vit; } }
+    private int str = 1; public int STR { get { return str; } }
+    private int agi = 1; public int AGI { get { return agi; } }
+    private int @int = 1; public int INT { get { return @int; } }
+    private int mnd = 1; public int MND { get { return mnd; } }
+    private int ad = 1; public int AD { get { return ad; } }
+    private int md = 1; public int MD { get { return md; } }
+    private int ar = 1; public int AR { get { return ar; } }
+    private int mr = 1; public int MR { get { return mr; } }
+    private int mindslots = 1; public int MindSlots { get { return mindslots; } }
+    private float movementspeed = 1.0f; public float MovementSpeed { get { return movementspeed; } }
+    private float runratio = 2.0f; public float RunRatio { get { return runratio; } }
+    private float HPGainBonus = 1.0f, HPRegenBonus = 1.0f, SPGainBonus = 1.0f, SPRegenBonus = 1.0f;
+    private int maxhp = 1; public int MaxHP { get { return maxhp; } }
+    private int maxsp = 1; public int MaxSP { get { return maxsp; } }
+    private int hpregen = 1; public int HPRegen { get { return hpregen; } }
+    private int spregen = 1; public int SPRegen { get { return spregen; } }
+    private int hp = 1; public int HP { get { return hp; } }
+    private int sp = 1; public int SP { get { return sp; } }
+    private int vitalpoise = 0; public int VitalPoise { get { return vitalpoise; } }
+    private int mentalpoise = 0; public int MentalPoise { get { return mentalpoise; } }
     protected int[] LevelUpReward = {0, 0, 0, 0, 0};
-    public int GetLevel() { return Lv; }
     public int[] GetMainStatus()
     {
         int[] mains = new int[5];
-        mains[0] = VIT; mains[1] = STR; mains[2] = AGI; mains[3] = INT; mains[4] = MND;
+        mains[0] = vit; mains[1] = str; mains[2] = agi; mains[3] = @int; mains[4] = mnd;
         return mains;
     }
     /// <summary>
@@ -38,15 +48,13 @@ public abstract class AAnimal : MonoBehaviour {
     public float[] GetSubStatus()
     {
         float[] subs = new float[15];
-        subs[0] = AD; subs[1] = MD; subs[2] = AR; subs[3] = MR;
-        subs[4] = MindSlots; subs[5] = MovementSpeed; subs[6] = RunRatio;
-        subs[7] = HP; subs[8] = HPRegen; subs[9] = MAXHP;
-        subs[10] = SP; subs[11] = SPRegen; subs[12] = MAXSP;
-        subs[13] = VitalPoise; subs[14] = MentalPoise;
+        subs[0] = ad; subs[1] = md; subs[2] = ar; subs[3] = mr;
+        subs[4] = mindslots; subs[5] = movementspeed; subs[6] = runratio;
+        subs[7] = HP; subs[8] = HPRegen; subs[9] = MaxHP;
+        subs[10] = SP; subs[11] = SPRegen; subs[12] = MaxSP;
+        subs[13] = vitalpoise; subs[14] = mentalpoise;
         return subs;
     }
-    public int GetHP(){ return HP; }
-    public int GetSP() { return SP; }
 
     public void SetLevelUpReward(int n, int incORdec)
     {
@@ -67,14 +75,14 @@ public abstract class AAnimal : MonoBehaviour {
     public int[] GetLevelUpReward() { return LevelUpReward; }
     protected void levelUp()
     {
-        if (Lv >= 165) { }
+        if (lv >= 165) { }
         else
         {
-            Lv++;
-            VIT = VIT + LevelUpReward[0]; STR = STR + LevelUpReward[1]; AGI = AGI + LevelUpReward[2]; INT = INT + LevelUpReward[3]; MND = MND + LevelUpReward[4];
+            lv++;
+            vit = vit + LevelUpReward[0]; str = str + LevelUpReward[1]; agi = agi + LevelUpReward[2]; @int = @int + LevelUpReward[3]; mnd = mnd + LevelUpReward[4];
             int sum = 0;
             for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
-            if (sum == 0) { VIT++; VIT++; MND++; } else if (sum == 1) { VIT++; MND++; } else if (sum == 2) { VIT++; }
+            if (sum == 0) { vit++; vit++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { vit++; }
             setStatus(calcStatus(GetMainStatus()));
         }
     }
@@ -85,7 +93,7 @@ public abstract class AAnimal : MonoBehaviour {
     /// <returns></returns>
     protected void setMainStatus(int lv, int v, int s, int a, int i, int m)
     {
-        Lv = lv; VIT = v; STR = s; AGI = a; INT = i; MND = m;
+        this.lv = lv; vit = v; str = s; agi = a; @int = i; mnd = m;
         setStatus(calcStatus(GetMainStatus()));
     }
 
@@ -100,28 +108,28 @@ public abstract class AAnimal : MonoBehaviour {
         // Calculate sub states.
         float[] subs = new float[statusGenus];
         // first step
-        subs[0] = (4 * STR) + (AGI);// AD
-        subs[1] = (4 * INT) + (AGI);// MD
-        subs[2] = Mathf.RoundToInt(STR * Mathf.Sqrt(VIT / 50));// AR
-        subs[3] = Mathf.RoundToInt(INT * Mathf.Sqrt(VIT / 50));// MR
-        subs[4] = 1 + (MND / 10);// MindSlots
-        subs[5] = ((float)AGI + 100) / 100;// MovementSpeed
-        subs[6] = 2 + ((float)AGI / 25);// RunRatio
+        subs[0] = (4 * str) + (agi);// AD
+        subs[1] = (4 * @int) + (agi);// MD
+        subs[2] = Mathf.RoundToInt(str * Mathf.Sqrt(vit / 50));// AR
+        subs[3] = Mathf.RoundToInt(@int * Mathf.Sqrt(vit / 50));// MR
+        subs[4] = 1 + (mnd / 10);// MindSlots
+        subs[5] = ((float)agi + 100) / 100;// MovementSpeed
+        subs[6] = 2 + ((float)agi / 25);// RunRatio
         // second step
-        subs[7] = 1.0f + (STR / (100 + (float)STR));// HPGainRatio
-        subs[8] = 1.0f + ((STR + VIT) / (100 + (float)VIT));// HPRegenRatio
-        subs[9] = 1.0f + (INT / (100 + (float)INT));// SPGainRatio
-        subs[10] = 1.0f + (AGI / (100 + (float)AGI));// SPRegenRatio
+        subs[7] = 1.0f + (str / (100 + (float)str));// HPGainRatio
+        subs[8] = 1.0f + ((str + vit) / (100 + (float)vit));// HPRegenRatio
+        subs[9] = 1.0f + (@int / (100 + (float)@int));// SPGainRatio
+        subs[10] = 1.0f + (agi / (100 + (float)agi));// SPRegenRatio
         // third step
-        subs[11] = Mathf.RoundToInt(((15 * Mathf.Sqrt(VIT + Lv)) + (5 * (float)VIT) + 30) * subs[7]);// MAXHP
-        subs[12] = Mathf.RoundToInt((VIT + MND + 58) * subs[9]);// MAXSP
+        subs[11] = Mathf.RoundToInt(((15 * Mathf.Sqrt(vit + lv)) + (5 * (float)vit) + 30) * subs[7]);// MaxHP
+        subs[12] = Mathf.RoundToInt((vit + mnd + 58) * subs[9]);// MaxSP
         // fourth step
         subs[13] = Mathf.RoundToInt((subs[11] / 60) * subs[8]);// HPRegen
         subs[14] = Mathf.RoundToInt((subs[12] / 60) * subs[10]);// SPRegen
         subs[15] = subs[11];// HP
         subs[16] = subs[12];// SP
-        subs[17] = (subs[11] * MND) / (100 + (float)MND);// VitalPoise
-        subs[18] = (subs[12] * ((10 - ((float)MND / 5)) / 100));// MentalPoise
+        subs[17] = (subs[11] * mnd) / (100 + (float)mnd);// VitalPoise
+        subs[18] = (subs[12] * ((10 - ((float)mnd / 10)) / 100));// MentalPoise
 
         // Calculate buffs against to subs.
 
@@ -130,18 +138,18 @@ public abstract class AAnimal : MonoBehaviour {
     protected void setStatus(float[] status)
     {
         int fix = statusGenus;
-        AD = Mathf.RoundToInt(status[status.Length - fix + 0]); MD = Mathf.RoundToInt(status[status.Length - fix + 1]);
-        AR = Mathf.RoundToInt(status[status.Length - fix + 2]); MR = Mathf.RoundToInt(status[status.Length - fix + 3]);
-        MindSlots = Mathf.RoundToInt(status[status.Length - fix + 4]);
-        MovementSpeed = status[status.Length - fix + 5];
-        RunRatio = status[status.Length - fix + 6];
-        HPGainRatio = status[status.Length - fix + 7]; HPRegenRatio = status[status.Length - fix + 8];
-        SPGainRatio = status[status.Length - fix + 9]; SPRegenRatio = status[status.Length - fix + 10];
-        MAXHP = Mathf.RoundToInt(status[status.Length - fix + 11]); MAXSP = Mathf.RoundToInt(status[status.Length - fix + 12]);
-        HPRegen = Mathf.RoundToInt(status[status.Length - fix + 13]); SPRegen = Mathf.RoundToInt(status[status.Length - fix + 14]);
-        HP = Mathf.RoundToInt(status[status.Length - fix + 15]); SP = Mathf.RoundToInt(status[status.Length - fix + 16]);
-        VitalPoise = Mathf.RoundToInt(status[status.Length - fix + 17]);
-        MentalPoise = Mathf.RoundToInt(status[status.Length - fix + 18]);
+        ad = Mathf.RoundToInt(status[status.Length - fix + 0]); md = Mathf.RoundToInt(status[status.Length - fix + 1]);
+        ar = Mathf.RoundToInt(status[status.Length - fix + 2]); mr = Mathf.RoundToInt(status[status.Length - fix + 3]);
+        mindslots = Mathf.RoundToInt(status[status.Length - fix + 4]);
+        movementspeed = status[status.Length - fix + 5];
+        runratio = status[status.Length - fix + 6];
+        HPGainBonus = status[status.Length - fix + 7]; HPRegenBonus = status[status.Length - fix + 8];
+        SPGainBonus = status[status.Length - fix + 9]; SPRegenBonus = status[status.Length - fix + 10];
+        maxhp = Mathf.RoundToInt(status[status.Length - fix + 11]); maxsp = Mathf.RoundToInt(status[status.Length - fix + 12]);
+        hpregen = Mathf.RoundToInt(status[status.Length - fix + 13]); spregen = Mathf.RoundToInt(status[status.Length - fix + 14]);
+        hp = Mathf.RoundToInt(status[status.Length - fix + 15]); sp = Mathf.RoundToInt(status[status.Length - fix + 16]);
+        vitalpoise = Mathf.RoundToInt(status[status.Length - fix + 17]);
+        mentalpoise = Mathf.RoundToInt(status[status.Length - fix + 18]);
     }
 
     // ActionManagement
@@ -236,8 +244,8 @@ public abstract class AAnimal : MonoBehaviour {
     private void passed()
     {
         // Regens
-        HP = HP + HPRegen; if (HP > MAXHP) { HP = MAXHP; }
-        SP = SP + SPRegen; if (SP > MAXSP) { SP = MAXSP; }
+        hp = HP + HPRegen; if (HP > MaxHP) { hp = MaxHP; }
+        sp = SP + SPRegen; if (SP > MaxSP) { sp = MaxSP; }
         // Buffs
     }
     /// <summary>
@@ -254,15 +262,15 @@ public abstract class AAnimal : MonoBehaviour {
     public void TakeDamage(int value, bool isAnotM)
     {
         int damage = 0;
-        if (isAnotM) { damage = value * (1 - (AR / (100 + AR))); }
-        else { damage = value * (1 - (MR / (100 + MR))); }
-        HP = HP - damage;
+        if (isAnotM) { damage = value * (1 - (ar / (100 + ar))); }
+        else { damage = value * (1 - (mr / (100 + mr))); }
+        hp = HP - damage;
     }
     public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
     {
-        HP = HP - hpcost; SP = SP - spcost;
-        HP = HP - (MAXHP * (hppercentcost / 100)); SP = SP - (MAXSP * (sppercentcost / 100));
-        if (HP < 0) { HP = 0; }
+        hp = HP - hpcost; sp = SP - spcost;
+        hp = HP - (MaxHP * (hppercentcost / 100)); sp = SP - (MaxSP * (sppercentcost / 100));
+        if (HP < 0) { hp = 0; }
     }
     public abstract void YouDied();
 }

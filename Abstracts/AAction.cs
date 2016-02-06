@@ -11,28 +11,23 @@ using System.Collections;
 public abstract class AAction : AIcon
 {
     protected int ACTIONCODE = 0;
-    protected float duration = 0.0f;
-    public float Duration { get { return duration; } }
-    protected int hpCost = 0;
-    public int HPCost { get { return hpCost; } }
-    protected int spCost = 0;
-    public int SPCost { get { return spCost; } }
-    protected int hppercentCost = 0;
-    public int HPPercentCost { get { return hppercentCost; } }
-    protected int sppercentCost = 0;
-    public int SPPercentCost { get { return sppercentCost; } }
+    protected float duration = 0.0f; public float Duration { get { return duration; } }
+    protected int hpCost = 0; public int HPCost { get { return hpCost; } }
+    protected int spCost = 0; public int SPCost { get { return spCost; } }
+    protected int hppercentCost = 0; public int HPPercentCost { get { return hppercentCost; } }
+    protected int sppercentCost = 0; public int SPPercentCost { get { return sppercentCost; } }
 
     // have to definite ACTIONCODE, DURATION and NAME at inheriting constracter
     protected AAction() { }
     public abstract bool CanDoAction(AAnimal target);
     protected bool CanDoActionAboutHPSP(AAnimal target)
     {
-        int hp = target.GetHP(); int sp = target.GetSP();
+        int hp = target.HP; int sp = target.SP;
         float[] subs = target.GetSubStatus();
         hp = hp - hpCost; sp = sp - spCost;
-        hp = hp - Mathf.RoundToInt(subs[9] * ((float)hppercentCost / 100));
-        sp = sp - Mathf.RoundToInt(subs[12] * ((float)sppercentCost / 100));
-        if (hp >= 0 && sp >= subs[14]) { return true; } 
+        hp = hp - Mathf.RoundToInt(target.MaxHP * ((float)hppercentCost / 100));
+        sp = sp - Mathf.RoundToInt(target.MaxSP * ((float)sppercentCost / 100));
+        if (hp >= 0 && sp >= target.MentalPoise) { return true; } 
         return false;
     }
     public abstract void Action(AAnimal target);

@@ -26,12 +26,11 @@ public class StatusMenuCanvasManager : ACanvasManager
     {
         setupColorLevelUpReward();
         // Level
-        int level = playerManager.GetLevel();
+        int level = playerManager.Lv;
         GameObject.Find("LevelText").GetComponent<Text>().text = "" + level;
         // Main Status
-        int[] mains = playerManager.GetMainStatus();
         GameObject.Find("MainStatusText").GetComponent<Text>().text =
-            mains[0] + "\n" + mains[1] + "\n" + mains[2] + "\n" + mains[3] + "\n" + mains[4] + "\n";
+            playerManager.VIT + "\n" + playerManager.STR + "\n" + playerManager.AGI + "\n" + playerManager.INT + "\n" + playerManager.MND;
         // Sub Status
         float[] subs = playerManager.GetSubStatus();
         string[] floatsubs = new string[4];
