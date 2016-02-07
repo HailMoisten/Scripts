@@ -45,7 +45,8 @@ public class PlayerManager : AChild {
     void Start () {
         this.transform.tag = "Player";
         // 3*(Lv-1) + 5
-        setMainStatus(165, 100, 100, 100, 100, 80);
+        //        setMainStatus(165, 100, 100, 100, 100, 100);
+        setMainStatus(10, 5, 10, 10, 2, 5);
 
         nextPOS = RoundToIntVector3XZ(this.transform.position);
         cam = GameObject.Find("Camera");
@@ -97,7 +98,11 @@ public class PlayerManager : AChild {
                         AddAction(actiondummy.AddComponent<WalkAction>());
                     }
                 }
-                if (Input.GetButton("Action_1"))
+                if (Input.GetButtonDown("Action_1"))
+                {
+                    
+                }
+                if (Input.GetButtonUp("Action_1"))
                 {
                     AddAction(ActionShortcuts[1]);
                 }

@@ -118,9 +118,8 @@ public class WalkAction : AAction
         if (Mathf.Abs(target.nextPOS.x - target.nextnextPOS.x) != 0 &&
              Mathf.Abs(target.nextPOS.z - target.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
-        float[] subs = target.GetSubStatus();
-        if (subs[5] == 0) { }
-        else { duration = (diag) / (subs[5]); }//time
+        if (target.MovementSpeed == 0) { }
+        else { duration = (diag) / target.MovementSpeed; }//time
         target.nextPOS = target.nextnextPOS;
         iTween.MoveTo(target.gameObject,
             iTween.Hash("position", target.nextPOS,
@@ -138,7 +137,7 @@ public class RunAction : AAction
         ACTIONCODE = 2;
         NAME = "Run";
         duration = 1.0f;
-        spCost = 10;
+        spCost = 1;
     }
     public override bool CanDoAction(AAnimal target)
     {
@@ -146,7 +145,7 @@ public class RunAction : AAction
         float[] subs = target.GetSubStatus();
         Vector3 dir2 = new Vector3(target.nextnextPOS.x - target.nextPOS.x, 0, target.nextnextPOS.z - target.nextPOS.z);
         dir2 = target.RoundToIntVector3XZ(dir2);
-        dir2 = dir2 * Mathf.RoundToInt(subs[6]);
+        dir2 = dir2 * Mathf.RoundToInt(target.RunRatio);
         target.nextnextPOS = target.nextPOS + dir2;
 
         float maxd = 1.0f;
@@ -188,8 +187,8 @@ public class RunAction : AAction
              Mathf.Abs(target.nextPOS.z - target.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
         float[] subs = target.GetSubStatus();
-        if (subs[5] * subs[6] == 0) { }
-        else { duration = (diag) / (subs[5]); }
+        if (target.MovementSpeed * target.RunRatio == 0) { }
+        else { duration = (diag) / target.MovementSpeed; }
         target.nextPOS = target.nextnextPOS;
         iTween.MoveTo(target.gameObject,
             iTween.Hash("position", target.nextPOS,
