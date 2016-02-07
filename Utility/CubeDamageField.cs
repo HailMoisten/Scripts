@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ManhattanDamageField : MonoBehaviour {
+public class CubeDamageField : MonoBehaviour {
     private int attackDamage = 10;
     private int magicDamage = 0;
     private Vector3 center = new Vector3(0, 0, 0);
