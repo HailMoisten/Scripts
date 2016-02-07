@@ -22,7 +22,7 @@ public abstract class AAction : AIcon
     public abstract bool CanDoAction(AAnimal target);
     protected bool CanDoActionAboutHPSP(AAnimal target)
     {
-        int hp = target.HP; int sp = target.SP;
+        float hp = target.HP; float sp = target.SP;
         float[] subs = target.GetSubStatus();
         hp = hp - hpCost; sp = sp - spCost;
         hp = hp - Mathf.RoundToInt(target.MaxHP * ((float)hppercentCost / 100));
@@ -91,7 +91,7 @@ public class WalkAction : AAction
             //            Debug.Log("hitsFront:" + hitFront.distance);
             if (hitFront.collider.tag == "Terrain" ||
                 hitFront.collider.tag == "Environment" ||
-                hitFront.collider.tag == "LifeSeed")
+                hitFront.collider.tag == "Animal")
             {
                 return false;
             }
@@ -100,7 +100,7 @@ public class WalkAction : AAction
         {
             //            Debug.Log("hitDown:" + hitDown.distance);
             if (hitDown.collider.tag == "Environment" ||
-                hitDown.collider.tag == "LifeSeed")
+                hitDown.collider.tag == "Animal")
             {
                 target.nextnextPOS.y = target.nextnextPOS.y + 1.5f - hitDown.distance;
             }
@@ -138,7 +138,7 @@ public class RunAction : AAction
         ACTIONCODE = 2;
         NAME = "Run";
         duration = 1.0f;
-        spCost = 1;
+        spCost = 10;
     }
     public override bool CanDoAction(AAnimal target)
     {
@@ -159,7 +159,7 @@ public class RunAction : AAction
             //            Debug.Log("hitsFront:" + hitFront.distance);
             if (hitFront.collider.tag == "Terrain" ||
                 hitFront.collider.tag == "Environment" ||
-                hitFront.collider.tag == "LifeSeed")
+                hitFront.collider.tag == "Animal")
             {
                 return false;
             }
@@ -168,7 +168,7 @@ public class RunAction : AAction
         {
             //            Debug.Log("hitDown:" + hitDown.distance);
             if (hitDown.collider.tag == "Environment" ||
-                hitDown.collider.tag == "LifeSeed")
+                hitDown.collider.tag == "Animal")
             {
                 target.nextnextPOS.y = target.nextnextPOS.y + 1.5f - hitDown.distance;
             }

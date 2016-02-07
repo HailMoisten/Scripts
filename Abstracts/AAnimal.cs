@@ -24,10 +24,10 @@ public abstract class AAnimal : MonoBehaviour {
     private float HPGainBonus = 1.0f, HPRegenBonus = 1.0f, SPGainBonus = 1.0f, SPRegenBonus = 1.0f;
     private int maxhp = 1; public int MaxHP { get { return maxhp; } }
     private int maxsp = 1; public int MaxSP { get { return maxsp; } }
-    private int hpregen = 1; public int HPRegen { get { return hpregen; } }
-    private int spregen = 1; public int SPRegen { get { return spregen; } }
-    private int hp = 1; public int HP { get { return hp; } }
-    private int sp = 1; public int SP { get { return sp; } }
+    private float hpregen = 1; public float HPRegen { get { return hpregen; } }
+    private float spregen = 1; public float SPRegen { get { return spregen; } }
+    private float hp = 1; public float HP { get { return hp; } }
+    private float sp = 1; public float SP { get { return sp; } }
     private int vitalpoise = 0; public int VitalPoise { get { return vitalpoise; } }
     private int mentalpoise = 0; public int MentalPoise { get { return mentalpoise; } }
     protected int[] LevelUpReward = {0, 0, 0, 0, 0};
@@ -108,8 +108,8 @@ public abstract class AAnimal : MonoBehaviour {
         // Calculate sub states.
         float[] subs = new float[statusGenus];
         // first step
-        subs[0] = (4 * str) + (agi);// AD
-        subs[1] = (4 * @int) + (agi);// MD
+        subs[0] = (2 * str) + (agi/2);// AD
+        subs[1] = (2 * @int) + (agi/2);// MD
         subs[2] = Mathf.RoundToInt(str * Mathf.Sqrt(vit / 50));// AR
         subs[3] = Mathf.RoundToInt(@int * Mathf.Sqrt(vit / 50));// MR
         subs[4] = 1 + (mnd / 10);// MindSlots
@@ -124,8 +124,8 @@ public abstract class AAnimal : MonoBehaviour {
         subs[11] = Mathf.RoundToInt(((15 * Mathf.Sqrt(vit + lv)) + (5 * (float)vit) + 30) * subs[7]);// MaxHP
         subs[12] = Mathf.RoundToInt((vit + mnd + 58) * subs[9]);// MaxSP
         // fourth step
-        subs[13] = Mathf.RoundToInt((subs[11] / 60) * subs[8]);// HPRegen
-        subs[14] = Mathf.RoundToInt((subs[12] / 60) * subs[10]);// SPRegen
+        subs[13] = (subs[11] / 60) * subs[8];// HPRegen
+        subs[14] = (subs[12] / 60) * subs[10];// SPRegen
         subs[15] = subs[11];// HP
         subs[16] = subs[12];// SP
         subs[17] = (subs[11] * mnd) / (100 + (float)mnd);// VitalPoise
@@ -146,7 +146,7 @@ public abstract class AAnimal : MonoBehaviour {
         HPGainBonus = status[status.Length - fix + 7]; HPRegenBonus = status[status.Length - fix + 8];
         SPGainBonus = status[status.Length - fix + 9]; SPRegenBonus = status[status.Length - fix + 10];
         maxhp = Mathf.RoundToInt(status[status.Length - fix + 11]); maxsp = Mathf.RoundToInt(status[status.Length - fix + 12]);
-        hpregen = Mathf.RoundToInt(status[status.Length - fix + 13]); spregen = Mathf.RoundToInt(status[status.Length - fix + 14]);
+        hpregen = status[status.Length - fix + 13]; spregen = status[status.Length - fix + 14];
         hp = Mathf.RoundToInt(status[status.Length - fix + 15]); sp = Mathf.RoundToInt(status[status.Length - fix + 16]);
         vitalpoise = Mathf.RoundToInt(status[status.Length - fix + 17]);
         mentalpoise = Mathf.RoundToInt(status[status.Length - fix + 18]);
@@ -185,8 +185,8 @@ public abstract class AAnimal : MonoBehaviour {
     public void DoAction()
     {
         // Calc. buffs and regens. Check DOA.
-        if (isPassed) { StartCoroutine(passedCD()); }
-        else { passed(); }
+        if (isPassed) {  }
+        else { passed(); StartCoroutine(passedCD()); }
         if (checkDOA()) { YouDied(); }
 
         // Do action.
@@ -235,7 +235,8 @@ public abstract class AAnimal : MonoBehaviour {
     private bool isPassed = false;
     private IEnumerator passedCD()
     {
-        yield return new WaitForSeconds(1.0f);
+        isPassed = true;
+        yield return new WaitForSeconds(0.1f);
         isPassed = false;
     }
     /// <summary>
@@ -244,8 +245,8 @@ public abstract class AAnimal : MonoBehaviour {
     private void passed()
     {
         // Regens
-        hp = HP + HPRegen; if (HP > MaxHP) { hp = MaxHP; }
-        sp = SP + SPRegen; if (SP > MaxSP) { sp = MaxSP; }
+        hp = HP + (HPRegen/10); if (HP > MaxHP) { hp = MaxHP; }
+        sp = SP + (SPRegen/10); if (SP > MaxSP) { sp = MaxSP; }
         // Buffs
     }
     /// <summary>
@@ -258,13 +259,14 @@ public abstract class AAnimal : MonoBehaviour {
         if (HP <= 0) { return true; }
         return false;
     }
+    public abstract void YouDied();
 
-    public void TakeDamage(int value, bool isAnotM)
+    public void TakeDamage(int attackdamage, int magicdamage)
     {
-        int damage = 0;
-        if (isAnotM) { damage = value * (1 - (ar / (100 + ar))); }
-        else { damage = value * (1 - (mr / (100 + mr))); }
+        int damage = Mathf.RoundToInt((attackdamage * (1 - (AR / (100 + (float)AR)))) + (magicdamage * (1 - (MR / (100 + (float)MR)))));
+        Debug.Log(damage);
         hp = HP - damage;
+        if (HP < 0) { hp = 0; }
     }
     public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
     {
@@ -272,5 +274,4 @@ public abstract class AAnimal : MonoBehaviour {
         hp = HP - (MaxHP * (hppercentcost / 100)); sp = SP - (MaxSP * (sppercentcost / 100));
         if (HP < 0) { hp = 0; }
     }
-    public abstract void YouDied();
 }
