@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public abstract class AAnimal : MonoBehaviour {
@@ -263,10 +264,12 @@ public abstract class AAnimal : MonoBehaviour {
 
     public void TakeDamage(int attackdamage, int magicdamage)
     {
-        int damage = Mathf.RoundToInt((attackdamage * (1 - (AR / (100 + (float)AR)))) + (magicdamage * (1 - (MR / (100 + (float)MR)))));
-        Debug.Log(damage);
-        hp = HP - damage;
+        int a = Mathf.RoundToInt(attackdamage * (1 - (AR / (100 + (float)AR))));
+        int m = Mathf.RoundToInt(magicdamage * (1 - (MR / (100 + (float)MR))));
+        hp = HP - (a + m);
         if (HP < 0) { hp = 0; }
+        GameObject dcanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/DamageTextCanvas"));
+        dcanvas.GetComponent<DamageTextCanvasManager>().SetDamageAndAwake(a, m, transform.position);
     }
     public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
     {

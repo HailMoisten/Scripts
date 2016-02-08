@@ -44,9 +44,11 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal target)
         {
-            duration = (1.0f / target.MovementSpeed);
-            GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utility/ManhattanDamageField"));
-            damagefield.GetComponent<CubeDamageField>().SetParamAndAwake(0, target.MD, target.nextnextPOS + new Vector3(0, 1.0f, 0), 1, duration);
+            castTime = (1.0f / target.MovementSpeed);
+            duration = 0.15f;
+            GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
+            damagefield.GetComponent<ADamageField>().SetMainParam(0, target.MD, duration, castTime, target.nextnextPOS + new Vector3(0, 1, 0), 1);
+            damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             Debug.Log(NAME + "!");
             SetMotionAndDurationAndUseHPSP(target);
         }
