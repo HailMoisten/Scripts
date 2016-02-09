@@ -89,7 +89,7 @@ public class PlayerManager : AChild {
     protected override void setMindSkillShortcuts()
     {
         mindSkillShortcuts[1] = Minds.transform.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
-//        mindSkillShortcuts[1].Icon = Minds.transform.GetChild(0).GetChild(1).GetComponent<AMindSkill>().Icon;
+        mindSkillShortcuts[1].Icon = Minds.transform.GetChild(0).GetChild(1).GetComponent<AMindSkill>().Icon;
     }
 
     // Update is called once per frame
@@ -145,7 +145,7 @@ public class PlayerManager : AChild {
                 {
                     if (visualAssistTarget != null) { }
                     else { visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
-                        targetPOS = nextPOS + Vector3.up; }
+                        targetPOS = nextnextPOS + Vector3.up; }
                 }
                 if (Input.GetButtonUp("Action_1"))
                 {

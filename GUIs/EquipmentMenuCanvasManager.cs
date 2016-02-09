@@ -27,22 +27,24 @@ public class EquipmentMenuCanvasManager : ACanvasManager
         // Actions
         for (int n = 1; n <= 1; n++)
         {
-            setPointa(2 + n);
-//            GameObject gm = Instantiate(playerManager.mindSkillShortcuts[n].gameObject);
-//            gm.transform.SetParent(Target.transform);
-//            Target.GetComponent<AIcon>().Icon = playerManager.mindSkillShortcuts[n].Icon;
+            if (playerManager.mindSkillShortcuts[n].GetComponent<AIcon>() != null)
+            {
+                AIcon actionsIcon = playerManager.mindSkillShortcuts[n].GetComponent<AIcon>();
+                setPointa(2 + n);
+                Target.GetComponent<SelectableTargetManager>().TargetIcon = actionsIcon;
+                Target.GetComponent<AIcon>().Icon = actionsIcon.Icon;
+            }
         }
         // Minds
-        AMind[] minds = playerManager.Minds.GetComponentsInChildren<AMind>();
-        for (int n = 0; n <= minds.Length-1; n++)
+        for (int n = 0; n <= playerManager.Minds.transform.childCount-1; n++)
         {
             if (n > playerManager.MindSlots) { }
-            else if (minds[n] != null)
+            else if (playerManager.Minds.transform.GetChild(n).GetComponent<AIcon>() != null)
             {
+                AIcon mindsIcon = playerManager.Minds.transform.GetChild(n).GetComponent<AIcon>();
                 setPointa(11+n);
-                GameObject gm = Instantiate(minds[n].gameObject);
-                gm.transform.SetParent(Target.transform);
-                Target.GetComponent<AIcon>().Icon = minds[n].Icon;
+                Target.GetComponent<SelectableTargetManager>().TargetIcon = mindsIcon;
+                Target.GetComponent<AIcon>().Icon = mindsIcon.Icon;
             }
         }
         for (int n = 21; n >= 11 + playerManager.MindSlots; n--)

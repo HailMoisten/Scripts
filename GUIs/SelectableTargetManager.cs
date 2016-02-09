@@ -7,6 +7,7 @@ public class SelectableTargetManager : AIcon {
     public bool changeImageAuto = false;
     public bool changeTextColorAuto = false;
     public bool changeTextSizeAuto = false;
+    public AIcon TargetIcon = null;
     protected Color LightYellow = new Color(1.0f, 1.0f, 0.753f, 1.0f);
     protected Color LightBlue = new Color(0.914f, 0.914f, 1.0f, 1.0f);
 
@@ -56,8 +57,7 @@ public class SelectableTargetManager : AIcon {
 
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
-        AIcon child = transform.GetChild(0).GetComponent<AIcon>();
-        if (child != null) { return child.Clicked(clickedpos); }
+        if (TargetIcon != null) { return TargetIcon.Clicked(clickedpos); }
         else { return null; }
     }
 }
