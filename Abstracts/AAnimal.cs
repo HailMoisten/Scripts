@@ -13,7 +13,7 @@ public abstract class AAnimal : MonoBehaviour {
     private int vit = 1; public int VIT { get { return vit; } }
     private int str = 1; public int STR { get { return str; } }
     private int agi = 1; public int AGI { get { return agi; } }
-    private int @int = 1; public int INT { get { return @int; } }
+    private int _int = 1; public int INT { get { return _int; } }
     private int mnd = 1; public int MND { get { return mnd; } }
     private int ad = 1; public int AD { get { return ad; } }
     private int md = 1; public int MD { get { return md; } }
@@ -35,7 +35,7 @@ public abstract class AAnimal : MonoBehaviour {
     public int[] GetMainStatus()
     {
         int[] mains = new int[5];
-        mains[0] = vit; mains[1] = str; mains[2] = agi; mains[3] = @int; mains[4] = mnd;
+        mains[0] = vit; mains[1] = str; mains[2] = agi; mains[3] = _int; mains[4] = mnd;
         return mains;
     }
     /// <summary>
@@ -80,11 +80,11 @@ public abstract class AAnimal : MonoBehaviour {
         else
         {
             lv++;
-            vit = vit + LevelUpReward[0]; str = str + LevelUpReward[1]; agi = agi + LevelUpReward[2]; @int = @int + LevelUpReward[3]; mnd = mnd + LevelUpReward[4];
+            vit = vit + LevelUpReward[0]; str = str + LevelUpReward[1]; agi = agi + LevelUpReward[2]; _int = _int + LevelUpReward[3]; mnd = mnd + LevelUpReward[4];
             int sum = 0;
             for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
             if (sum == 0) { vit++; vit++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { vit++; }
-            setStatus(calcStatus(GetMainStatus()));
+            setSubStatus(calcSubStatus());
         }
     }
 
@@ -94,49 +94,51 @@ public abstract class AAnimal : MonoBehaviour {
     /// <returns></returns>
     protected void setMainStatus(int lv, int v, int s, int a, int i, int m)
     {
-        this.lv = lv; vit = v; str = s; agi = a; @int = i; mnd = m;
-        setStatus(calcStatus(GetMainStatus()));
+        this.lv = lv; vit = v; str = s; agi = a; _int = i; mnd = m;
+        setSubStatus(calcSubStatus());
     }
 
     /// <summary>
     /// Calculate sub states. In addition, calculate buffs.
     /// </summary>
     /// <returns></returns>
-    protected float[] calcStatus(int[] mains)
+    protected float[] calcSubStatus()
     {
+        int[] mains = { VIT, STR, AGI, INT, MND };
         // Calculate buffs against to mains for sub states. Main status must not be buffed.
 
         // Calculate sub states.
         float[] subs = new float[statusGenus];
         // first step
-        subs[0] = (2 * str) + (agi/2);// AD
-        subs[1] = (2 * @int) + (agi/2);// MD
-        subs[2] = Mathf.RoundToInt(str * Mathf.Sqrt(vit / 50));// AR
-        subs[3] = Mathf.RoundToInt(@int * Mathf.Sqrt(vit / 50));// MR
-        subs[4] = 1 + (mnd / 10);// MindSlots
-        subs[5] = ((float)agi + 100) / 100;// MovementSpeed
-        subs[6] = 2 + ((float)agi / 25);// RunRatio
+        subs[0] = (2 * mains[1]) + (mains[2] / 2);// AD
+        subs[1] = (2 * mains[3]) + (mains[2] / 2);// MD
+        subs[2] = Mathf.RoundToInt(mains[1] * Mathf.Sqrt(mains[0] / 50));// AR
+        subs[3] = Mathf.RoundToInt(mains[3] * Mathf.Sqrt(mains[0] / 50));// MR
+        subs[4] = 1 + (mains[4] / 10);// MindSlots
+        subs[5] = ((float)mains[2] + 100) / 100;// MovementSpeed
+        subs[6] = 2 + ((float)mains[2] / 25);// RunRatio
         // second step
-        subs[7] = 1.0f + (str / (100 + (float)str));// HPGainRatio
-        subs[8] = 1.0f + ((str + vit) / (100 + (float)vit));// HPRegenRatio
-        subs[9] = 1.0f + (@int / (100 + (float)@int));// SPGainRatio
-        subs[10] = 1.0f + (agi / (100 + (float)agi));// SPRegenRatio
+        subs[7] = 1.0f + (mains[1] / (100 + (float)mains[1]));// HPGainRatio
+        subs[8] = 1.0f + ((mains[1] + mains[0]) / (100 + (float)mains[0]));// HPRegenRatio
+        subs[9] = 1.0f + (mains[3] / (100 + (float)mains[3]));// SPGainRatio
+        subs[10] = 1.0f + (mains[2] / (100 + (float)mains[2]));// SPRegenRatio
         // third step
-        subs[11] = Mathf.RoundToInt(((15 * Mathf.Sqrt(vit + lv)) + (5 * (float)vit) + 30) * subs[7]);// MaxHP
-        subs[12] = Mathf.RoundToInt((vit + mnd + 58) * subs[9]);// MaxSP
+        subs[11] = Mathf.RoundToInt(((15 * Mathf.Sqrt(mains[0] + Lv)) + (5 * (float)mains[0]) + 30) * subs[7]);// MaxHP
+        subs[12] = Mathf.RoundToInt((mains[0] + mains[4] + 58) * subs[9]);// MaxSP
         // fourth step
         subs[13] = (subs[11] / 60) * subs[8];// HPRegen
         subs[14] = (subs[12] / 60) * subs[10];// SPRegen
         subs[15] = subs[11];// HP
         subs[16] = subs[12];// SP
-        subs[17] = (subs[11] * mnd) / (100 + (float)mnd);// VitalPoise
-        subs[18] = (subs[12] * ((10 - ((float)mnd / 10)) / 100));// MentalPoise
+        subs[17] = (subs[11] * mains[4]) / (100 + (float)mains[4]);// VitalPoise
+        subs[18] = (subs[12] * ((10 - ((float)mains[4] / 10)) / 100));// MentalPoise
 
         // Calculate buffs against to subs.
 
+
         return subs;
     }
-    protected void setStatus(float[] status)
+    protected void setSubStatus(float[] status)
     {
         int fix = statusGenus;
         ad = Mathf.RoundToInt(status[status.Length - fix + 0]); md = Mathf.RoundToInt(status[status.Length - fix + 1]);
