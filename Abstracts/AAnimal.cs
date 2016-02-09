@@ -32,6 +32,7 @@ public abstract class AAnimal : MonoBehaviour {
     private int vitalpoise = 0; public int VitalPoise { get { return vitalpoise; } }
     private int mentalpoise = 0; public int MentalPoise { get { return mentalpoise; } }
     protected int[] LevelUpReward = {0, 0, 0, 0, 0};
+
     public int[] GetMainStatus()
     {
         int[] mains = new int[5];
@@ -85,6 +86,7 @@ public abstract class AAnimal : MonoBehaviour {
             for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
             if (sum == 0) { vit++; vit++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { vit++; }
             setSubStatus(calcSubStatus());
+            hp = MaxHP; sp = MaxSP;
         }
     }
 
@@ -96,6 +98,7 @@ public abstract class AAnimal : MonoBehaviour {
     {
         this.lv = lv; vit = v; str = s; agi = a; _int = i; mnd = m;
         setSubStatus(calcSubStatus());
+        hp = MaxHP; sp = MaxSP;
     }
 
     /// <summary>
@@ -106,7 +109,13 @@ public abstract class AAnimal : MonoBehaviour {
     {
         int[] mains = { VIT, STR, AGI, INT, MND };
         // Calculate buffs against to mains for sub states. Main status must not be buffed.
-
+        ABuff buff;
+        for (int i = 0; i < Buffs.transform.childCount; i++ )
+        {
+            buff = Buffs.transform.GetChild(i).GetComponent<ABuff>();
+            if (buff.IsUsed) { }
+            else { mains = buff.BuffToMainStatus(mains); }
+        }
         // Calculate sub states.
         float[] subs = new float[statusGenus];
         // first step
@@ -128,31 +137,36 @@ public abstract class AAnimal : MonoBehaviour {
         // fourth step
         subs[13] = (subs[11] / 60) * subs[8];// HPRegen
         subs[14] = (subs[12] / 60) * subs[10];// SPRegen
-        subs[15] = subs[11];// HP
-        subs[16] = subs[12];// SP
+        subs[15] = HP;// HP
+        subs[16] = SP;// SP
         subs[17] = (subs[11] * mains[4]) / (100 + (float)mains[4]);// VitalPoise
         subs[18] = (subs[12] * ((10 - ((float)mains[4] / 10)) / 100));// MentalPoise
 
         // Calculate buffs against to subs.
-
+        for (int i = 0; i < Buffs.transform.childCount; i++)
+        {
+            buff = Buffs.transform.GetChild(i).GetComponent<ABuff>();
+            if (buff.IsUsed) { }
+            else { subs = buff.BuffToSubStatus(subs); buff.Used(); }
+        }
 
         return subs;
     }
-    protected void setSubStatus(float[] status)
+    protected void setSubStatus(float[] subs)
     {
         int fix = statusGenus;
-        ad = Mathf.RoundToInt(status[status.Length - fix + 0]); md = Mathf.RoundToInt(status[status.Length - fix + 1]);
-        ar = Mathf.RoundToInt(status[status.Length - fix + 2]); mr = Mathf.RoundToInt(status[status.Length - fix + 3]);
-        mindslots = Mathf.RoundToInt(status[status.Length - fix + 4]);
-        movementspeed = status[status.Length - fix + 5];
-        runratio = status[status.Length - fix + 6];
-        HPGainBonus = status[status.Length - fix + 7]; HPRegenBonus = status[status.Length - fix + 8];
-        SPGainBonus = status[status.Length - fix + 9]; SPRegenBonus = status[status.Length - fix + 10];
-        maxhp = Mathf.RoundToInt(status[status.Length - fix + 11]); maxsp = Mathf.RoundToInt(status[status.Length - fix + 12]);
-        hpregen = status[status.Length - fix + 13]; spregen = status[status.Length - fix + 14];
-        hp = Mathf.RoundToInt(status[status.Length - fix + 15]); sp = Mathf.RoundToInt(status[status.Length - fix + 16]);
-        vitalpoise = Mathf.RoundToInt(status[status.Length - fix + 17]);
-        mentalpoise = Mathf.RoundToInt(status[status.Length - fix + 18]);
+        ad = Mathf.RoundToInt(subs[subs.Length - fix + 0]); md = Mathf.RoundToInt(subs[subs.Length - fix + 1]);
+        ar = Mathf.RoundToInt(subs[subs.Length - fix + 2]); mr = Mathf.RoundToInt(subs[subs.Length - fix + 3]);
+        mindslots = Mathf.RoundToInt(subs[subs.Length - fix + 4]);
+        movementspeed = subs[subs.Length - fix + 5];
+        runratio = subs[subs.Length - fix + 6];
+        HPGainBonus = subs[subs.Length - fix + 7]; HPRegenBonus = subs[subs.Length - fix + 8];
+        SPGainBonus = subs[subs.Length - fix + 9]; SPRegenBonus = subs[subs.Length - fix + 10];
+        maxhp = Mathf.RoundToInt(subs[subs.Length - fix + 11]); maxsp = Mathf.RoundToInt(subs[subs.Length - fix + 12]);
+        hpregen = subs[subs.Length - fix + 13]; spregen = subs[subs.Length - fix + 14];
+        hp = Mathf.RoundToInt(subs[subs.Length - fix + 15]); sp = Mathf.RoundToInt(subs[subs.Length - fix + 16]);
+        vitalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 17]);
+        mentalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 18]);
     }
 
     // ActionManagement
@@ -166,9 +180,18 @@ public abstract class AAnimal : MonoBehaviour {
     public Vector3 DIR = new Vector3();
     public Vector3 nextPOS = new Vector3();
     public Vector3 nextnextPOS = new Vector3();
+    public Vector3 targetPOS = new Vector3();
     private bool isActing = false;
     private AAction[] actionStack = new AAction[3];
-    protected GameObject actiondummy;
+    protected GameObject mainActionPool;
+    protected void setMainActionPool()
+    {
+        mainActionPool = new GameObject("MainActionPool");
+        mainActionPool.transform.SetParent(transform);
+        mainActionPool.AddComponent<IdleAction>();
+        mainActionPool.AddComponent<WalkAction>();
+        mainActionPool.AddComponent<RunAction>();
+    }
 
     public void AddAction(AAction AnyAction)
     {
@@ -176,13 +199,13 @@ public abstract class AAnimal : MonoBehaviour {
         if (actionStack[0] == null)
         {
             actionStack[0] = AnyAction;
-            actionStack[1] = actiondummy.AddComponent<IdleAction>();
+            actionStack[1] = mainActionPool.GetComponent<IdleAction>();
             actionStack[2] = null;
         }
         else
         {
             actionStack[1] = AnyAction;
-            actionStack[2] = actiondummy.AddComponent<IdleAction>();
+            actionStack[2] = mainActionPool.GetComponent<IdleAction>();
         }
     }
     public void DoAction()
@@ -201,7 +224,11 @@ public abstract class AAnimal : MonoBehaviour {
             {
                 doRotate();
                 if (actionStack[0].CanDoAction(this)) { }
-                else { actionStack[0] = actiondummy.AddComponent<IdleAction>(); Debug.Log("I can NOT do it."); }
+                else
+                {
+                    actionStack[0] = mainActionPool.GetComponent<IdleAction>();
+                    Debug.Log("I can NOT do it.");
+                }
                 actionStack[0].Action(this);
             }
         }
@@ -235,6 +262,16 @@ public abstract class AAnimal : MonoBehaviour {
     }
 
     // Utility
+    protected GameObject Items;
+    public GameObject Equipments;
+    public GameObject Weapon;
+    public GameObject Accessories;
+    public AMindSkill[] mindSkillShortcuts;
+    public GameObject Minds;
+    public GameObject Buffs;
+    protected abstract void setUtilities();
+    protected abstract void setMindSkillShortcuts();
+
     private bool isPassed = false;
     private IEnumerator passedCD()
     {
@@ -251,6 +288,21 @@ public abstract class AAnimal : MonoBehaviour {
         hp = HP + (HPRegen/10); if (HP > MaxHP) { hp = MaxHP; }
         sp = SP + (SPRegen/10); if (SP > MaxSP) { sp = MaxSP; }
         // Buffs
+        if (SP < MentalPoise)
+        {
+            bool isExhausted = false;
+            foreach(Transform b in Buffs.transform)
+            {
+                Debug.Log(b.gameObject.GetComponent<ABuff>().Name);
+                if (b.gameObject.GetComponent<ABuff>().Name == "Exhausted") { isExhausted = true; }
+            }
+            if (isExhausted) { }
+            else {
+                GameObject buff = Instantiate((GameObject)Resources.Load("Prefabs/Buffs/Exhausted"));
+                buff.transform.parent = Buffs.transform;
+            }
+        }
+        setSubStatus(calcSubStatus());
     }
     /// <summary>
     /// Return Dead or Alive.

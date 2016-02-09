@@ -24,12 +24,19 @@ public class EquipmentMenuCanvasManager : ACanvasManager
 
     private void setupEquipmentMenu()
     {
-        float[] subs = playerManager.GetSubStatus();
-
-        AMind[] minds = playerManager.gameObject.transform.FindChild("Equipments/Minds").GetComponentsInChildren<AMind>();
+        // Actions
+        for (int n = 1; n <= 1; n++)
+        {
+            setPointa(2 + n);
+//            GameObject gm = Instantiate(playerManager.mindSkillShortcuts[n].gameObject);
+//            gm.transform.SetParent(Target.transform);
+//            Target.GetComponent<AIcon>().Icon = playerManager.mindSkillShortcuts[n].Icon;
+        }
+        // Minds
+        AMind[] minds = playerManager.Minds.GetComponentsInChildren<AMind>();
         for (int n = 0; n <= minds.Length-1; n++)
         {
-            if (n > subs[4]) { }
+            if (n > playerManager.MindSlots) { }
             else if (minds[n] != null)
             {
                 setPointa(11+n);
@@ -38,12 +45,12 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                 Target.GetComponent<AIcon>().Icon = minds[n].Icon;
             }
         }
-        for (int n = 21; n >= 11 + subs[4]; n--)
+        for (int n = 21; n >= 11 + playerManager.MindSlots; n--)
         {
             setPointa(n);
             Target.SetActive(false);
         }
-        pointaNUM = 10 + (int)subs[4];
+        pointaNUM = 10 + (int)playerManager.MindSlots;
     }
 
     // Update is called once per frame

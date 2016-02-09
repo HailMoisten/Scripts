@@ -6,16 +6,11 @@ public class MageMind : AMind {
 
     protected override void Start()
     {
-        NAME = "Mage"; // const
-        TYPE = "Mind"; // const
-        FLAVOR = "Mage is a Nuker.";
-        ICON = GetComponent<Image>().sprite; // const
-        PROFICIENCY = 0;
-        NUMofMindSkills = 10+1;
-        skills = new AMindSkill[NUMofMindSkills];
-        actiondummy = new GameObject("actiondummy");
-        actiondummy.transform.SetParent(transform);
-        skills[1] = actiondummy.AddComponent<Pressure>();
+        _name = "Mage"; // const
+        type = "Mind"; // const
+        flavor = "Mage is a Nuker.";
+        icon = GetComponent<Image>().sprite; // const
+        proficiency = 0;
 
         initSkills();
     }
@@ -23,17 +18,35 @@ public class MageMind : AMind {
     private void initSkills()
     {
         // get from savedata
-        PROFICIENCY = 0;
-        MINDLEVEL = 1 + (PROFICIENCY/100);
+        proficiency = 0;
+        mindlevel = 1 + (proficiency/100);
+
+        transform.GetChild(0).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(1).gameObject.AddComponent<Pressure>();
+        transform.GetChild(2).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(3).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(4).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(5).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(6).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(7).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(8).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(9).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(10).gameObject.AddComponent<Break_The_Limit>();
+
     }
 
     public class Pressure : AMindSkill
     {
         public Pressure()
         {
-            ACTIONCODE = 5;
-            NAME = "Pressure";
-            duration = 1.0f;
+            actioncode = 5;
+            _name = "Pressure";
+            flavor = "Give 1.0*MD damage as magicdamage.";
+            icon = GetComponent<Image>().sprite;
+
+            castTime = 3.0f;
+            damageDuration = 0.15f;
+            duration = castTime + damageDuration;
             isPassive = false;
 
             spCost = 5;
@@ -44,12 +57,13 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal target)
         {
-            castTime = (1.0f / target.MovementSpeed);
-            duration = 0.15f;
+            castTime = (2.0f / target.MovementSpeed);
+            damageDuration = 0.10f;
+            duration = castTime + damageDuration;
             GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
-            damagefield.GetComponent<ADamageField>().SetMainParam(0, target.MD, duration, castTime, target.nextnextPOS + new Vector3(0, 1, 0), 1);
+            damagefield.GetComponent<ADamageField>().SetMainParam(0, target.MD, damageDuration, castTime, target.targetPOS, 1);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
-            Debug.Log(NAME + "!");
+            Debug.Log(_name + "!");
             SetMotionAndDurationAndUseHPSP(target);
         }
     }
@@ -58,8 +72,8 @@ public class MageMind : AMind {
     {
         public Break_The_Limit()
         {
-            ACTIONCODE = 0;
-            NAME = "Break The Limit";
+            actioncode = 0;
+            _name = "Break The Limit";
             duration = 1.0f;
             isPassive = true;
         }
@@ -71,7 +85,7 @@ public class MageMind : AMind {
         {
             //Give a Buff about this.
 
-            Debug.Log(NAME + "!");
+            Debug.Log(_name + "!");
             SetMotionAndDurationAndUseHPSP(target);
         }
     }

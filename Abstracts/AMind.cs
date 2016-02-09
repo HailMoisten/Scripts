@@ -3,29 +3,27 @@ using UnityEngine.UI;
 
 public abstract class AMind : AIcon {
 
-    protected int PROFICIENCY = 0;
+    protected int proficiency = 0;
     public int Proficiency
     {
-        get { return PROFICIENCY; }
-        set { PROFICIENCY = value; }
+        get { return proficiency; }
+        set { proficiency = value; }
     }
-    protected int MINDLEVEL = 0;
+    protected int mindlevel = 1;
     public int MindLevel
     {
-        get { return MINDLEVEL; }
+        get { return mindlevel; }
     }
 
     protected int NUMofMindSkills = 1;
-    protected AMindSkill[] skills;
-    protected GameObject actiondummy;
 
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
         GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpTextCanvas"));
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
         PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
-        ptcm.Title = NAME;
-        ptcm.Content = FLAVOR;
+        ptcm.Title = _name;
+        ptcm.Content = flavor;
 
         return ptcm;
     }
@@ -37,10 +35,10 @@ public abstract class AMind : AIcon {
     /// </summary>
     protected abstract void Start();
 
-    public void GrowProficiency(int addp) { PROFICIENCY = PROFICIENCY + addp; }
+    public void GrowProficiency(int addp) { proficiency = proficiency + addp; }
     public AMindSkill GetMindSkill(int index)
     {
-        if (MINDLEVEL >= index) { return skills[index]; }
+        if (mindlevel >= index) { return transform.GetChild(index).GetComponent<AMindSkill>(); }
         else { Debug.Log("Need more MindLevel."); }
         return null;
     }

@@ -10,7 +10,7 @@ using System.Collections;
 */
 public abstract class AAction : AIcon
 {
-    protected int ACTIONCODE = 0;
+    protected int actioncode = 0;
     protected float duration = 0.0f; public float Duration { get { return duration; } }
     protected int hpCost = 0; public int HPCost { get { return hpCost; } }
     protected int spCost = 0; public int SPCost { get { return spCost; } }
@@ -34,7 +34,7 @@ public abstract class AAction : AIcon
     protected void SetMotionAndDurationAndUseHPSP(AAnimal target)
     {
         target.UseHPSP(hpCost, spCost, hppercentCost, sppercentCost);
-        target.GetAnimator().SetInteger("ActionCode", ACTIONCODE);
+        target.GetAnimator().SetInteger("ActionCode", actioncode);
         target.StartCoroutine(target.DoingAction(duration));
     }
     public override ACanvasManager Clicked(Vector3 clickedpos)
@@ -43,7 +43,7 @@ public abstract class AAction : AIcon
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
         PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
         ptcm.Title = Name;
-        ptcm.Content = Flavor;
+        ptcm.Content = "Duration " + Duration + " sec\n" + Flavor;
         return ptcm;
     }
 
@@ -54,8 +54,8 @@ public class IdleAction : AAction
 {
     public IdleAction()
     {
-        ACTIONCODE = 0;
-        NAME = "Idle";
+        actioncode = 0;
+        _name = "Idle";
         duration = 0.0f;
     }
     public override bool CanDoAction(AAnimal target)
@@ -73,8 +73,8 @@ public class WalkAction : AAction
 {
     public WalkAction()
     {
-        ACTIONCODE = 1;
-        NAME = "Walk";
+        actioncode = 1;
+        _name = "Walk";
         duration = 1.0f;
     }
     public override bool CanDoAction(AAnimal target)
@@ -134,8 +134,8 @@ public class RunAction : AAction
 {
     public RunAction()
     {
-        ACTIONCODE = 2;
-        NAME = "Run";
+        actioncode = 2;
+        _name = "Run";
         duration = 1.0f;
         spCost = 1;
     }

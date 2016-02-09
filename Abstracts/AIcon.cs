@@ -4,22 +4,22 @@ using System.Collections;
 
 public abstract class AIcon : MonoBehaviour {
 
-    protected string NAME = ""; // const
-    public string Name { get { return NAME; } }
-    protected string TYPE = ""; // mind, item, action, etc...
-    public string Type { get { return TYPE; } }
-    protected string FLAVOR = "";
+    protected string _name = ""; // const
+    public string Name { get { return _name; } }
+    protected string type = ""; // mind, item, action, etc...
+    public string Type { get { return type; } }
+    protected string flavor = "";
     public string Flavor
     {
-        get { return FLAVOR; }
+        get { return flavor; }
     }
-    protected Sprite ICON = null; // const
+    protected Sprite icon = null; // const
     public Sprite Icon
     {
-        get { return ICON; }
+        get { return icon; }
         set
         {
-            ICON = value;
+            icon = value;
             GetComponent<Image>().sprite = value;
         }
     }
