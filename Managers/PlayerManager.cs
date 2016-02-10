@@ -125,11 +125,6 @@ public class PlayerManager : AChild {
                     }
                     else if (Input.GetButton("Action_1"))
                     {
-                        if (visualAssistTarget != null) { }
-                        else { visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity); }
-                        SettargetPOS();
-                        visualAssistTarget.transform.position = targetPOS;
-                        isInput = true;
                     }
                     else if (Input.GetKey(KeyCode.LeftShift))
                     {
@@ -141,11 +136,25 @@ public class PlayerManager : AChild {
                         AddAction(mainActionPool.GetComponent<WalkAction>());
                     }
                 }
+                if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)
+                    || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    if (Input.GetButton("Action_1"))
+                    {
+                        if (visualAssistTarget != null)
+                        {
+                            SettargetPOS();
+                            visualAssistTarget.transform.position = targetPOS;
+                        }
+                        else { targetPOS = nextnextPOS + Vector3.up;
+                            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity); }
+                    }
+                }
                 if (Input.GetButtonDown("Action_1"))
                 {
                     if (visualAssistTarget != null) { }
-                    else { visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
-                        targetPOS = nextnextPOS + Vector3.up; }
+                    else { targetPOS = nextnextPOS + Vector3.up;
+                        visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity); }
                 }
                 if (Input.GetButtonUp("Action_1"))
                 {

@@ -61,8 +61,8 @@ public class MageMind : AMind {
         public override void Action(AAnimal target)
         {
             castTime = (2.0f / target.MovementSpeed);
-            damageDuration = 0.10f;
-            duration = castTime + damageDuration;
+            damageDuration = 0.15f;
+            duration = castTime;
             GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
             damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration,0, target.MD, damageDuration, castTime, target.targetPOS, 1);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
