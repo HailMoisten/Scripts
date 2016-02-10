@@ -10,9 +10,12 @@ public abstract class ADamageField : MonoBehaviour {
     protected Vector3 center = new Vector3(0, 0, 0);
     protected int size = 1;
     protected BoxCollider myCollider;
+    protected GameObject damageEffect = null;
+    protected float damageEffectDuration;
 
-    public void SetMainParam(int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition, int size)
+    public void SetMainParam(GameObject damageeffect, float damageeffectduration, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition, int size)
     {
+        damageEffect = damageeffect; damageEffectDuration = damageeffectduration;
         attackDamage = attackdamage; magicDamage = magicdamage;
         this.damageDuration = damageduration; this.castTime = casttime;
         center = centerposition; this.size = size;
@@ -23,6 +26,8 @@ public abstract class ADamageField : MonoBehaviour {
     {
         yield return new WaitForSeconds(castTime);
         myCollider.enabled = true;
+        GameObject dm = (GameObject)Instantiate(damageEffect, center, Quaternion.identity);
+        Destroy(dm, damageEffectDuration);
         Destroy(gameObject, damageDuration);
     }
 

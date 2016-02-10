@@ -49,6 +49,9 @@ public class MageMind : AMind {
             duration = castTime + damageDuration;
             isPassive = false;
 
+            damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
+            damageEffectDuration = 2.0f;
+
             spCost = 5;
         }
         public override bool CanDoAction(AAnimal target)
@@ -61,10 +64,10 @@ public class MageMind : AMind {
             damageDuration = 0.10f;
             duration = castTime + damageDuration;
             GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
-            damagefield.GetComponent<ADamageField>().SetMainParam(0, target.MD, damageDuration, castTime, target.targetPOS, 1);
+            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration,0, target.MD, damageDuration, castTime, target.targetPOS, 1);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
-            Debug.Log(_name + "!");
             SetMotionAndDurationAndUseHPSP(target);
+
         }
     }
 
