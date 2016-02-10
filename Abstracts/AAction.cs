@@ -27,7 +27,7 @@ public abstract class AAction : AIcon
         hp = hp - hpCost; sp = sp - spCost;
         hp = hp - Mathf.RoundToInt(target.MaxHP * ((float)hppercentCost / 100));
         sp = sp - Mathf.RoundToInt(target.MaxSP * ((float)sppercentCost / 100));
-        if (hp >= 0 && sp >= target.MentalPoise) { return true; } 
+        if (hp >= 0 && sp >= 0) { return true; }// Break_The_Limit
         return false;
     }
     public abstract void Action(AAnimal target);
@@ -76,6 +76,7 @@ public class WalkAction : AAction
         actioncode = 1;
         _name = "Walk";
         duration = 1.0f;
+        spCost = 1;
     }
     public override bool CanDoAction(AAnimal target)
     {
@@ -137,7 +138,7 @@ public class RunAction : AAction
         actioncode = 2;
         _name = "Run";
         duration = 1.0f;
-        spCost = 1;
+        spCost = 2;
     }
     public override bool CanDoAction(AAnimal target)
     {

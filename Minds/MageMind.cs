@@ -52,7 +52,7 @@ public class MageMind : AMind {
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
             damageEffectDuration = 2.0f;
 
-            spCost = 5;
+            spCost = 10;
         }
         public override bool CanDoAction(AAnimal target)
         {

@@ -113,16 +113,15 @@ public abstract class AAnimal : MonoBehaviour {
         for (int i = 0; i < Buffs.transform.childCount; i++ )
         {
             buff = Buffs.transform.GetChild(i).GetComponent<ABuff>();
-            if (buff.IsUsed) { }
-            else { mains = buff.BuffToMainStatus(mains); }
+            mains = buff.BuffToMainStatus(mains);
         }
         // Calculate sub states.
         float[] subs = new float[statusGenus];
         // first step
         subs[0] = (2 * mains[1]) + (mains[2] / 2);// AD
         subs[1] = (2 * mains[3]) + (mains[2] / 2);// MD
-        subs[2] = Mathf.RoundToInt(mains[1] * Mathf.Sqrt(mains[0] / 50));// AR
-        subs[3] = Mathf.RoundToInt(mains[3] * Mathf.Sqrt(mains[0] / 50));// MR
+        subs[2] = mains[1] + Mathf.RoundToInt(Mathf.Sqrt((float)mains[0] / 50));// AR
+        subs[3] = mains[3] + Mathf.RoundToInt(Mathf.Sqrt((float)mains[0] / 50));// MR
         subs[4] = 1 + (mains[4] / 10);// MindSlots
         subs[5] = ((float)mains[2] + 100) / 100;// MovementSpeed
         subs[6] = 2 + ((float)mains[2] / 25);// RunRatio
@@ -146,8 +145,7 @@ public abstract class AAnimal : MonoBehaviour {
         for (int i = 0; i < Buffs.transform.childCount; i++)
         {
             buff = Buffs.transform.GetChild(i).GetComponent<ABuff>();
-            if (buff.IsUsed) { }
-            else { subs = buff.BuffToSubStatus(subs); buff.Used(); }
+            subs = buff.BuffToSubStatus(subs); buff.Used();
         }
 
         return subs;
@@ -276,7 +274,7 @@ public abstract class AAnimal : MonoBehaviour {
     private IEnumerator passedCD()
     {
         isPassed = true;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.5f);
         isPassed = false;
     }
     /// <summary>
@@ -285,8 +283,8 @@ public abstract class AAnimal : MonoBehaviour {
     private void passed()
     {
         // Regens
-        hp = HP + (HPRegen/10); if (HP > MaxHP) { hp = MaxHP; }
-        sp = SP + (SPRegen/10); if (SP > MaxSP) { sp = MaxSP; }
+        hp = HP + (HPRegen/2); if (HP > MaxHP) { hp = MaxHP; }
+        sp = SP + (SPRegen/2); if (SP > MaxSP) { sp = MaxSP; }
         // Buffs
         if (SP < MentalPoise)
         {
@@ -299,7 +297,7 @@ public abstract class AAnimal : MonoBehaviour {
             if (isExhausted) { }
             else {
                 GameObject buff = Instantiate((GameObject)Resources.Load("Prefabs/Buffs/Exhausted"));
-                buff.transform.parent = Buffs.transform;
+                buff.transform.SetParent(Buffs.transform);
             }
         }
         setSubStatus(calcSubStatus());
