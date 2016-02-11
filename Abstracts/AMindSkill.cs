@@ -12,6 +12,8 @@ public abstract class AMindSkill : AAction {
     public GameObject DamageEffect { get { return damageEffect; } }
     protected float damageEffectDuration = 1.0f;
     public float DamageEffectDuration { get { return damageEffectDuration; } }
+    protected GameObject buff = null;
+    public GameObject Buff { get { return buff; } }
 
     // Please definite isPassive at inheriting constracter in addition ACTIONCODE, DURATION and NAME.
 

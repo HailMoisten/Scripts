@@ -124,7 +124,7 @@ public abstract class AAnimal : MonoBehaviour {
         subs[3] = mains[3] + Mathf.RoundToInt(Mathf.Sqrt((float)mains[0] / 50));// MR
         subs[4] = 1 + (mains[4] / 10);// MindSlots
         subs[5] = ((float)mains[2] + 100) / 100;// MovementSpeed
-        subs[6] = 2 + ((float)mains[2] / 25);// RunRatio
+        subs[6] = 2 + 3*((float)mains[2] / 100);// RunRatio
         // second step
         subs[7] = 1.0f + (mains[1] / (100 + (float)mains[1]));// HPGainRatio
         subs[8] = 1.0f + ((mains[1] + mains[0]) / (100 + (float)mains[0]));// HPRegenRatio
@@ -168,7 +168,7 @@ public abstract class AAnimal : MonoBehaviour {
     }
 
     // ActionManagement
-    private float gcd = 0.15f; public float GCD { get { return gcd; } }
+    private float gcd = 0.10f; public float GCD { get { return gcd; } }
     protected bool isInput = false;
     protected IEnumerator InputCD()
     {

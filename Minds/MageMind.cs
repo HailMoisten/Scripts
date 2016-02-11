@@ -61,10 +61,10 @@ public class MageMind : AMind {
         public override void Action(AAnimal target)
         {
             castTime = (2.0f / target.MovementSpeed);
-            damageDuration = 0.15f;
+            damageDuration = 0.10f;
             duration = castTime;
             GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
-            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration,0, target.MD, damageDuration, castTime, target.targetPOS, 1);
+            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS, 1);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(target);
 
@@ -78,7 +78,7 @@ public class MageMind : AMind {
             actioncode = 0;
             _name = "Break The Limit";
             duration = 1.0f;
-            isPassive = true;
+            buff = (GameObject)Resources.Load("Prefabs/Buffs/");
         }
         public override bool CanDoAction(AAnimal target)
         {

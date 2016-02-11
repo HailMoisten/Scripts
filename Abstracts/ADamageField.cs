@@ -12,10 +12,12 @@ public abstract class ADamageField : MonoBehaviour {
     protected BoxCollider myCollider;
     protected GameObject damageEffect = null;
     protected float damageEffectDuration;
+    protected GameObject buff = null;
 
-    public void SetMainParam(GameObject damageeffect, float damageeffectduration, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition, int size)
+    public void SetMainParam(GameObject damageeffect, float damageeffectduration, GameObject buff, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition, int size)
     {
         damageEffect = damageeffect; damageEffectDuration = damageeffectduration;
+        this.buff = buff;
         attackDamage = attackdamage; magicDamage = magicdamage;
         this.damageDuration = damageduration; this.castTime = casttime;
         center = centerposition; this.size = size;
@@ -35,7 +37,17 @@ public abstract class ADamageField : MonoBehaviour {
     {
         if (colliderInfo.gameObject.tag == "Animal" || colliderInfo.gameObject.tag == "Player")
         {
-            colliderInfo.gameObject.GetComponent<AAnimal>().TakeDamage(attackDamage, magicDamage);
+            AAnimal target = colliderInfo.gameObject.GetComponent<AAnimal>();
+            target.TakeDamage(attackDamage, magicDamage);
+            if (buff != null)
+            {
+                foreach (Transform b in target.Buffs.transform)
+                {
+                    if (b.gameObject.GetComponent<ABuff>().Name == buff.GetComponent<ABuff>().Name) { Destroy(b.gameObject); }
+                }
+                GameObject newbuff = Instantiate(buff);
+                newbuff.transform.SetParent(target.Buffs.transform);
+            }
         }
     }
 
