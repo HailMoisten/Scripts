@@ -120,8 +120,8 @@ public abstract class AAnimal : MonoBehaviour {
         // first step
         subs[0] = (2 * mains[1]) + (mains[2] / 2);// AD
         subs[1] = (2 * mains[3]) + (mains[2] / 2);// MD
-        subs[2] = mains[1] + Mathf.RoundToInt(Mathf.Sqrt((float)mains[0] / 50));// AR
-        subs[3] = mains[3] + Mathf.RoundToInt(Mathf.Sqrt((float)mains[0] / 50));// MR
+        subs[2] = mains[1] + ((float)mains[0] / 2);// AR
+        subs[3] = mains[3] + ((float)mains[0] / 2);// MR
         subs[4] = 1 + (mains[4] / 10);// MindSlots
         subs[5] = ((float)mains[2] + 100) / 100;// MovementSpeed
         subs[6] = 2 + 3*((float)mains[2] / 100);// RunRatio
@@ -136,16 +136,21 @@ public abstract class AAnimal : MonoBehaviour {
         // fourth step
         subs[13] = (subs[11] / 60) * subs[8];// HPRegen
         subs[14] = (subs[12] / 60) * subs[10];// SPRegen
-        subs[15] = HP;// HP
-        subs[16] = SP;// SP
-        subs[17] = (subs[11] * mains[4]) / (100 + (float)mains[4]);// VitalPoise
-        subs[18] = (subs[12] * ((10 - ((float)mains[4] / 10)) / 100));// MentalPoise
+        subs[15] = (subs[11] * mains[4]) / (100 + (float)mains[4]);// VitalPoise
+        subs[16] = (subs[12] * ((10 - ((float)mains[4] / 10)) / 100));// MentalPoise
+        subs[17] = HP;// HP
+        subs[18] = SP;// SP
 
-        // Calculate buffs against to subs.
+        // Calculate buffs against to subs and HPSP.
         for (int i = 0; i < Buffs.transform.childCount; i++)
         {
             buff = Buffs.transform.GetChild(i).GetComponent<ABuff>();
-            subs = buff.BuffToSubStatus(subs); buff.Used();
+            subs = buff.BuffToSubStatus(subs);
+            subs[17] = buff.BuffToHP(subs[17]);
+            subs[18] = buff.BuffToSP(subs[18]);
+            if (buff.IsUsed) { }
+            else { subs[17] = buff.BuffToHPOnlyOnce(subs[17]); subs[18] = buff.BuffToSPOnlyOnce(subs[18]);
+                buff.Used(); }
         }
 
         return subs;
@@ -162,13 +167,13 @@ public abstract class AAnimal : MonoBehaviour {
         SPGainBonus = subs[subs.Length - fix + 9]; SPRegenBonus = subs[subs.Length - fix + 10];
         maxhp = Mathf.RoundToInt(subs[subs.Length - fix + 11]); maxsp = Mathf.RoundToInt(subs[subs.Length - fix + 12]);
         hpregen = subs[subs.Length - fix + 13]; spregen = subs[subs.Length - fix + 14];
-        hp = Mathf.RoundToInt(subs[subs.Length - fix + 15]); sp = Mathf.RoundToInt(subs[subs.Length - fix + 16]);
-        vitalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 17]);
-        mentalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 18]);
+        vitalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 15]);
+        mentalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 16]);
+        hp = Mathf.RoundToInt(subs[subs.Length - fix + 17]); sp = Mathf.RoundToInt(subs[subs.Length - fix + 18]);
     }
 
     // ActionManagement
-    private float gcd = 0.10f; public float GCD { get { return gcd; } }
+    private float gcd = 0.09f; public float GCD { get { return gcd; } }
     protected bool isInput = false;
     protected IEnumerator InputCD()
     {

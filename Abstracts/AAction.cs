@@ -146,8 +146,8 @@ public class RunAction : AAction
         float[] subs = target.GetSubStatus();
         Vector3 dir2 = new Vector3(target.nextnextPOS.x - target.nextPOS.x, 0, target.nextnextPOS.z - target.nextPOS.z);
         dir2 = target.RoundToIntVector3XZ(dir2);
-        dir2 = dir2 * Mathf.RoundToInt(target.RunRatio);
-        target.nextnextPOS = target.nextPOS + dir2;
+//        dir2 = dir2 * Mathf.RoundToInt(target.RunRatio);
+//        target.nextnextPOS = target.nextPOS + dir2;
 
         float maxd = 1.0f;
         if (dir2.x != 0 && dir2.z != 0) { maxd = 1.5f; }
@@ -189,7 +189,7 @@ public class RunAction : AAction
         else { diag = 1.0f; }
         float[] subs = target.GetSubStatus();
         if (target.MovementSpeed * target.RunRatio == 0) { }
-        else { duration = (diag) / target.MovementSpeed; }
+        else { duration = (diag) / (target.MovementSpeed * target.RunRatio); }
         target.nextPOS = target.nextnextPOS;
         iTween.MoveTo(target.gameObject,
             iTween.Hash("position", target.nextPOS,

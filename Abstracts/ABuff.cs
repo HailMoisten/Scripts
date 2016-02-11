@@ -7,6 +7,11 @@ public abstract class ABuff : AIcon {
     protected float duration = 8.0f; public float Duration { get { return duration; } }
     public abstract int[] BuffToMainStatus(int[] mains);
     public abstract float[] BuffToSubStatus(float[] subs);
+    public abstract float BuffToHP(float hp);
+    public abstract float BuffToHPOnlyOnce(float hp);
+    public abstract float BuffToSP(float sp);
+    public abstract float BuffToSPOnlyOnce(float sp);
+
     public void Used(){ IsUsed = true; Destroy(gameObject, duration); }
 
     public override ACanvasManager Clicked(Vector3 clickedpos)

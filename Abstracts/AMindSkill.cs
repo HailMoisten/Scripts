@@ -6,11 +6,11 @@ public abstract class AMindSkill : AAction {
     public bool IsPassive { get { return isPassive; } }
     protected float castTime;
     public float CastTime { get { return castTime; } }
-    protected float damageDuration = 0.15f;
+    protected float damageDuration = 0.10f;
     public float DamageDuration { get { return damageDuration; } }
     protected GameObject damageEffect = null;
     public GameObject DamageEffect { get { return damageEffect; } }
-    protected float damageEffectDuration = 1.0f;
+    protected float damageEffectDuration = 2.0f;
     public float DamageEffectDuration { get { return damageEffectDuration; } }
     protected GameObject buff = null;
     public GameObject Buff { get { return buff; } }

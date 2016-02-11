@@ -28,8 +28,8 @@ public abstract class ADamageField : MonoBehaviour {
     {
         yield return new WaitForSeconds(castTime);
         myCollider.enabled = true;
-        GameObject dm = (GameObject)Instantiate(damageEffect, center, Quaternion.identity);
-        Destroy(dm, damageEffectDuration);
+        if (damageEffect != null) { GameObject dm = (GameObject)Instantiate(damageEffect, center, Quaternion.identity);
+        Destroy(dm, damageEffectDuration); }
         Destroy(gameObject, damageDuration);
     }
 

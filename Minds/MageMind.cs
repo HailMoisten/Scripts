@@ -44,13 +44,7 @@ public class MageMind : AMind {
             flavor = "Give 1.0*MD damage as magicdamage.";
             icon = GetComponent<Image>().sprite;
 
-            castTime = 3.0f;
-            damageDuration = 0.15f;
-            duration = castTime + damageDuration;
-            isPassive = false;
-
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
-            damageEffectDuration = 2.0f;
 
             spCost = 10;
         }
@@ -61,13 +55,11 @@ public class MageMind : AMind {
         public override void Action(AAnimal target)
         {
             castTime = (2.0f / target.MovementSpeed);
-            damageDuration = 0.10f;
             duration = castTime;
             GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
             damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS, 1);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(target);
-
         }
     }
 
@@ -75,10 +67,13 @@ public class MageMind : AMind {
     {
         public Break_The_Limit()
         {
-            actioncode = 0;
+            actioncode = 5;
             _name = "Break The Limit";
-            duration = 1.0f;
-            buff = (GameObject)Resources.Load("Prefabs/Buffs/");
+            flavor = "Give buff of -Break The Limit- to you.";
+            icon = GetComponent<Image>().sprite;
+            castTime = 5.0f;
+            duration = 5.0f;
+            buff = (GameObject)Resources.Load("Prefabs/Buffs/Break_The_Limit");
         }
         public override bool CanDoAction(AAnimal target)
         {
@@ -87,8 +82,9 @@ public class MageMind : AMind {
         public override void Action(AAnimal target)
         {
             //Give a Buff about this.
-
-            Debug.Log(_name + "!");
+            GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
+            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, 0, DamageDuration, CastTime, target.nextPOS, 1);
+            damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(target);
         }
     }
