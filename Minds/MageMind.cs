@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 public class MageMind : AMind {
 
-    protected override void Start()
+    public override void Start()
     {
         _name = "Mage"; // const
         type = "Mind"; // const
         flavor = "Mage is a Nuker.";
-        icon = GetComponent<Image>().sprite; // const
+        icon = GetComponent<Image>().sprite;
         proficiency = 0;
 
         initSkills();
@@ -37,15 +37,7 @@ public class MageMind : AMind {
 
     public class Pressure : AMindSkill
     {
-        public Pressure()
-        {
-            Debug.Log("Pressure");
-        }
-        public override bool CanDoAction(AAnimal target)
-        {
-            return CanDoActionAboutHPSP(target);
-        }
-        public override void Action(AAnimal target)
+        public override void Start()
         {
             actioncode = 5;
             _name = "Pressure";
@@ -53,10 +45,16 @@ public class MageMind : AMind {
             icon = GetComponent<Image>().sprite;
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
             spCost = 10;
-
-            castTime = (2.0f / target.MovementSpeed);
-            duration = castTime;
-            GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
+            castTime = 2.0f;
+            duration = 2.0f;
+        }
+        public override bool CanDoAction(AAnimal target)
+        {
+            return CanDoActionAboutHPSP(target);
+        }
+        public override void Action(AAnimal target)
+        {
+            GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
             damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS, 1);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(target);
@@ -65,14 +63,7 @@ public class MageMind : AMind {
 
     public class Break_The_Limit : AMindSkill
     {
-        public Break_The_Limit()
-        {
-        }
-        public override bool CanDoAction(AAnimal target)
-        {
-            return isPassive;
-        }
-        public override void Action(AAnimal target)
+        public override void Start()
         {
             actioncode = 5;
             _name = "Break The Limit";
@@ -81,9 +72,15 @@ public class MageMind : AMind {
             castTime = 5.0f;
             duration = 5.0f;
             buff = (GameObject)Resources.Load("Prefabs/Buffs/Break_The_Limit");
-
+        }
+        public override bool CanDoAction(AAnimal target)
+        {
+            return isPassive;
+        }
+        public override void Action(AAnimal target)
+        {
             //Give a Buff about this.
-            GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
+            GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
             damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, 0, DamageDuration, CastTime, target.nextPOS, 1);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(target);

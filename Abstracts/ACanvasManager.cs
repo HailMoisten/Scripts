@@ -42,7 +42,7 @@ public abstract class ACanvasManager : MonoBehaviour {
     protected void setTarget()
     {
         lastTarget = target;
-        Component[] selectables = GetComponentsInChildren<SelectableTargetManager>();
+        SelectableTargetManager[] selectables = GetComponentsInChildren<SelectableTargetManager>();
         if (pointa <= 0 || pointa >= selectables.Length + 1) { }
         else { target = selectables[pointa - 1].gameObject; }
     }

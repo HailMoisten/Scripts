@@ -5,6 +5,7 @@ public abstract class ABuff : AIcon {
 
     public bool IsUsed = false;
     protected float duration = 8.0f; public float Duration { get { return duration; } }
+
     public abstract int[] BuffToMainStatus(int[] mains);
     public abstract float[] BuffToSubStatus(float[] subs);
     public abstract float BuffToHP(float hp);
@@ -16,7 +17,7 @@ public abstract class ABuff : AIcon {
 
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
-        GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpTextCanvas"));
+        GameObject inst = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/PopUpTextCanvas"), Vector3.one, Quaternion.identity);
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
         PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
         ptcm.Title = Name;

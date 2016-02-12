@@ -4,6 +4,14 @@ using System.Collections;
 
 public class Exhausted : ABuff {
 
+    public override void Start()
+    {
+        duration = 10.0f;
+        _name = "Exhausted";
+        icon = GetComponent<Image>().sprite;
+        type = "Buff";
+        flavor = "You are exhausted." + "\n" + "Your MovementSpeed is half of original.";
+    }
     public override int[] BuffToMainStatus(int[] mains)
     {
         return mains;
@@ -17,13 +25,5 @@ public class Exhausted : ABuff {
     public override float BuffToHPOnlyOnce(float hp) { return hp; }
     public override float BuffToSP(float sp) { return sp; }
     public override float BuffToSPOnlyOnce(float sp) { return sp; }
-    public Exhausted()
-    {
-        duration = 10.0f;
-        _name = "Exhausted";
-        icon = GetComponent<Image>().sprite;
-        type = "Buff";
-        flavor = "You are exhausted." + "\n" + "Your MovementSpeed is half of original.";
-    }
 
 }

@@ -45,7 +45,7 @@ public abstract class ADamageField : MonoBehaviour {
                 {
                     if (b.gameObject.GetComponent<ABuff>().Name == buff.GetComponent<ABuff>().Name) { Destroy(b.gameObject); }
                 }
-                GameObject newbuff = Instantiate(buff);
+                GameObject newbuff = (GameObject)Instantiate(buff, Vector3.zero, Quaternion.identity);
                 newbuff.transform.SetParent(target.Buffs.transform);
             }
         }

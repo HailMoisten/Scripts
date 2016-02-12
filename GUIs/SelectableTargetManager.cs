@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class SelectableTargetManager : AIcon {
@@ -16,7 +17,7 @@ public class SelectableTargetManager : AIcon {
     protected Color c2 = new Color(1.0f, 0.5f, 0.5f, 1.0f);
     protected Color c3 = new Color(0.5f, 1.0f, 1.0f, 1.0f);
 
-
+    public override void Start() { }
     public void OnKersol()
     {
         isSelected = true;

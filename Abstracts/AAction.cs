@@ -18,7 +18,6 @@ public abstract class AAction : AIcon
     protected int sppercentCost = 0; public int SPPercentCost { get { return sppercentCost; } }
 
     // have to definite ACTIONCODE, DURATION and NAME at inheriting constracter
-    protected AAction() { }
     public abstract bool CanDoAction(AAnimal target);
     protected bool CanDoActionAboutHPSP(AAnimal target)
     {
@@ -39,7 +38,7 @@ public abstract class AAction : AIcon
     }
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
-        GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpTextCanvas"));
+        GameObject inst = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/PopUpTextCanvas"), Vector3.zero, Quaternion.identity);
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
         PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
         ptcm.Title = Name;
@@ -52,12 +51,13 @@ public abstract class AAction : AIcon
 // Main Actions
 public class IdleAction : AAction
 {
-    public IdleAction()
+    public override void Start()
     {
         actioncode = 0;
         _name = "Idle";
         duration = 0.0f;
     }
+
     public override bool CanDoAction(AAnimal target)
     {
         return true;
@@ -71,7 +71,7 @@ public class IdleAction : AAction
 }
 public class WalkAction : AAction
 {
-    public WalkAction()
+    public override void Start()
     {
         actioncode = 1;
         _name = "Walk";
@@ -133,7 +133,7 @@ public class WalkAction : AAction
 }
 public class RunAction : AAction
 {
-    public RunAction()
+    public override void Start()
     {
         actioncode = 2;
         _name = "Run";
