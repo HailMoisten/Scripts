@@ -39,14 +39,7 @@ public class MageMind : AMind {
     {
         public Pressure()
         {
-            actioncode = 5;
-            _name = "Pressure";
-            flavor = "Give 1.0*MD damage as magicdamage.";
-            icon = GetComponent<Image>().sprite;
-
-            damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
-
-            spCost = 10;
+            Debug.Log("Pressure");
         }
         public override bool CanDoAction(AAnimal target)
         {
@@ -54,6 +47,13 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal target)
         {
+            actioncode = 5;
+            _name = "Pressure";
+            flavor = "Give 1.0*MD damage as magicdamage.";
+            icon = GetComponent<Image>().sprite;
+            damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
+            spCost = 10;
+
             castTime = (2.0f / target.MovementSpeed);
             duration = castTime;
             GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
@@ -67,13 +67,6 @@ public class MageMind : AMind {
     {
         public Break_The_Limit()
         {
-            actioncode = 5;
-            _name = "Break The Limit";
-            flavor = "Give buff of -Break The Limit- to you.";
-            icon = GetComponent<Image>().sprite;
-            castTime = 5.0f;
-            duration = 5.0f;
-            buff = (GameObject)Resources.Load("Prefabs/Buffs/Break_The_Limit");
         }
         public override bool CanDoAction(AAnimal target)
         {
@@ -81,6 +74,14 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal target)
         {
+            actioncode = 5;
+            _name = "Break The Limit";
+            flavor = "Give buff of -Break The Limit- to you.";
+            icon = GetComponent<Image>().sprite;
+            castTime = 5.0f;
+            duration = 5.0f;
+            buff = (GameObject)Resources.Load("Prefabs/Buffs/Break_The_Limit");
+
             //Give a Buff about this.
             GameObject damagefield = Instantiate((GameObject)Resources.Load("Prefabs/Utilities/CubeDamageField"));
             damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, 0, DamageDuration, CastTime, target.nextPOS, 1);
