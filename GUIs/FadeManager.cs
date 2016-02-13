@@ -7,7 +7,7 @@ using System.Collections;
 /// </summary>
 public class FadeManager : MonoBehaviour {
 
-    private static FadeManager instance;
+//    private static FadeManager instance;
     /// <summary>暗転用黒テクスチャ</summary>
     private Texture2D blackTexture;
     /// <summary>フェード中の透明度</summary>
