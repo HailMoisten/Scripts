@@ -9,7 +9,7 @@ public class CubeDamageField : ADamageField {
         myCollider.enabled = false;
 
         transform.position = center;
-        transform.localScale = new Vector3(size - 0.1f, 1 - 0.1f, size - 0.1f);
+        transform.localScale = skillScaleVector + (-0.1f * Vector3.one);
         StartCoroutine(AwakeAndDestroy());
     }
 

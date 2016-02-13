@@ -44,7 +44,11 @@ public class MageMind : AMind {
             flavor = "Give 1.0*MD damage as magicdamage.";
             icon = GetComponent<Image>().sprite;
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
-            spCost = 10;
+            spCost = 3;
+            canUseAnyTargetPOS = true;
+            canUseAnyTargetScale = true;
+            skillRange = 8;
+            skillScaleOneSideLimit = 10;
             castTime = 2.0f;
             duration = 2.0f;
         }
@@ -54,8 +58,11 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal target)
         {
+            skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
+            spCost = Mathf.RoundToInt(SPCost * skillScale);
+            Debug.Log(skillScale); Debug.Log(SkillScaleVector);
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS, 1);
+            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(target);
         }
@@ -75,13 +82,13 @@ public class MageMind : AMind {
         }
         public override bool CanDoAction(AAnimal target)
         {
-            return isPassive;
+            return canUseAnyTargetPOS;
         }
         public override void Action(AAnimal target)
         {
             //Give a Buff about this.
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, DamageEffectDuration, Buff, 0, 0, DamageDuration, CastTime, target.nextPOS, 1);
+            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, 0, DamageDuration, CastTime, target.nextPOS);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(target);
         }

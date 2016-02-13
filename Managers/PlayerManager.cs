@@ -119,19 +119,16 @@ public class PlayerManager : AChild {
                 {
                     SetDirection();
                     SetnextnextPOS();
-                    if (Input.GetKey(KeyCode.Space)) // Action : Run
+                    if (Input.GetKey(KeyCode.Space))
                     {
                         AddAction(mainActionPool.GetComponent<RunAction>());
                     }
-                    else if (Input.GetButton("Action_1"))
-                    {
-                    }
                     else if (Input.GetKey(KeyCode.LeftShift))
                     {
-                        // Only doRotate();
                         AddAction(mainActionPool.GetComponent<IdleAction>());
                     }
-                    else // Action : Walk
+                    else if (Input.GetButton("Action_1") || Input.GetButton("Action_2")) { }
+                    else
                     {
                         AddAction(mainActionPool.GetComponent<WalkAction>());
                     }
@@ -141,20 +138,17 @@ public class PlayerManager : AChild {
                 {
                     if (Input.GetButton("Action_1"))
                     {
-                        if (visualAssistTarget != null)
+                        if (Input.GetKey(KeyCode.LeftShift))
                         {
-                            SettargetPOS();
-                            visualAssistTarget.transform.position = targetPOS;
+                            mindSkillShortcuts[1].SkillScaleVector += (Quaternion.AngleAxis(45 * camAngle, Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+                            visualAssistTarget.transform.localScale = mindSkillShortcuts[1].SkillScaleVector;
                         }
-                        else { targetPOS = nextnextPOS + Vector3.up;
-                            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity); }
+                        else { controlVisualAssistTarget(); }
                     }
                 }
                 if (Input.GetButtonDown("Action_1"))
                 {
-                    if (visualAssistTarget != null) { }
-                    else { targetPOS = nextnextPOS + Vector3.up;
-                        visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity); }
+                    controlVisualAssistTarget();
                 }
                 if (Input.GetButtonUp("Action_1"))
                 {
@@ -179,6 +173,20 @@ public class PlayerManager : AChild {
             DoAction();
         }
 
+    }
+
+    private void controlVisualAssistTarget()
+    {
+        if (visualAssistTarget != null)
+        {
+            SettargetPOS();
+            visualAssistTarget.transform.position = targetPOS;
+        }
+        else {
+            targetPOS = nextPOS + Vector3.up;
+            SettargetPOS();
+            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
+        }
     }
 
     public override void YouDied()

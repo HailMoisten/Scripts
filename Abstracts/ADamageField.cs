@@ -8,19 +8,18 @@ public abstract class ADamageField : MonoBehaviour {
     protected float damageDuration = 1.0f;
     protected float castTime = 0.5f;
     protected Vector3 center = new Vector3(0, 0, 0);
-    protected int size = 1;
     protected BoxCollider myCollider;
     protected GameObject damageEffect = null;
-    protected float damageEffectDuration;
+    protected Vector3 skillScaleVector = Vector3.one;
     protected GameObject buff = null;
 
-    public void SetMainParam(GameObject damageeffect, float damageeffectduration, GameObject buff, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition, int size)
+    public void SetMainParam(GameObject damageeffect, Vector3 skillscalevector, GameObject buff, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition)
     {
-        damageEffect = damageeffect; damageEffectDuration = damageeffectduration;
+        damageEffect = damageeffect; skillScaleVector = skillscalevector;
         this.buff = buff;
         attackDamage = attackdamage; magicDamage = magicdamage;
         this.damageDuration = damageduration; this.castTime = casttime;
-        center = centerposition; this.size = size;
+        center = centerposition;
     }
 
 
@@ -28,8 +27,12 @@ public abstract class ADamageField : MonoBehaviour {
     {
         yield return new WaitForSeconds(castTime);
         myCollider.enabled = true;
-        if (damageEffect != null) { GameObject dm = (GameObject)Instantiate(damageEffect, center, Quaternion.identity);
-        Destroy(dm, damageEffectDuration); }
+        if (damageEffect != null)
+        {
+            GameObject dm = (GameObject)Instantiate(damageEffect, center, Quaternion.identity);
+            dm.GetComponent<EffectManager>().Scale = skillScaleVector;
+            dm.GetComponent<EffectManager>().Go();
+        }
         Destroy(gameObject, damageDuration);
     }
 
