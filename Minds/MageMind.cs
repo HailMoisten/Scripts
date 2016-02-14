@@ -59,12 +59,14 @@ public class MageMind : AMind {
         public override void Action(AAnimal target)
         {
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
-            spCost = Mathf.RoundToInt(SPCost * skillScale);
             Debug.Log(skillScale); Debug.Log(SkillScaleVector);
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
             damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
+            int tempspcost = SPCost;
+            spCost = Mathf.RoundToInt(SPCost * skillScale);
             SetMotionAndDurationAndUseHPSP(target);
+            spCost = tempspcost;
         }
     }
 

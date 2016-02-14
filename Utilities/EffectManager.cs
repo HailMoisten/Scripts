@@ -18,7 +18,8 @@ public class EffectManager : MonoBehaviour {
         transform.localScale = Scale;
         Duration = GetComponent<ParticleSystem>().duration;
         float scaleNum = Mathf.Sqrt(Scale.x * Scale.y * Scale.z);
-        if (scaleNum > 1.0f) { scaleNum = 1; }
+        Debug.Log(scaleNum);
+        if (scaleNum > 8.0f) { scaleNum = 8; } else if (scaleNum <= 0) { scaleNum = 1; }
         Transform par = null;
         for (int n = 0; n < transform.childCount; n++)
         {
@@ -35,6 +36,13 @@ public class EffectManager : MonoBehaviour {
                 emitrate = par.GetComponent<ParticleSystem>().maxParticles;
                 emitrate = emitrate * scaleNum;
                 par.GetComponent<ParticleSystem>().maxParticles = Mathf.RoundToInt(emitrate);
+            }
+            else if (par.tag == "ResizeParticle")
+            {
+                // emitsize
+                emitrate = par.GetComponent<ParticleSystem>().startSize;
+                emitrate = emitrate * scaleNum;
+                par.GetComponent<ParticleSystem>().startSize = emitrate;
             }
         }
         Destroy(gameObject, Duration);

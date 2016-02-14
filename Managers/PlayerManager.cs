@@ -127,7 +127,10 @@ public class PlayerManager : AChild {
                     {
                         AddAction(mainActionPool.GetComponent<IdleAction>());
                     }
-                    else if (Input.GetButton("Action_1") || Input.GetButton("Action_2")) { }
+                    else if (Input.GetButton("Action_1") || Input.GetButton("Action_2") ||
+                        Input.GetButton("Action_3") || Input.GetButton("Action_4") ||
+                        Input.GetButton("Action_5") || Input.GetButton("Action_6") ||
+                        Input.GetButton("Action_7") || Input.GetButton("Action_8")) { }
                     else
                     {
                         AddAction(mainActionPool.GetComponent<WalkAction>());
@@ -136,24 +139,39 @@ public class PlayerManager : AChild {
                 if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)
                     || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    if (Input.GetButton("Action_1"))
+                    for (int n = 1; n <= 8; n++)
                     {
-                        if (Input.GetKey(KeyCode.LeftShift))
+                        if (Input.GetButton("Action_" + n))
                         {
-                            mindSkillShortcuts[1].SkillScaleVector += (Quaternion.AngleAxis(45 * camAngle, Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
-                            visualAssistTarget.transform.localScale = mindSkillShortcuts[1].SkillScaleVector;
+                            if (Input.GetKey(KeyCode.LeftShift) && mindSkillShortcuts[n].CanUseAnyTargetScale)
+                            { resizeVisualAssistTarget(n); }
+                            else if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
+                            { controlVisualAssistTarget(n); }
                         }
-                        else { controlVisualAssistTarget(); }
                     }
                 }
-                if (Input.GetButtonDown("Action_1"))
+                for (int n = 1; n <= 8; n++)
                 {
-                    controlVisualAssistTarget();
-                }
-                if (Input.GetButtonUp("Action_1"))
-                {
-                    AddAction(mindSkillShortcuts[1]);
-                    Destroy(GameObject.Find("VisualAssistTarget(Clone)"));
+                    if (Input.GetButtonDown("Action_" + n))
+                    {
+                        if (mindSkillShortcuts[n] != null)
+                        {
+                            if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
+                            { controlVisualAssistTarget(n); }
+                            else { AddAction(mindSkillShortcuts[n]); }
+                        }
+                    }
+                    if (Input.GetButtonUp("Action_" + n))
+                    {
+                        if (mindSkillShortcuts[n] != null)
+                        {
+                            if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
+                            {
+                                AddAction(mindSkillShortcuts[n]);
+                                Destroy(GameObject.Find("VisualAssistTarget(Clone)"));
+                            }
+                        }
+                    }
                 }
 
                 if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -175,7 +193,18 @@ public class PlayerManager : AChild {
 
     }
 
-    private void controlVisualAssistTarget()
+    private void resizeVisualAssistTarget(int n)
+    {
+        Vector3 sv = mindSkillShortcuts[n].SkillScaleVector + (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+        sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
+        int limit = mindSkillShortcuts[n].SkillScaleOneSideLimit;
+        if (sv.x > limit) { sv -= Vector3.right; } else if (sv.x < 1) { sv += Vector3.right; }
+        if (sv.y > limit) { sv -= Vector3.up; } else if (sv.y < 1) { sv += Vector3.up; }
+        if (sv.z > limit) { sv -= Vector3.forward; } else if (sv.z < 1) { sv += Vector3.forward; }
+        mindSkillShortcuts[n].SkillScaleVector = sv;
+        visualAssistTarget.transform.localScale = mindSkillShortcuts[n].SkillScaleVector;
+    }
+    private void controlVisualAssistTarget(int n)
     {
         if (visualAssistTarget != null)
         {
@@ -186,6 +215,7 @@ public class PlayerManager : AChild {
             targetPOS = nextPOS + Vector3.up;
             SettargetPOS();
             visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
+            visualAssistTarget.transform.localScale = mindSkillShortcuts[n].SkillScaleVector;
         }
     }
 
