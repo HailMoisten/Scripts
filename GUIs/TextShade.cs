@@ -10,7 +10,7 @@ public class TextShade : MonoBehaviour {
         {
             GameObject main = Instantiate(gameObject);
             main.transform.SetParent(transform);
-            main.transform.localPosition = transform.position + Vector3.up;
+            main.transform.localPosition = Vector3.up;
             main.transform.localScale = Vector3.one;
             main.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f);
         }

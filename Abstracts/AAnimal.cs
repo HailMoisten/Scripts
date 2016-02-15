@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 public abstract class AAnimal : MonoBehaviour {
+    public abstract void Awake();
     // Necessary Public Methods
     public Animator GetAnimator() { return GetComponent<Animator>(); }
     public Vector3 RoundToIntVector3XZ(Vector3 pos) { return new Vector3(Mathf.RoundToInt(pos.x), pos.y, Mathf.RoundToInt(pos.z)); }

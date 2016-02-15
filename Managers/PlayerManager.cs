@@ -50,7 +50,7 @@ public class PlayerManager : AChild {
     public bool isMenuAwake = false;
 
     // Use this for initialization
-    void Start () {
+    public override void Awake () {
         setUtilities();
 
         transform.tag = "Player";
