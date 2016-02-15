@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerCanvasManager : ACanvasManager {
 
@@ -9,6 +10,9 @@ public class PlayerCanvasManager : ACanvasManager {
     private Text HPText;
     private RectTransform SPBar;
     private Text SPText;
+    private ABuff targetBuff;
+    // This is not <string> for destroying Instantiated GameObject
+    public List<SelectableTargetManager> buffListSTM = new List<SelectableTargetManager>();
 
     protected override void Start()
     {
@@ -35,6 +39,8 @@ public class PlayerCanvasManager : ACanvasManager {
         SPBar.sizeDelta = new Vector2(spbarwid, SPBar.sizeDelta.y);
         SPText.text = "SP    " + Mathf.RoundToInt(playerManager.SP).ToString(); SPText.GetComponent<TextShade>().TextUpdate();
 
+        if (playerManager.Buffs.transform.childCount > 0) { updateBuffs(); }
+
         if (nextCanvas != null) { }
         else
         {
@@ -43,6 +49,7 @@ public class PlayerCanvasManager : ACanvasManager {
                 openMenu();
             }
         }
+
     }
     private void openMenu()
     {
@@ -56,6 +63,57 @@ public class PlayerCanvasManager : ACanvasManager {
         playerManager.isMenuAwake = false;
         Time.timeScale = 1.0f;
         nextCanvas.DestroyThisCanvas();
+    }
+    private void updateBuffs()
+    {
+        for (int i = 0; i < playerManager.Buffs.transform.childCount; i++)
+        {
+            targetBuff = playerManager.Buffs.transform.GetChild(i).GetComponent<ABuff>();
+            if (targetBuff.IsDrawn)
+            {
+                if (targetBuff.Sands <= 0.0f)
+                {
+                    for (int j = 0; j < buffListSTM.Count; j++) {
+                        if (buffListSTM[j].TargetIcon.Name == targetBuff.Name) {
+                            Destroy(buffListSTM[j].gameObject); buffListSTM.RemoveAt(j);
+                        }
+                    }
+                    Destroy(targetBuff.gameObject);
+                }
+            }
+            else
+            {
+                if (buffListSTM.Count == 0)
+                {
+                    GameObject temp = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/SelectableTarget"), Vector3.zero, Quaternion.identity);
+                    temp.transform.SetParent(transform);
+                    temp.GetComponent<RectTransform>().position = new Vector3(700 + (24 * i), 60, 0);
+                    buffListSTM.Add(temp.GetComponent<SelectableTargetManager>());
+                    buffListSTM[buffListSTM.Count - 1].TargetIcon = targetBuff.GetComponent<AIcon>();
+                    buffListSTM[buffListSTM.Count - 1].Icon = targetBuff.Icon;
+
+                    targetBuff.IsDrawn = true;
+                }
+                for (int j = 0; j < buffListSTM.Count; j++)
+                {
+                    if (buffListSTM[j].TargetIcon.Name == targetBuff.Name)
+                    {
+                        targetBuff.Sands = targetBuff.Duration; targetBuff.IsDrawn = true;
+                    }
+                    else
+                    {
+                        GameObject temp = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/SelectableTarget"), Vector3.zero, Quaternion.identity);
+                        temp.transform.SetParent(transform);
+                        temp.GetComponent<RectTransform>().position = new Vector3(700 + (24 * i), 60, 0);
+                        buffListSTM.Add(temp.GetComponent<SelectableTargetManager>());
+                        buffListSTM[buffListSTM.Count - 1].TargetIcon = targetBuff.GetComponent<AIcon>();
+                        buffListSTM[buffListSTM.Count - 1].Icon = targetBuff.Icon;
+
+                        targetBuff.IsDrawn = true;
+                    }
+                }
+            }
+        }
     }
 
 }

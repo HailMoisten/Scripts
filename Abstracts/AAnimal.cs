@@ -296,12 +296,11 @@ public abstract class AAnimal : MonoBehaviour {
             bool isExhausted = false;
             foreach(Transform b in Buffs.transform)
             {
-                Debug.Log(b.gameObject.GetComponent<ABuff>().Name);
                 if (b.gameObject.GetComponent<ABuff>().Name == "Exhausted") { isExhausted = true; }
             }
             if (isExhausted) { }
             else {
-                GameObject buff = Instantiate((GameObject)Resources.Load("Prefabs/Buffs/Exhausted"));
+                GameObject buff = (GameObject)Instantiate(Resources.Load("Prefabs/Buffs/Exhausted"), Vector3.zero, Quaternion.identity);
                 buff.transform.SetParent(Buffs.transform);
             }
         }

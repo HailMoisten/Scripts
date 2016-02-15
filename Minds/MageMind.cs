@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class MageMind : AMind {
 
-    public override void Start()
+    public override void Awake()
     {
         _name = "Mage"; // const
         type = "Mind"; // const
@@ -37,7 +37,7 @@ public class MageMind : AMind {
 
     public class Pressure : AMindSkill
     {
-        public override void Start()
+        public override void Awake()
         {
             actioncode = 5;
             _name = "Pressure";
@@ -72,7 +72,7 @@ public class MageMind : AMind {
 
     public class Break_The_Limit : AMindSkill
     {
-        public override void Start()
+        public override void Awake()
         {
             actioncode = 5;
             _name = "Break The Limit";

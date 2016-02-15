@@ -23,7 +23,7 @@ public abstract class AIcon : MonoBehaviour {
             GetComponent<Image>().sprite = value;
         }
     }
-    public abstract void Start();
+    public abstract void Awake();
 
     public abstract ACanvasManager Clicked(Vector3 newcanvaspos);
 

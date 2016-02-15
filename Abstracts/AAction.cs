@@ -51,7 +51,7 @@ public abstract class AAction : AIcon
 // Main Actions
 public class IdleAction : AAction
 {
-    public override void Start()
+    public override void Awake()
     {
         actioncode = 0;
         _name = "Idle";
@@ -71,7 +71,7 @@ public class IdleAction : AAction
 }
 public class WalkAction : AAction
 {
-    public override void Start()
+    public override void Awake()
     {
         actioncode = 1;
         _name = "Walk";
@@ -133,7 +133,7 @@ public class WalkAction : AAction
 }
 public class RunAction : AAction
 {
-    public override void Start()
+    public override void Awake()
     {
         actioncode = 2;
         _name = "Run";

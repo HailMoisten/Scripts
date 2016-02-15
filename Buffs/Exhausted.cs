@@ -4,9 +4,10 @@ using System.Collections;
 
 public class Exhausted : ABuff {
 
-    public override void Start()
+    public override void Awake()
     {
-        duration = 10.0f;
+        Duration = 10.0f;
+        Sands = 10.0f;
         _name = "Exhausted";
         icon = GetComponent<Image>().sprite;
         type = "Buff";

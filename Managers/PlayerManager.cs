@@ -59,7 +59,6 @@ public class PlayerManager : AChild {
 
         setMainStatus(165, 100, 100, 100, 100, 100);
         //setMainStatus(10, 5, 10, 10, 2, 5);
-//        setMindSkillShortcuts();
 
     }
 
@@ -85,6 +84,7 @@ public class PlayerManager : AChild {
         Buffs = new GameObject("Buffs");
         Buffs.transform.SetParent(transform);
         setMainActionPool();
+        setMindSkillShortcuts();
     }
     protected override void setMindSkillShortcuts()
     {

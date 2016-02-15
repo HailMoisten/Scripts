@@ -4,13 +4,13 @@ using System.Collections;
 
 public class Break_The_Limit : ABuff {
 
-    public override void Start()
+    public override void Awake()
     {
-        duration = 60.0f;
+        Duration = 60.0f;
         _name = "Break_The_Limit";
         icon = GetComponent<Image>().sprite;
         type = "Buff";
-        flavor = "Break your limit." + "\n" + "Gain 1.5 times your MaxSP for a while.";
+        flavor = "Break your limit." + "\n" + "Gain a half your MaxSP and SP for a while.";
     }
     public override int[] BuffToMainStatus(int[] mains)
     {
