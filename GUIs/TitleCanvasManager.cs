@@ -7,7 +7,7 @@ public class TitleCanvasManager : ACanvasManager
     private FadeManager fade;
     private GameObject configCanvas;
 
-    protected override void Start()
+    protected override void Awake()
     {
         fade = GetComponent<FadeManager>();
         fade.FadeIn(5.0f);

@@ -19,7 +19,7 @@ public class YesNoPopUpTextCanvasManager : ACanvasManager {
         }
     }
 
-    protected override void Start()
+    protected override void Awake()
     {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 1;

@@ -9,7 +9,7 @@ public class StatusMenuCanvasManager : ACanvasManager
 
     private PlayerManager playerManager;
 
-    protected override void Start()
+    protected override void Awake()
     {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;

@@ -20,7 +20,7 @@ public class PopUpTextCanvasManager : ACanvasManager {
     }
 
     // Use this for initialization
-    protected override void Start()
+    protected override void Awake()
     {
         pointa = 0;
         pointaNUM = 0;

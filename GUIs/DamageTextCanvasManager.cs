@@ -28,7 +28,7 @@ public class DamageTextCanvasManager : ACanvasManager {
     }
 
     // Use this for initialization
-    protected override void Start () {
+    protected override void Awake () {
     }
 
 }

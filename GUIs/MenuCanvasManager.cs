@@ -6,7 +6,7 @@ public class MenuCanvasManager : ACanvasManager {
     private PlayerCanvasManager playerCanvas;
     private GameObject[] nextMenus = new GameObject[4];
 
-    protected override void Start()
+    protected override void Awake()
     {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 1;

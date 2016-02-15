@@ -14,7 +14,7 @@ public class PlayerCanvasManager : ACanvasManager {
     // This is not <string> for destroying Instantiated GameObject
     public List<SelectableTargetManager> buffListSTM = new List<SelectableTargetManager>();
 
-    protected override void Start()
+    protected override void Awake()
     {
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         HPBar = transform.FindChild("HPBar").GetComponent<RectTransform>();

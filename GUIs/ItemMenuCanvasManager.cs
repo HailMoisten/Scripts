@@ -7,7 +7,7 @@ public class ItemMenuCanvasManager : ACanvasManager
     private PlayerManager playerManager;
 
     // Use this for initialization
-    protected override void Start()
+    protected override void Awake()
     {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 1;

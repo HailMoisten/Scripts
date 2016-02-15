@@ -4,7 +4,7 @@ using System.Collections;
 public class ControlsMenuCanvasManager : ACanvasManager {
 
     // Use this for initialization
-    protected override void Start() {
+    protected override void Awake() {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 0;

@@ -22,7 +22,7 @@ public abstract class ACanvasManager : MonoBehaviour {
 
     // At least, please set myKersolRect.
     // Can we access to protected constracters from Prefabs?
-    protected abstract void Start();
+    protected abstract void Awake();
     /*
     {
         myKersolRect = transform.FindObject("Kersol").gameObject.GetComponent<RectTransform>();
