@@ -51,6 +51,8 @@ public class MageMind : AMind {
             skillScaleOneSideLimit = 10;
             castTime = 2.0f;
             duration = 2.0f;
+            isChargeSkill = true;
+            chargeLimit = 5;
         }
         public override bool CanDoAction(AAnimal target)
         {
@@ -58,16 +60,20 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal target)
         {
+            castTime = 2.0f / target.MovementSpeed;
+            duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
-            Debug.Log(skillScale); Debug.Log(SkillScaleVector);
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS);
+            if (Charged) { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, target.MD * 2, DamageDuration, CastTime, target.targetPOS); }
+            else { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS); }
+            if (IsChargeSkill) { chargeCount = 0; charged = false; } // Need this. if (IsChargeSkill)
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             int tempspcost = SPCost;
             spCost = Mathf.RoundToInt(SPCost * skillScale);
             SetMotionAndDurationAndUseHPSP(target);
             spCost = tempspcost;
         }
+
     }
 
     public class Break_The_Limit : AMindSkill

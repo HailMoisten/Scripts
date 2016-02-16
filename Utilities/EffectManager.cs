@@ -7,7 +7,7 @@ public class EffectManager : MonoBehaviour {
     public float Duration { get; set; }
     private float emitrate = 1.0f;
 
-    public void Start()
+    public void Awake()
     {
         Scale = Vector3.one;
         Duration = 5.0f;
@@ -18,7 +18,6 @@ public class EffectManager : MonoBehaviour {
         transform.localScale = Scale;
         Duration = GetComponent<ParticleSystem>().duration;
         float scaleNum = Mathf.Sqrt(Scale.x * Scale.y * Scale.z);
-        Debug.Log(scaleNum);
         if (scaleNum > 8.0f) { scaleNum = 8; } else if (scaleNum <= 0) { scaleNum = 1; }
         Transform par = null;
         for (int n = 0; n < transform.childCount; n++)

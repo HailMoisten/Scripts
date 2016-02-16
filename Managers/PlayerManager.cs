@@ -12,11 +12,17 @@ public class PlayerManager : AChild {
             new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
         nextnextPOS = RoundToIntVector3XZ(nextnextPOS);
     }
-    private void SettargetPOS()
+    private void SettargetPOS(int n)
     {
-        targetPOS = targetPOS + (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) *
+        Vector3 sv = targetPOS - nextPOS;
+        Vector3 iv = (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) *
             new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
-        targetPOS = RoundToIntVector3XZ(targetPOS);
+        int limit = mindSkillShortcuts[n].SkillRange;
+        if (Mathf.Abs(sv.x + iv.x) > limit) { } else { sv = sv + Vector3.right * iv.x; }
+        if (Mathf.Abs(sv.y + iv.y) > limit) { } else { sv = sv + Vector3.up * iv.y; }
+        if (Mathf.Abs(sv.z + iv.z) > limit) { } else { sv = sv + Vector3.forward * iv.z; }
+        sv = new Vector3(Mathf.RoundToInt(sv.x), Mathf.RoundToInt(sv.y), Mathf.RoundToInt(sv.z));
+        targetPOS = nextPOS + sv;
     }
     private void SetDirection()
     {
@@ -136,20 +142,6 @@ public class PlayerManager : AChild {
                         AddAction(mainActionPool.GetComponent<WalkAction>());
                     }
                 }
-                if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)
-                    || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
-                {
-                    for (int n = 1; n <= 8; n++)
-                    {
-                        if (Input.GetButton("Action_" + n))
-                        {
-                            if (Input.GetKey(KeyCode.LeftShift) && mindSkillShortcuts[n].CanUseAnyTargetScale)
-                            { resizeVisualAssistTarget(n); }
-                            else if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
-                            { controlVisualAssistTarget(n); }
-                        }
-                    }
-                }
                 for (int n = 1; n <= 8; n++)
                 {
                     if (Input.GetButtonDown("Action_" + n))
@@ -172,19 +164,40 @@ public class PlayerManager : AChild {
                             }
                         }
                     }
-                }
-
-                if (Input.GetKeyDown(KeyCode.LeftShift))
-                {
-                    setMindSkillShortcuts();
-                }
-                if (Input.GetKeyDown(KeyCode.RightShift))
-                {
-                    if (visualAssist != null) { Destroy(GameObject.Find("VisualAssistManhattanDiag(Clone)")); }
-                    else
+                    if (Input.GetButton("Action_" + n))
                     {
-                        visualAssist = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistManhattanDiag"), nextPOS, Quaternion.identity);
+                        if (mindSkillShortcuts[n].IsChargeSkill)
+                        {
+                            if (mindSkillShortcuts[n].Charged) { }
+                            else { mindSkillShortcuts[n].Charge(this); }
+                        }
                     }
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)
+                || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                for (int n = 1; n <= 8; n++)
+                {
+                    if (Input.GetButton("Action_" + n))
+                    {
+                        if (Input.GetKey(KeyCode.LeftShift) && mindSkillShortcuts[n].CanUseAnyTargetScale)
+                        { resizeVisualAssistTarget(n); }
+                        else if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
+                        { controlVisualAssistTarget(n); }
+                    }
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                setMindSkillShortcuts();
+            }
+            if (Input.GetKeyDown(KeyCode.RightShift))
+            {
+                if (visualAssist != null) { Destroy(GameObject.Find("VisualAssistManhattanDiag(Clone)")); }
+                else
+                {
+                    visualAssist = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistManhattanDiag"), nextPOS, Quaternion.identity);
                 }
             }
             // Update every flame
@@ -208,12 +221,12 @@ public class PlayerManager : AChild {
     {
         if (visualAssistTarget != null)
         {
-            SettargetPOS();
+            SettargetPOS(n);
             visualAssistTarget.transform.position = targetPOS;
         }
         else {
             targetPOS = nextPOS + Vector3.up;
-            SettargetPOS();
+            SettargetPOS(n);
             visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
             visualAssistTarget.transform.localScale = mindSkillShortcuts[n].SkillScaleVector;
         }

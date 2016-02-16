@@ -14,6 +14,38 @@ public abstract class AMindSkill : AAction {
     public int SkillScaleOneSideLimit { get { return skillScaleOneSideLimit; } }
     protected int skillRange = 1;
     public int SkillRange { get { return skillRange; } }
+    protected bool isChargeSkill = false;
+    public bool IsChargeSkill { get { return isChargeSkill; } }
+    protected bool charged = false;
+    public bool Charged { get { return charged; } }
+    protected int chargeCount = 1; // Inclement a times per second.
+    public int ChargeCount { get { return chargeCount; } set { chargeCount = value; } }
+    protected int chargeLimit = 1;
+    public int ChargeLimit { get { return chargeLimit; } }
+    protected bool isCharged = false;
+    protected IEnumerator chargedCD(float time)
+    {
+        isCharged = true;
+        yield return new WaitForSeconds(time);
+        isCharged = false;
+    }
+    public void Charge(AAnimal target)
+    {
+        if (isCharged) { }
+        else
+        {
+            if (ChargeCount >= ChargeLimit)
+            {
+                charged = true;
+                GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charged"), target.nextPOS + Vector3.up, Quaternion.identity);
+                ef.GetComponent<EffectManager>().Go();
+                Debug.Log("Charged!");
+            }
+            else { chargeCount++; target.UseHPSP(0, SPCost, 0, 0); }
+            StartCoroutine(chargedCD(CastTime / target.MovementSpeed));
+        }
+    }
+
     protected float castTime;
     public float CastTime { get { return castTime; } }
     protected float damageDuration = 0.10f;
