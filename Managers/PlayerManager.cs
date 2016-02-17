@@ -15,8 +15,14 @@ public class PlayerManager : AChild {
     private void SettargetPOS(int n)
     {
         Vector3 sv = targetPOS - nextPOS;
-        Vector3 iv = (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) *
-            new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+        Vector3 iv = Vector3.zero;
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            iv = new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+        } else {
+            iv = (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) *
+                new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+        }
         int limit = mindSkillShortcuts[n].SkillRange;
         if (Mathf.Abs(sv.x + iv.x) > limit) { } else { sv = sv + Vector3.right * iv.x; }
         if (Mathf.Abs(sv.y + iv.y) > limit) { } else { sv = sv + Vector3.up * iv.y; }
@@ -125,7 +131,11 @@ public class PlayerManager : AChild {
                 {
                     SetDirection();
                     SetnextnextPOS();
-                    if (Input.GetKey(KeyCode.Space))
+                    if (Input.GetButton("Action_1") || Input.GetButton("Action_2") ||
+                        Input.GetButton("Action_3") || Input.GetButton("Action_4") ||
+                        Input.GetButton("Action_5") || Input.GetButton("Action_6") ||
+                        Input.GetButton("Action_7") || Input.GetButton("Action_8")) { }
+                    else if (Input.GetKey(KeyCode.Space))
                     {
                         AddAction(mainActionPool.GetComponent<RunAction>());
                     }
@@ -133,10 +143,6 @@ public class PlayerManager : AChild {
                     {
                         AddAction(mainActionPool.GetComponent<IdleAction>());
                     }
-                    else if (Input.GetButton("Action_1") || Input.GetButton("Action_2") ||
-                        Input.GetButton("Action_3") || Input.GetButton("Action_4") ||
-                        Input.GetButton("Action_5") || Input.GetButton("Action_6") ||
-                        Input.GetButton("Action_7") || Input.GetButton("Action_8")) { }
                     else
                     {
                         AddAction(mainActionPool.GetComponent<WalkAction>());
@@ -148,7 +154,7 @@ public class PlayerManager : AChild {
                     {
                         if (mindSkillShortcuts[n] != null)
                         {
-                            if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
+                            if (mindSkillShortcuts[n].CanSelectPosition)
                             { controlVisualAssistTarget(n); }
                             else { AddAction(mindSkillShortcuts[n]); }
                         }
@@ -157,7 +163,7 @@ public class PlayerManager : AChild {
                     {
                         if (mindSkillShortcuts[n] != null)
                         {
-                            if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
+                            if (mindSkillShortcuts[n].CanSelectPosition)
                             {
                                 AddAction(mindSkillShortcuts[n]);
                                 Destroy(GameObject.Find("VisualAssistTarget(Clone)"));
@@ -181,10 +187,27 @@ public class PlayerManager : AChild {
                 {
                     if (Input.GetButton("Action_" + n))
                     {
-                        if (Input.GetKey(KeyCode.LeftShift) && mindSkillShortcuts[n].CanUseAnyTargetScale)
+                        if (Input.GetKey(KeyCode.LeftShift) && mindSkillShortcuts[n].CanResize)
                         { resizeVisualAssistTarget(n); }
-                        else if (mindSkillShortcuts[n].CanUseAnyTargetPOS)
+                        else if (mindSkillShortcuts[n].CanSelectPosition)
                         { controlVisualAssistTarget(n); }
+                        else
+                        {
+                            SetDirection();
+                            SetnextnextPOS();
+                            if (Input.GetKey(KeyCode.Space))
+                            {
+                                AddAction(mainActionPool.GetComponent<RunAction>());
+                            }
+                            else if (Input.GetKey(KeyCode.LeftShift))
+                            {
+                                AddAction(mainActionPool.GetComponent<IdleAction>());
+                            }
+                            else
+                            {
+                                AddAction(mainActionPool.GetComponent<WalkAction>());
+                            }
+                        }
                     }
                 }
             }
@@ -208,8 +231,16 @@ public class PlayerManager : AChild {
 
     private void resizeVisualAssistTarget(int n)
     {
-        Vector3 sv = mindSkillShortcuts[n].SkillScaleVector + (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
-        sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
+        Vector3 sv = Vector3.zero;
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            sv = mindSkillShortcuts[n].SkillScaleVector + new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+        }
+        else
+        {
+            sv = mindSkillShortcuts[n].SkillScaleVector + (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+            sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
+        }
         int limit = mindSkillShortcuts[n].SkillScaleOneSideLimit;
         if (sv.x > limit) { sv -= Vector3.right; } else if (sv.x < 1) { sv += Vector3.right; }
         if (sv.y > limit) { sv -= Vector3.up; } else if (sv.y < 1) { sv += Vector3.up; }
@@ -225,7 +256,7 @@ public class PlayerManager : AChild {
             visualAssistTarget.transform.position = targetPOS;
         }
         else {
-            targetPOS = nextPOS + Vector3.up;
+            if (Input.GetKey(KeyCode.LeftAlt)) { } else { targetPOS = nextPOS + Vector3.up; }
             SettargetPOS(n);
             visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
             visualAssistTarget.transform.localScale = mindSkillShortcuts[n].SkillScaleVector;
