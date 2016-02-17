@@ -45,8 +45,8 @@ public class MageMind : AMind {
             icon = GetComponent<Image>().sprite;
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
             spCost = 3;
-            canUseAnyTargetPOS = true;
-            canUseAnyTargetScale = true;
+            canSelectPosition = true;
+            canResize = true;
             skillRange = 8;
             skillScaleOneSideLimit = 10;
             castTime = 2.0f;
@@ -90,7 +90,7 @@ public class MageMind : AMind {
         }
         public override bool CanDoAction(AAnimal target)
         {
-            return canUseAnyTargetPOS;
+            return canSelectPosition;
         }
         public override void Action(AAnimal target)
         {

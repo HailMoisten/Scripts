@@ -2,10 +2,10 @@
 using System.Collections;
 
 public abstract class AMindSkill : AAction {
-    protected bool canUseAnyTargetPOS = false;
-    public bool CanUseAnyTargetPOS { get { return canUseAnyTargetPOS; } }
-    protected bool canUseAnyTargetScale = false;
-    public bool CanUseAnyTargetScale { get { return canUseAnyTargetScale; } }
+    protected bool canSelectPosition = false;
+    public bool CanSelectPosition { get { return canSelectPosition; } }
+    protected bool canResize = false;
+    public bool CanResize { get { return canResize; } }
     protected Vector3 skillScaleVector = Vector3.one;
     public Vector3 SkillScaleVector { get { return skillScaleVector; } set { skillScaleVector = value; } }
     protected float skillScale = 1.0f;
