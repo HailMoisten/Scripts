@@ -7,8 +7,10 @@ public class PlayerCanvasManager : ACanvasManager {
 
     private PlayerManager playerManager;
     private RectTransform HPBar;
+    private RectTransform HPEnd;
     private Text HPText;
     private RectTransform SPBar;
+    private RectTransform SPEnd;
     private Text SPText;
     private ABuff targetBuff;
     // This is not <string> for destroying Instantiated GameObject
@@ -18,8 +20,10 @@ public class PlayerCanvasManager : ACanvasManager {
     {
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         HPBar = transform.FindChild("HPBar").GetComponent<RectTransform>();
+        HPEnd = HPBar.transform.FindChild("HPEnd").GetComponent<RectTransform>();
         HPText = transform.FindChild("HPText").GetComponent<Text>();
         SPBar = transform.FindChild("SPBar").GetComponent<RectTransform>();
+        SPEnd = SPBar.transform.FindChild("SPEnd").GetComponent<RectTransform>();
         SPText = transform.FindChild("SPText").GetComponent<Text>();
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
@@ -35,8 +39,10 @@ public class PlayerCanvasManager : ACanvasManager {
         int hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
         int spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
         HPBar.sizeDelta = new Vector2(hpbarwid, HPBar.sizeDelta.y);
+        HPEnd.localPosition = new Vector3(hpbarwid, 0, 0);
         HPText.text = "HP    " + Mathf.RoundToInt(playerManager.HP).ToString(); HPText.GetComponent<TextShade>().TextUpdate();
         SPBar.sizeDelta = new Vector2(spbarwid, SPBar.sizeDelta.y);
+        SPEnd.localPosition = new Vector3(spbarwid, 0, 0);
         SPText.text = "SP    " + Mathf.RoundToInt(playerManager.SP).ToString(); SPText.GetComponent<TextShade>().TextUpdate();
 
         if (playerManager.Buffs.transform.childCount > 0) { updateBuffs(); }
