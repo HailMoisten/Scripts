@@ -87,7 +87,7 @@ public class WalkAction : AAction
         RaycastHit hitFront; RaycastHit hitDown;
         Ray rayFront = new Ray(target.nextPOS + new Vector3(0, 1.5f, 0), dir2);
         Ray rayDown = new Ray(target.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
-        if (Physics.Raycast(target.nextPOS + new Vector3(0, 1.5f, 0), dir2, out hitFront, maxd))
+        if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
             //            Debug.Log("hitsFront:" + hitFront.distance);
             if (hitFront.collider.tag == "Terrain" ||
@@ -97,7 +97,7 @@ public class WalkAction : AAction
                 return false;
             }
         }
-        if (Physics.Raycast(target.nextnextPOS + new Vector3(0, 1.5f, 0), -Vector3.up, out hitDown, 3.0f))
+        if (Physics.Raycast(rayDown, out hitDown, 3.0f))
         {
             //            Debug.Log("hitDown:" + hitDown.distance);
             if (hitDown.collider.tag == "Environment" ||
@@ -121,6 +121,7 @@ public class WalkAction : AAction
         else { diag = 1.0f; }
         if (target.MovementSpeed == 0) { }
         else { duration = (diag) / target.MovementSpeed; }//time
+        target.POS = target.nextPOS;
         target.nextPOS = target.nextnextPOS;
         iTween.MoveTo(target.gameObject,
             iTween.Hash("position", target.nextPOS,
@@ -190,6 +191,7 @@ public class RunAction : AAction
         float[] subs = target.GetSubStatus();
         if (target.MovementSpeed * target.RunRatio == 0) { }
         else { duration = (diag) / (target.MovementSpeed * target.RunRatio); }
+        target.POS = target.nextPOS;
         target.nextPOS = target.nextnextPOS;
         iTween.MoveTo(target.gameObject,
             iTween.Hash("position", target.nextPOS,
@@ -197,6 +199,27 @@ public class RunAction : AAction
             "easetype", "linear"
             ));
         SetMotionAndDurationAndUseHPSP(target);
+    }
+
+}
+public class Stunned : AAction
+{
+    public override void Awake()
+    {
+        actioncode = -1;
+        _name = "Stunned";
+        duration = 1.0f;
+    }
+
+    public override bool CanDoAction(AAnimal target)
+    {
+        return true;
+    }
+    public override void Action(AAnimal target)
+    {
+        duration = 1.0f / target.MovementSpeed;
+        SetMotionAndDurationAndUseHPSP(target);
+        target.Interrupting = false;
     }
 
 }

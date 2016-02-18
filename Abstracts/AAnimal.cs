@@ -182,11 +182,13 @@ public abstract class AAnimal : MonoBehaviour {
         isInput = false;
     }
     public Vector3 DIR = new Vector3();
+    public Vector3 POS = new Vector3();
     public Vector3 nextPOS = new Vector3();
     public Vector3 nextnextPOS = new Vector3();
     public Vector3 targetPOS = new Vector3();
     private bool isActing = false;
-    private AAction[] actionStack = new AAction[3];
+    public bool Interrupting { get; set; }
+    public AAction[] actionStack = new AAction[3];
     protected GameObject mainActionPool;
     protected void setMainActionPool()
     {
@@ -195,21 +197,25 @@ public abstract class AAnimal : MonoBehaviour {
         mainActionPool.AddComponent<IdleAction>();
         mainActionPool.AddComponent<WalkAction>();
         mainActionPool.AddComponent<RunAction>();
+        mainActionPool.AddComponent<Stunned>();
     }
 
     public void AddAction(AAction AnyAction)
     {
         isInput = true;
-        if (actionStack[0] == null)
-        {
-            actionStack[0] = AnyAction;
-            actionStack[1] = mainActionPool.GetComponent<IdleAction>();
-            actionStack[2] = null;
-        }
-        else
-        {
-            actionStack[1] = AnyAction;
-            actionStack[2] = mainActionPool.GetComponent<IdleAction>();
+        if (Interrupting) { }
+        else {
+            if (actionStack[0] == null)
+            {
+                actionStack[0] = AnyAction;
+                actionStack[1] = mainActionPool.GetComponent<IdleAction>();
+                actionStack[2] = null;
+            }
+            else
+            {
+                actionStack[1] = AnyAction;
+                actionStack[2] = mainActionPool.GetComponent<IdleAction>();
+            }
         }
     }
     public void DoAction()
@@ -323,6 +329,11 @@ public abstract class AAnimal : MonoBehaviour {
     {
         int a = Mathf.RoundToInt(attackdamage * (1 - (AR / (100 + (float)AR))));
         int m = Mathf.RoundToInt(magicdamage * (1 - (MR / (100 + (float)MR))));
+        if (a + m >= VitalPoise)
+        {
+            AddAction(mainActionPool.GetComponent<Stunned>());
+            Interrupting = true;
+        } 
         hp = HP - (a + m);
         if (HP < 0) { hp = 0; }
         GameObject dcanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/DamageTextCanvas"));
@@ -333,5 +344,14 @@ public abstract class AAnimal : MonoBehaviour {
         hp = HP - hpcost; sp = SP - spcost;
         hp = HP - (MaxHP * (hppercentcost / 100)); sp = SP - (MaxSP * (sppercentcost / 100));
         if (HP < 0) { hp = 0; }
+    }
+    protected void OnTriggerEnter(Collider colliderInfo)
+    {
+        if (colliderInfo.gameObject.tag == "Animal")
+        {
+            AAnimal target = colliderInfo.gameObject.GetComponent<AAnimal>();
+            target.TakeDamage(AD, 0);
+            transform.position = POS;
+        }
     }
 }

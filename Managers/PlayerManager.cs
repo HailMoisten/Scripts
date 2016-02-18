@@ -69,7 +69,7 @@ public class PlayerManager : AChild {
         cam = GameObject.Find("Camera");
         playerCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<ACanvasManager>();
 
-        setMainStatus(165, 100, 100, 100, 100, 100);
+        setMainStatus(165, 100, 100, 100, 100, 1);
         //setMainStatus(10, 5, 10, 10, 2, 5);
 
     }
