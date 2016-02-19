@@ -6,8 +6,8 @@ public abstract class AIcon : MonoBehaviour {
 
     protected string _name = ""; // const
     public string Name { get { return _name; } }
-    protected string type = ""; // mind, item, action, etc...
-    public string Type { get { return type; } }
+    protected string typestring = ""; // mind, item, action, etc...
+    public string TypeString { get { return typestring; } }
     protected string flavor = "";
     public string Flavor
     {

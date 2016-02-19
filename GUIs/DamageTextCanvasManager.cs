@@ -7,7 +7,7 @@ public class DamageTextCanvasManager : ACanvasManager {
     Transform adText;
     Transform mdText;
 
-    public void SetDamageAndAwake(int a, int m, Vector3 pos)
+    public void SetAndDestroy(int a, int m, Vector3 pos)
     {
         adText = transform.GetChild(0);
         adText.GetComponent<RectTransform>().localPosition = GameObject.Find("Camera").GetComponent<Camera>().WorldToScreenPoint(pos) + new Vector3(0, 128, 0);

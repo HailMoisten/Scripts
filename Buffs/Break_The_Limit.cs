@@ -9,7 +9,7 @@ public class Break_The_Limit : ABuff {
         Duration = 60.0f;
         _name = "Break_The_Limit";
         icon = GetComponent<Image>().sprite;
-        type = "Buff";
+        typestring = "Buff";
         flavor = "Break your limit." + "\n" + "Gain a half your MaxSP and SP for a while.";
     }
     public override int[] BuffToMainStatus(int[] mains)

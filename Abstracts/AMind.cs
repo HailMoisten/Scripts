@@ -35,9 +35,9 @@ public abstract class AMind : AIcon {
     /// </summary>
 
     public void GrowProficiency(int addp) { proficiency = proficiency + addp; }
-    public AMindSkill GetMindSkill(int index)
+    public AAction GetMindSkill(int index)
     {
-        if (mindlevel >= index) { return transform.GetChild(index).GetComponent<AMindSkill>(); }
+        if (mindlevel >= index) { return transform.GetChild(index).GetComponent<AAction>(); }
         else { Debug.Log("Need more MindLevel."); }
         return null;
     }

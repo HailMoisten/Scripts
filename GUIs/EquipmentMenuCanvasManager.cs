@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 
 public class EquipmentMenuCanvasManager : ACanvasManager
@@ -25,21 +26,25 @@ public class EquipmentMenuCanvasManager : ACanvasManager
     private void setupEquipmentMenu()
     {
         // Actions
-        for (int n = 1; n <= 1; n++)
+        for (int n = 1; n <= 8; n++)
         {
-            if (playerManager.mindSkillShortcuts[n].GetComponent<AIcon>() != null)
+            try
             {
-                AIcon actionsIcon = playerManager.mindSkillShortcuts[n].GetComponent<AIcon>();
-                setPointa(2 + n);
-                Target.GetComponent<SelectableTargetManager>().TargetIcon = actionsIcon;
-                Target.GetComponent<AIcon>().Icon = actionsIcon.Icon;
+                if (playerManager.actionShortcuts[n].GetComponent<AIcon>())
+                {
+                    AIcon actionsIcon = playerManager.actionShortcuts[n].GetComponent<AIcon>();
+                    setPointa(2 + n);
+                    Target.GetComponent<SelectableTargetManager>().TargetIcon = actionsIcon;
+                    Target.GetComponent<AIcon>().Icon = actionsIcon.Icon;
+                }
             }
+            catch (Exception) { Debug.Log("Missing action."); }
         }
         // Minds
         for (int n = 0; n <= playerManager.Minds.transform.childCount-1; n++)
         {
             if (n > playerManager.MindSlots) { }
-            else if (playerManager.Minds.transform.GetChild(n).GetComponent<AIcon>() != null)
+            else 
             {
                 AIcon mindsIcon = playerManager.Minds.transform.GetChild(n).GetComponent<AIcon>();
                 setPointa(11+n);

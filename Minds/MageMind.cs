@@ -7,7 +7,7 @@ public class MageMind : AMind {
     public override void Awake()
     {
         _name = "Mage"; // const
-        type = "Mind"; // const
+        typestring = "Mind"; // const
         flavor = "Mage is a Nuker.";
         icon = GetComponent<Image>().sprite;
         proficiency = 0;
@@ -35,7 +35,7 @@ public class MageMind : AMind {
 
     }
 
-    public class Pressure : AMindSkill
+    public class Pressure : AAction
     {
         public override void Awake()
         {
@@ -76,7 +76,7 @@ public class MageMind : AMind {
 
     }
 
-    public class Break_The_Limit : AMindSkill
+    public class Break_The_Limit : AAction
     {
         public override void Awake()
         {

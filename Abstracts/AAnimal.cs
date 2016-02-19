@@ -198,6 +198,7 @@ public abstract class AAnimal : MonoBehaviour {
         mainActionPool.AddComponent<WalkAction>();
         mainActionPool.AddComponent<RunAction>();
         mainActionPool.AddComponent<Stunned>();
+        mainActionPool.AddComponent<PickUp>();
     }
 
     public void AddAction(AAction AnyAction)
@@ -237,7 +238,8 @@ public abstract class AAnimal : MonoBehaviour {
                 else
                 {
                     actionStack[0] = mainActionPool.GetComponent<IdleAction>();
-                    Debug.Log("I can NOT do it.");
+                    GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
+                    ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(3);
                 }
                 actionStack[0].Action(this);
             }
@@ -272,15 +274,20 @@ public abstract class AAnimal : MonoBehaviour {
     }
 
     // Utility
-    protected GameObject Items;
-    public GameObject Equipments;
-    public GameObject Weapon;
-    public GameObject Accessories;
-    public AMindSkill[] mindSkillShortcuts;
-    public GameObject Minds;
-    public GameObject Buffs;
+    public GameObject Inventory { get; set; }
+    public GameObject ItemBag { get; set; }
+    public GameObject WeaponBag { get; set; }
+    public GameObject AccessoriesBag { get; set; }
+    public GameObject MindBag { get; set; }
+    public GameObject Equipments { get; set; }
+    public GameObject Weapon { get; set; }
+    public GameObject Accessories { get; set; }
+    public AAction[] actionShortcuts;
+    public GameObject Minds { get; set; }
+    public GameObject Buffs { get; set; }
     protected abstract void setUtilities();
-    protected abstract void setMindSkillShortcuts();
+    protected abstract void setActionShortcuts();
+    protected AAction submitAction;
 
     private bool isPassed = false;
     private IEnumerator passedCD()
@@ -337,7 +344,7 @@ public abstract class AAnimal : MonoBehaviour {
         hp = HP - (a + m);
         if (HP < 0) { hp = 0; }
         GameObject dcanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/DamageTextCanvas"));
-        dcanvas.GetComponent<DamageTextCanvasManager>().SetDamageAndAwake(a, m, transform.position);
+        dcanvas.GetComponent<DamageTextCanvasManager>().SetAndDestroy(a, m, transform.position);
     }
     public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
     {
@@ -353,5 +360,20 @@ public abstract class AAnimal : MonoBehaviour {
             target.TakeDamage(AD, 0);
             transform.position = POS;
         }
+        if (colliderInfo.gameObject.tag == "Item")
+        {
+            mainActionPool.GetComponent<PickUp>().TargetItem = colliderInfo.gameObject.GetComponent<AItem>();
+            submitAction = mainActionPool.GetComponent<PickUp>();
+            Debug.Log("There is an item.");
+        }
     }
+    // kowai
+    protected void OnTriggerExit(Collider colliderInfo)
+    {
+        if (colliderInfo.gameObject.tag == "Item")
+        {
+            submitAction = null;
+        }
+    }
+
 }

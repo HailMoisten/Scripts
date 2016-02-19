@@ -36,13 +36,70 @@ public abstract class AAction : AIcon
         target.GetAnimator().SetInteger("ActionCode", actioncode);
         target.StartCoroutine(target.DoingAction(duration));
     }
+
+    protected bool canSelectPosition = false;
+    public bool CanSelectPosition { get { return canSelectPosition; } }
+    protected bool canResize = false;
+    public bool CanResize { get { return canResize; } }
+    protected Vector3 skillScaleVector = Vector3.one;
+    public Vector3 SkillScaleVector { get { return skillScaleVector; } set { skillScaleVector = value; } }
+    protected float skillScale = 1.0f;
+    public float SkillScale { get { return skillScale; } }
+    protected int skillScaleOneSideLimit = 1;
+    public int SkillScaleOneSideLimit { get { return skillScaleOneSideLimit; } }
+    protected int skillRange = 1;
+    public int SkillRange { get { return skillRange; } }
+    protected bool isChargeSkill = false;
+    public bool IsChargeSkill { get { return isChargeSkill; } }
+    protected bool charged = false;
+    public bool Charged { get { return charged; } }
+    protected int chargeCount = 1; // Inclement a times per second.
+    public int ChargeCount { get { return chargeCount; } set { chargeCount = value; } }
+    protected int chargeLimit = 1;
+    public int ChargeLimit { get { return chargeLimit; } }
+    protected bool isCharged = false;
+    protected IEnumerator chargedCD(float time)
+    {
+        isCharged = true;
+        yield return new WaitForSeconds(time);
+        isCharged = false;
+    }
+    public void Charge(AAnimal target)
+    {
+        if (isCharged) { }
+        else
+        {
+            if (ChargeCount >= ChargeLimit)
+            {
+                charged = true;
+                GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charged"), target.nextPOS + Vector3.up, Quaternion.identity);
+                ef.GetComponent<EffectManager>().Go();
+                Debug.Log("Charged!");
+            }
+            else { chargeCount++; target.UseHPSP(0, SPCost, 0, 0); }
+            StartCoroutine(chargedCD(CastTime / target.MovementSpeed));
+        }
+    }
+
+    protected float castTime;
+    public float CastTime { get { return castTime; } }
+    protected float damageDuration = 0.10f;
+    public float DamageDuration { get { return damageDuration; } }
+    protected GameObject damageEffect = null;
+    public GameObject DamageEffect { get { return damageEffect; } }
+    protected GameObject buff = null;
+    public GameObject Buff { get { return buff; } }
+
+    // Please definite ACTIONCODE, DURATION and NAME and more at Start.
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
         GameObject inst = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/PopUpTextCanvas"), Vector3.zero, Quaternion.identity);
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
         PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
         ptcm.Title = Name;
-        ptcm.Content = "Duration " + Duration + " sec\n" + Flavor;
+        ptcm.Content = "Duration " + Duration + " sec\n" +
+            "CastTime " + CastTime + " sec\n" +
+            Flavor;
         return ptcm;
     }
 
@@ -103,11 +160,11 @@ public class WalkAction : AAction
             if (hitDown.collider.tag == "Environment" ||
                 hitDown.collider.tag == "Animal")
             {
-                target.nextnextPOS.y = target.nextnextPOS.y + 1.5f - hitDown.distance;
+                target.nextnextPOS = target.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
             }
             else if (hitDown.collider.tag == "Terrain")
             {
-                target.nextnextPOS.y = Terrain.activeTerrain.SampleHeight(target.nextnextPOS);
+                target.nextnextPOS = target.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(target.nextnextPOS) - target.nextnextPOS.y, 0);
             }
             return true;
         }
@@ -155,7 +212,7 @@ public class RunAction : AAction
         RaycastHit hitFront; RaycastHit hitDown;
         Ray rayFront = new Ray(target.nextPOS + new Vector3(0, 1.5f, 0), dir2);
         Ray rayDown = new Ray(target.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
-        if (Physics.Raycast(target.nextPOS + new Vector3(0, 1.5f, 0), dir2, out hitFront, maxd))
+        if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
             //            Debug.Log("hitsFront:" + hitFront.distance);
             if (hitFront.collider.tag == "Terrain" ||
@@ -165,17 +222,17 @@ public class RunAction : AAction
                 return false;
             }
         }
-        if (Physics.Raycast(target.nextnextPOS + new Vector3(0, 1.5f, 0), -Vector3.up, out hitDown, 3.0f))
+        if (Physics.Raycast(rayDown, out hitDown, 3.0f))
         {
             //            Debug.Log("hitDown:" + hitDown.distance);
             if (hitDown.collider.tag == "Environment" ||
                 hitDown.collider.tag == "Animal")
             {
-                target.nextnextPOS.y = target.nextnextPOS.y + 1.5f - hitDown.distance;
+                target.nextnextPOS = target.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
             }
             else if (hitDown.collider.tag == "Terrain")
             {
-                target.nextnextPOS.y = Terrain.activeTerrain.SampleHeight(target.nextnextPOS);
+                target.nextnextPOS = target.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(target.nextnextPOS) - target.nextnextPOS.y, 0);
             }
             return true;
         }
@@ -220,6 +277,41 @@ public class Stunned : AAction
         duration = 1.0f / target.MovementSpeed;
         SetMotionAndDurationAndUseHPSP(target);
         target.Interrupting = false;
+    }
+
+}
+public class PickUp : AAction
+{
+    public AItem TargetItem { get; set; }
+    public override void Awake()
+    {
+        actioncode = -2;
+        _name = "PickUp";
+        duration = 0.5f;
+    }
+
+    public override bool CanDoAction(AAnimal target)
+    {
+        Vector3 diff = target.nextPOS - TargetItem.transform.position;
+        if (Mathf.Abs(diff.x) < 1.5f && Mathf.Abs(diff.y) < 1.5f && Mathf.Abs(diff.z) < 1.5f) { return true; }
+        return false;
+    }
+    public override void Action(AAnimal target)
+    {
+        if (target.ItemBag.transform.FindChild(TargetItem.Name))
+        {
+            target.ItemBag.transform.FindChild(TargetItem.Name).GetComponent<AItem>().Number++;
+        }
+        else
+        {
+            GameObject item = new GameObject(TargetItem.Name);
+            item.AddComponent(TargetItem.GetType());
+            item.transform.SetParent(target.ItemBag.transform);
+        }
+        TargetItem.PickUp();
+        duration = 0.5f / target.MovementSpeed;
+        TargetItem = null;
+        SetMotionAndDurationAndUseHPSP(target);
     }
 
 }

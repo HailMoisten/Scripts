@@ -23,7 +23,7 @@ public class PlayerManager : AChild {
             iv = (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) *
                 new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
         }
-        int limit = mindSkillShortcuts[n].SkillRange;
+        int limit = actionShortcuts[n].SkillRange;
         if (Mathf.Abs(sv.x + iv.x) > limit) { } else { sv = sv + Vector3.right * iv.x; }
         if (Mathf.Abs(sv.y + iv.y) > limit) { } else { sv = sv + Vector3.up * iv.y; }
         if (Mathf.Abs(sv.z + iv.z) > limit) { } else { sv = sv + Vector3.forward * iv.z; }
@@ -80,15 +80,26 @@ public class PlayerManager : AChild {
         BoxCollider myC = gameObject.AddComponent<BoxCollider>();
         myC.isTrigger = true; myC.center = new Vector3(0, 1, 0); myC.size = new Vector3(1, 2, 1);
         Rigidbody myRG = gameObject.AddComponent<Rigidbody>(); myRG.useGravity = false; myRG.isKinematic = true;
-        Items = new GameObject("Items");
-        Items.transform.SetParent(transform);
+        Inventory = new GameObject("Inventory");
+        Inventory.transform.SetParent(transform);
+        ItemBag = new GameObject("ItemBag");
+        ItemBag.transform.SetParent(Inventory.transform);
+        GameObject item = new GameObject("AirShard");
+        item.AddComponent<AirShard>();
+        item.transform.SetParent(ItemBag.transform);
+        ItemBag.AddComponent<AirShard>();
+        WeaponBag = new GameObject("WeaponBag");
+        WeaponBag.transform.SetParent(Inventory.transform);
+        AccessoriesBag = new GameObject("AccessoriesBag");
+        AccessoriesBag.transform.SetParent(Inventory.transform);
+
         Equipments = new GameObject("Equipments");
         Equipments.transform.SetParent(transform);
         Weapon = new GameObject("Weapon");
         Weapon.transform.SetParent(Equipments.transform);
         Accessories = new GameObject("Accessories");
         Accessories.transform.SetParent(Equipments.transform);
-        mindSkillShortcuts = new AMindSkill[9];
+        actionShortcuts = new AAction[9];
         Minds = new GameObject("Minds");
         Minds.transform.SetParent(Equipments.transform);
         GameObject mind1 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/MageMind"));
@@ -96,12 +107,14 @@ public class PlayerManager : AChild {
         Buffs = new GameObject("Buffs");
         Buffs.transform.SetParent(transform);
         setMainActionPool();
-        setMindSkillShortcuts();
+        setActionShortcuts();
     }
-    protected override void setMindSkillShortcuts()
+    protected override void setActionShortcuts()
     {
-        mindSkillShortcuts[1] = Minds.transform.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
-        mindSkillShortcuts[1].Icon = Minds.transform.GetChild(0).GetChild(1).GetComponent<AMindSkill>().Icon;
+        actionShortcuts[1] = Minds.transform.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
+        actionShortcuts[1].Icon = Minds.transform.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
+        actionShortcuts[2] = ItemBag.transform.GetChild(0).GetComponent<AAction>();
+        actionShortcuts[2].Icon = ItemBag.transform.GetChild(0).GetComponent<AAction>().Icon;
     }
 
     // Update is called once per frame
@@ -152,30 +165,30 @@ public class PlayerManager : AChild {
                 {
                     if (Input.GetButtonDown("Action_" + n))
                     {
-                        if (mindSkillShortcuts[n] != null)
+                        if (actionShortcuts[n] != null)
                         {
-                            if (mindSkillShortcuts[n].CanSelectPosition)
+                            if (actionShortcuts[n].CanSelectPosition)
                             { controlVisualAssistTarget(n); }
-                            else { AddAction(mindSkillShortcuts[n]); }
+                            else { AddAction(actionShortcuts[n]); }
                         }
                     }
                     if (Input.GetButtonUp("Action_" + n))
                     {
-                        if (mindSkillShortcuts[n] != null)
+                        if (actionShortcuts[n] != null)
                         {
-                            if (mindSkillShortcuts[n].CanSelectPosition)
+                            if (actionShortcuts[n].CanSelectPosition)
                             {
-                                AddAction(mindSkillShortcuts[n]);
+                                AddAction(actionShortcuts[n]);
                                 Destroy(GameObject.Find("VisualAssistTarget(Clone)"));
                             }
                         }
                     }
                     if (Input.GetButton("Action_" + n))
                     {
-                        if (mindSkillShortcuts[n].IsChargeSkill)
+                        if (actionShortcuts[n].IsChargeSkill)
                         {
-                            if (mindSkillShortcuts[n].Charged) { }
-                            else { mindSkillShortcuts[n].Charge(this); }
+                            if (actionShortcuts[n].Charged) { }
+                            else { actionShortcuts[n].Charge(this); }
                         }
                     }
                 }
@@ -187,9 +200,9 @@ public class PlayerManager : AChild {
                 {
                     if (Input.GetButton("Action_" + n))
                     {
-                        if (Input.GetKey(KeyCode.LeftShift) && mindSkillShortcuts[n].CanResize)
+                        if (Input.GetKey(KeyCode.LeftShift) && actionShortcuts[n].CanResize)
                         { resizeVisualAssistTarget(n); }
-                        else if (mindSkillShortcuts[n].CanSelectPosition)
+                        else if (actionShortcuts[n].CanSelectPosition)
                         { controlVisualAssistTarget(n); }
                         else
                         {
@@ -211,9 +224,17 @@ public class PlayerManager : AChild {
                     }
                 }
             }
+            if (Input.GetButtonDown("Submit"))
+            {
+                if(submitAction == null) { }
+                else {
+                    AddAction(submitAction);
+                    submitAction = null;
+                }
+            }
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-                setMindSkillShortcuts();
+                setActionShortcuts();
             }
             if (Input.GetKeyDown(KeyCode.RightShift))
             {
@@ -234,19 +255,19 @@ public class PlayerManager : AChild {
         Vector3 sv = Vector3.zero;
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
-            sv = mindSkillShortcuts[n].SkillScaleVector + new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+            sv = actionShortcuts[n].SkillScaleVector + new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
         }
         else
         {
-            sv = mindSkillShortcuts[n].SkillScaleVector + (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+            sv = actionShortcuts[n].SkillScaleVector + (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
             sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
         }
-        int limit = mindSkillShortcuts[n].SkillScaleOneSideLimit;
+        int limit = actionShortcuts[n].SkillScaleOneSideLimit;
         if (sv.x > limit) { sv -= Vector3.right; } else if (sv.x < 1) { sv += Vector3.right; }
         if (sv.y > limit) { sv -= Vector3.up; } else if (sv.y < 1) { sv += Vector3.up; }
         if (sv.z > limit) { sv -= Vector3.forward; } else if (sv.z < 1) { sv += Vector3.forward; }
-        mindSkillShortcuts[n].SkillScaleVector = sv;
-        visualAssistTarget.transform.localScale = mindSkillShortcuts[n].SkillScaleVector;
+        actionShortcuts[n].SkillScaleVector = sv;
+        visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
     }
     private void controlVisualAssistTarget(int n)
     {
@@ -259,7 +280,7 @@ public class PlayerManager : AChild {
             if (Input.GetKey(KeyCode.LeftAlt)) { } else { targetPOS = nextPOS + Vector3.up; }
             SettargetPOS(n);
             visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
-            visualAssistTarget.transform.localScale = mindSkillShortcuts[n].SkillScaleVector;
+            visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
         }
     }
 

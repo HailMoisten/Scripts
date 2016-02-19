@@ -10,7 +10,7 @@ public class Exhausted : ABuff {
         Sands = 10.0f;
         _name = "Exhausted";
         icon = GetComponent<Image>().sprite;
-        type = "Buff";
+        typestring = "Buff";
         flavor = "You are exhausted." + "\n" + "Your MovementSpeed is half of original.";
     }
     public override int[] BuffToMainStatus(int[] mains)
