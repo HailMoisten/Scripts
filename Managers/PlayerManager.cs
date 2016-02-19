@@ -77,44 +77,35 @@ public class PlayerManager : AChild {
     protected override void setUtilities()
     {
         nextPOS = RoundToIntVector3XZ(transform.position);
-        BoxCollider myC = gameObject.AddComponent<BoxCollider>();
-        myC.isTrigger = true; myC.center = new Vector3(0, 1, 0); myC.size = new Vector3(1, 2, 1);
-        Rigidbody myRG = gameObject.AddComponent<Rigidbody>(); myRG.useGravity = false; myRG.isKinematic = true;
-        Inventory = new GameObject("Inventory");
-        Inventory.transform.SetParent(transform);
-        ItemBag = new GameObject("ItemBag");
-        ItemBag.transform.SetParent(Inventory.transform);
+
+        Inventory = transform.FindChild("Inventory");
+        ItemBag = Inventory.FindChild("ItemBag");
+        WeaponBag = Inventory.FindChild("WeaponBag");
+        RingBag = Inventory.FindChild("RingBag");
+        MindBag = Inventory.FindChild("MindBag");
+
+        Equipment = transform.FindChild("Equipment");
+        Weapon = Equipment.FindChild("Weapon");
+        Ring = Equipment.FindChild("Ring");
+        Mind = Equipment.FindChild("Mind");
+
+        Buffs = transform.FindChild("Buffs");
+
+        actionShortcuts = new AAction[9];
         GameObject item = new GameObject("AirShard");
         item.AddComponent<AirShard>();
         item.transform.SetParent(ItemBag.transform);
-        ItemBag.AddComponent<AirShard>();
-        WeaponBag = new GameObject("WeaponBag");
-        WeaponBag.transform.SetParent(Inventory.transform);
-        AccessoriesBag = new GameObject("AccessoriesBag");
-        AccessoriesBag.transform.SetParent(Inventory.transform);
-
-        Equipments = new GameObject("Equipments");
-        Equipments.transform.SetParent(transform);
-        Weapon = new GameObject("Weapon");
-        Weapon.transform.SetParent(Equipments.transform);
-        Accessories = new GameObject("Accessories");
-        Accessories.transform.SetParent(Equipments.transform);
-        actionShortcuts = new AAction[9];
-        Minds = new GameObject("Minds");
-        Minds.transform.SetParent(Equipments.transform);
         GameObject mind1 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/MageMind"));
-        mind1.transform.SetParent(Minds.transform);
-        Buffs = new GameObject("Buffs");
-        Buffs.transform.SetParent(transform);
+        mind1.transform.SetParent(Mind.transform);
         setMainActionPool();
         setActionShortcuts();
     }
     protected override void setActionShortcuts()
     {
-        actionShortcuts[1] = Minds.transform.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
-        actionShortcuts[1].Icon = Minds.transform.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
-        actionShortcuts[2] = ItemBag.transform.GetChild(0).GetComponent<AAction>();
-        actionShortcuts[2].Icon = ItemBag.transform.GetChild(0).GetComponent<AAction>().Icon;
+        actionShortcuts[1] = Mind.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
+        actionShortcuts[1].Icon = Mind.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
+        actionShortcuts[2] = ItemBag.GetChild(0).GetComponent<AAction>();
+        actionShortcuts[2].Icon = ItemBag.GetChild(0).GetComponent<AAction>().Icon;
     }
 
     // Update is called once per frame

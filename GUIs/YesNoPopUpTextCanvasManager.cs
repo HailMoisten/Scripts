@@ -38,8 +38,7 @@ public class YesNoPopUpTextCanvasManager : ACanvasManager {
         // Should give pointa;
         if (Input.GetButtonDown("Submit"))
         {
-            if (pointa == 1) { backCanvas.YesNoAnswerOfNextPopUpTextCanvas = true; }
-            else { backCanvas.YesNoAnswerOfNextPopUpTextCanvas = false; }
+            backCanvas.ReturnedIcon = Target.GetComponent<SelectableTargetManager>().TargetIcon;
             DestroyThisCanvas();
         }
     }

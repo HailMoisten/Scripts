@@ -274,17 +274,17 @@ public abstract class AAnimal : MonoBehaviour {
     }
 
     // Utility
-    public GameObject Inventory { get; set; }
-    public GameObject ItemBag { get; set; }
-    public GameObject WeaponBag { get; set; }
-    public GameObject AccessoriesBag { get; set; }
-    public GameObject MindBag { get; set; }
-    public GameObject Equipments { get; set; }
-    public GameObject Weapon { get; set; }
-    public GameObject Accessories { get; set; }
+    public Transform Inventory { get; set; }
+    public Transform ItemBag { get; set; }
+    public Transform WeaponBag { get; set; }
+    public Transform RingBag { get; set; }
+    public Transform MindBag { get; set; }
+    public Transform Equipment { get; set; }
+    public Transform Weapon { get; set; }
+    public Transform Ring { get; set; }
+    public Transform Mind { get; set; }
+    public Transform Buffs { get; set; }
     public AAction[] actionShortcuts;
-    public GameObject Minds { get; set; }
-    public GameObject Buffs { get; set; }
     protected abstract void setUtilities();
     protected abstract void setActionShortcuts();
     protected AAction submitAction;

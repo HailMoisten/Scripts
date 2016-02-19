@@ -298,9 +298,9 @@ public class PickUp : AAction
     }
     public override void Action(AAnimal target)
     {
-        if (target.ItemBag.transform.FindChild(TargetItem.Name))
+        if (target.ItemBag.FindChild(TargetItem.Name))
         {
-            target.ItemBag.transform.FindChild(TargetItem.Name).GetComponent<AItem>().Number++;
+            target.ItemBag.FindChild(TargetItem.Name).GetComponent<AItem>().Number++;
         }
         else
         {

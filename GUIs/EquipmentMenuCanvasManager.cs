@@ -5,8 +5,12 @@ using System.Collections;
 
 public class EquipmentMenuCanvasManager : ACanvasManager
 {
+    //    public AWeapon ReturnedWeapon = null;
+    //    public ARing ReturnedRing = null;
+    public AAction ReturnedAction = null;
 
     private PlayerManager playerManager;
+    private Text targetIconNameText;
     
     // Use this for initialization
     protected override void Awake()
@@ -15,12 +19,15 @@ public class EquipmentMenuCanvasManager : ACanvasManager
         pointa = 0;
         pointaNUM = 21;
         kersolPOSfix = new Vector3(-4, -4, 0);
-        firstpointa = 0;
+        firstpointa = 1;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
+        targetIconNameText = gameObject.transform.FindChild("TargetNameText").GetComponent<Text>();
 
         setupEquipmentMenu();
         initPointaAndKersol();
+        targetIconNameText.text = targetIconName;
+        moveKersol();
     }
 
     private void setupEquipmentMenu()
@@ -41,12 +48,12 @@ public class EquipmentMenuCanvasManager : ACanvasManager
             catch (Exception) { Debug.Log("Missing action."); }
         }
         // Minds
-        for (int n = 0; n <= playerManager.Minds.transform.childCount-1; n++)
+        for (int n = 0; n <= playerManager.Mind.transform.childCount-1; n++)
         {
             if (n > playerManager.MindSlots) { }
             else 
             {
-                AIcon mindsIcon = playerManager.Minds.transform.GetChild(n).GetComponent<AIcon>();
+                AIcon mindsIcon = playerManager.Mind.transform.GetChild(n).GetComponent<AIcon>();
                 setPointa(11+n);
                 Target.GetComponent<SelectableTargetManager>().TargetIcon = mindsIcon;
                 Target.GetComponent<AIcon>().Icon = mindsIcon.Icon;
@@ -57,7 +64,7 @@ public class EquipmentMenuCanvasManager : ACanvasManager
             setPointa(n);
             Target.SetActive(false);
         }
-        pointaNUM = 10 + (int)playerManager.MindSlots;
+        pointaNUM = 10 + playerManager.MindSlots;
     }
 
     // Update is called once per frame
@@ -73,6 +80,7 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                 if (pointa == 3 || pointa == 4) { setPointa(1); }
                 else if (pointa == 5 || pointa == 6) { setPointa(2); }
                 else { setPointa(pointa - 4); }
+                targetIconNameText.text = targetIconName;
                 moveKersol();
             }
             if (Input.GetKeyDown(KeyCode.DownArrow))
@@ -80,21 +88,34 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                 if (pointa == 1) { setPointa(3); }
                 else if (pointa == 2) { setPointa(5); }
                 else { setPointa(pointa + 4); }
+                targetIconNameText.text = targetIconName;
                 moveKersol();
             }
-            if (Input.GetKeyDown(KeyCode.RightArrow)) { inclementPointa(); moveKersol(); }
+            if (Input.GetKeyDown(KeyCode.RightArrow)) { inclementPointa(); targetIconNameText.text = targetIconName; moveKersol(); }
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 if (pointa <= 1 || pointa % 4 == 3)
                 {
                     DestroyThisCanvas();
                 }
-                else { declementPointa(); moveKersol(); }
+                else { declementPointa(); targetIconNameText.text = targetIconName; moveKersol(); }
             }
             if (Input.GetButtonDown("Submit"))
             {
-                nextCanvas = clickTarget();
-                if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
+                if (pointa == 1) { }// Weapon
+                else if (pointa == 2) { }// Ring
+                else if (pointa >= 3 && pointa <= 10)// Actions
+                {
+
+                }
+                else
+                {
+                    if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
+                    {
+                        nextCanvas = clickTarget();
+                        if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
+                    }
+                }
             }
         }
     }

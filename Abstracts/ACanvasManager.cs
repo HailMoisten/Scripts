@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 
 public abstract class ACanvasManager : MonoBehaviour {
-
+    public AIcon ReturnedIcon = null;
+    protected string targetIconName = string.Empty;
     private GameObject target = null;
     protected GameObject Target { get { return target; } }
     private GameObject lastTarget = null;
@@ -11,7 +13,6 @@ public abstract class ACanvasManager : MonoBehaviour {
     protected ACanvasManager backCanvas = null;
     protected ACanvasManager nextCanvas = null;
     public int SortOrder { get { return GetComponent<Canvas>().sortingOrder; } set { GetComponent<Canvas>().sortingOrder = value; } }
-    public bool YesNoAnswerOfNextPopUpTextCanvas = false;
 
     // About Kersol
     protected int pointa = 0;
@@ -39,13 +40,21 @@ public abstract class ACanvasManager : MonoBehaviour {
     protected void inclementPointa() { if (pointa >= pointaNUM) { } else { pointa++; } setTarget();}
     protected void declementPointa() { if (pointa <= 1) { } else { pointa--; } setTarget(); }
     protected void setPointa(int n) { if (n <= 0 || n >= pointaNUM+1) { } else { pointa = n; setTarget(); } }
-    protected void initPointaAndKersol() { pointa = 0; myKersolRect.localPosition = firstKersolPOS; }
-    protected void setTarget()
+    protected void initPointaAndKersol() {
+        if (firstpointa <= 0) { pointa = 0; setTarget(); } else { setPointa(firstpointa); }
+        myKersolRect.localPosition = firstKersolPOS;
+    }
+    protected virtual void setTarget()
     {
         lastTarget = target;
         SelectableTargetManager[] selectables = GetComponentsInChildren<SelectableTargetManager>();
         if (pointa <= 0 || pointa >= selectables.Length + 1) { }
-        else { target = selectables[pointa - 1].gameObject; }
+        else { target = selectables[pointa - 1].gameObject;
+            try {
+                targetIconName = target.GetComponent<SelectableTargetManager>().TargetIcon.Name;
+            }
+            catch (NullReferenceException) { targetIconName = " "; }
+        }
     }
     protected void moveKersol()
     {
