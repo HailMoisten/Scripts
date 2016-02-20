@@ -69,7 +69,7 @@ public class PlayerManager : AChild {
         cam = GameObject.Find("Camera");
         playerCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<ACanvasManager>();
 
-        setMainStatus(165, 100, 100, 100, 100, 1);
+        setMainStatus(165, 100, 100, 100, 100, 100);
         //setMainStatus(10, 5, 10, 10, 2, 5);
 
     }
@@ -95,17 +95,17 @@ public class PlayerManager : AChild {
         GameObject item = new GameObject("AirShard");
         item.AddComponent<AirShard>();
         item.transform.SetParent(ItemBag.transform);
-        GameObject mind1 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/MageMind"));
-        mind1.transform.SetParent(Mind.transform);
+        GameObject mind1 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/Mage"));
+        mind1.transform.SetParent(MindBag.transform);
         setMainActionPool();
         setActionShortcuts();
     }
     protected override void setActionShortcuts()
     {
-        actionShortcuts[1] = Mind.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
-        actionShortcuts[1].Icon = Mind.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
-        actionShortcuts[2] = ItemBag.GetChild(0).GetComponent<AAction>();
-        actionShortcuts[2].Icon = ItemBag.GetChild(0).GetComponent<AAction>().Icon;
+        //actionShortcuts[1] = Mind.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
+        //actionShortcuts[1].Icon = Mind.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
+        //actionShortcuts[2] = ItemBag.GetChild(0).GetComponent<AAction>();
+        //actionShortcuts[2].Icon = ItemBag.GetChild(0).GetComponent<AAction>().Icon;
     }
 
     // Update is called once per frame
@@ -154,32 +154,35 @@ public class PlayerManager : AChild {
                 }
                 for (int n = 1; n <= 8; n++)
                 {
-                    if (Input.GetButtonDown("Action_" + n))
+                    if (actionShortcuts[n] != null)
                     {
-                        if (actionShortcuts[n] != null)
+                        if (Input.GetButtonDown("Action_" + n))
                         {
-                            if (actionShortcuts[n].CanSelectPosition)
-                            { controlVisualAssistTarget(n); }
-                            else { AddAction(actionShortcuts[n]); }
-                        }
-                    }
-                    if (Input.GetButtonUp("Action_" + n))
-                    {
-                        if (actionShortcuts[n] != null)
-                        {
-                            if (actionShortcuts[n].CanSelectPosition)
+                            if (actionShortcuts[n] != null)
                             {
-                                AddAction(actionShortcuts[n]);
-                                Destroy(GameObject.Find("VisualAssistTarget(Clone)"));
+                                if (actionShortcuts[n].CanSelectPosition)
+                                { controlVisualAssistTarget(n); }
+                                else { AddAction(actionShortcuts[n]); }
                             }
                         }
-                    }
-                    if (Input.GetButton("Action_" + n))
-                    {
-                        if (actionShortcuts[n].IsChargeSkill)
+                        if (Input.GetButtonUp("Action_" + n))
                         {
-                            if (actionShortcuts[n].Charged) { }
-                            else { actionShortcuts[n].Charge(this); }
+                            if (actionShortcuts[n] != null)
+                            {
+                                if (actionShortcuts[n].CanSelectPosition)
+                                {
+                                    AddAction(actionShortcuts[n]);
+                                    Destroy(GameObject.Find("VisualAssistTarget(Clone)"));
+                                }
+                            }
+                        }
+                        if (Input.GetButton("Action_" + n))
+                        {
+                            if (actionShortcuts[n].IsChargeSkill)
+                            {
+                                if (actionShortcuts[n].Charged) { }
+                                else { actionShortcuts[n].Charge(this); }
+                            }
                         }
                     }
                 }
@@ -189,27 +192,30 @@ public class PlayerManager : AChild {
             {
                 for (int n = 1; n <= 8; n++)
                 {
-                    if (Input.GetButton("Action_" + n))
+                    if (actionShortcuts[n] != null)
                     {
-                        if (Input.GetKey(KeyCode.LeftShift) && actionShortcuts[n].CanResize)
-                        { resizeVisualAssistTarget(n); }
-                        else if (actionShortcuts[n].CanSelectPosition)
-                        { controlVisualAssistTarget(n); }
-                        else
+                        if (Input.GetButton("Action_" + n))
                         {
-                            SetDirection();
-                            SetnextnextPOS();
-                            if (Input.GetKey(KeyCode.Space))
-                            {
-                                AddAction(mainActionPool.GetComponent<RunAction>());
-                            }
-                            else if (Input.GetKey(KeyCode.LeftShift))
-                            {
-                                AddAction(mainActionPool.GetComponent<IdleAction>());
-                            }
+                            if (Input.GetKey(KeyCode.LeftShift) && actionShortcuts[n].CanResize)
+                            { resizeVisualAssistTarget(n); }
+                            else if (actionShortcuts[n].CanSelectPosition)
+                            { controlVisualAssistTarget(n); }
                             else
                             {
-                                AddAction(mainActionPool.GetComponent<WalkAction>());
+                                SetDirection();
+                                SetnextnextPOS();
+                                if (Input.GetKey(KeyCode.Space))
+                                {
+                                    AddAction(mainActionPool.GetComponent<RunAction>());
+                                }
+                                else if (Input.GetKey(KeyCode.LeftShift))
+                                {
+                                    AddAction(mainActionPool.GetComponent<IdleAction>());
+                                }
+                                else
+                                {
+                                    AddAction(mainActionPool.GetComponent<WalkAction>());
+                                }
                             }
                         }
                     }
@@ -217,10 +223,10 @@ public class PlayerManager : AChild {
             }
             if (Input.GetButtonDown("Submit"))
             {
-                if(submitAction == null) { }
+                if(SubmitAction == null) { }
                 else {
-                    AddAction(submitAction);
-                    submitAction = null;
+                    AddAction(SubmitAction);
+                    SubmitAction = null;
                 }
             }
             if (Input.GetKeyDown(KeyCode.LeftShift))

@@ -6,11 +6,10 @@ public class Exhausted : ABuff {
 
     public override void Awake()
     {
+        base.Awake();
         Duration = 10.0f;
         Sands = 10.0f;
         _name = "Exhausted";
-        icon = GetComponent<Image>().sprite;
-        typestring = "Buff";
         flavor = "You are exhausted." + "\n" + "Your MovementSpeed is half of original.";
     }
     public override int[] BuffToMainStatus(int[] mains)

@@ -6,10 +6,10 @@ public class Break_The_Limit : ABuff {
 
     public override void Awake()
     {
+        base.Awake();
         Duration = 60.0f;
         _name = "Break_The_Limit";
         icon = GetComponent<Image>().sprite;
-        typestring = "Buff";
         flavor = "Break your limit." + "\n" + "Gain a half your MaxSP and SP for a while.";
     }
     public override int[] BuffToMainStatus(int[] mains)

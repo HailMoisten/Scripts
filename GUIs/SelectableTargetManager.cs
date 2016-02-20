@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class SelectableTargetManager : AIcon {
 
+    public int NumberForText = 1;
+    private Text numberText = null;
     private bool isSelected = false;
     public bool changeImageAuto = false;
     public bool changeTextColorAuto = false;
@@ -18,6 +20,19 @@ public class SelectableTargetManager : AIcon {
     protected Color c3 = new Color(0.5f, 1.0f, 1.0f, 1.0f);
 
     public override void Awake() { }
+    public void SetNumber(int n) {
+        if(numberText == null)
+        {
+            GameObject nt = Instantiate((GameObject)Resources.Load("Prefabs/GUI/NumberText"));
+            nt.transform.SetParent(transform); nt.transform.localScale = Vector3.one;
+            nt.GetComponent<RectTransform>().localPosition += transform.position;
+            numberText = nt.GetComponent<Text>();
+        }
+        NumberForText = n;
+        if (NumberForText <= 0) { numberText.text = ""; }
+        else { numberText.text = NumberForText.ToString(); }
+        numberText.GetComponent<TextShade>().TextUpdate();
+    }
     public void OnKersol()
     {
         isSelected = true;

@@ -2,16 +2,15 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using IconType;
 
 public class EquipmentMenuCanvasManager : ACanvasManager
 {
-    //    public AWeapon ReturnedWeapon = null;
-    //    public ARing ReturnedRing = null;
-    public AAction ReturnedAction = null;
-
     private PlayerManager playerManager;
+    private Sprite nullSprite;
     private Text targetIconNameText;
-    
+    private GameObject returnIMC = null;
+
     // Use this for initialization
     protected override void Awake()
     {
@@ -22,7 +21,9 @@ public class EquipmentMenuCanvasManager : ACanvasManager
         firstpointa = 1;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
+        nullSprite = Resources.Load<Sprite>("Images/GUI/glass_black");
         targetIconNameText = gameObject.transform.FindChild("TargetNameText").GetComponent<Text>();
+        returnIMC = (GameObject)Resources.Load("Prefabs/GUI/ReturnInventoryMenuCanvas");
 
         setupEquipmentMenu();
         initPointaAndKersol();
@@ -37,13 +38,18 @@ public class EquipmentMenuCanvasManager : ACanvasManager
         {
             try
             {
+                setPointa(2 + n);
+                Target.GetComponent<SelectableTargetManager>().TargetIcon = null;
+                Target.GetComponent<AIcon>().Icon = nullSprite;
+                Target.GetComponent<SelectableTargetManager>().SetNumber(0);
                 if (playerManager.actionShortcuts[n].GetComponent<AIcon>())
                 {
-                    AIcon actionsIcon = playerManager.actionShortcuts[n].GetComponent<AIcon>();
-                    Debug.Log(actionsIcon);
-                    setPointa(2 + n);
-                    Target.GetComponent<SelectableTargetManager>().TargetIcon = actionsIcon;
-                    Target.GetComponent<AIcon>().Icon = actionsIcon.Icon;
+                    AIcon actionIcon = playerManager.actionShortcuts[n].GetComponent<AIcon>();
+                    Target.GetComponent<SelectableTargetManager>().TargetIcon = actionIcon;
+                    Target.GetComponent<AIcon>().Icon = actionIcon.Icon;
+                    if (actionIcon.CanTogether) {
+                        Target.GetComponent<SelectableTargetManager>().SetNumber(actionIcon.Number);
+                    }
                 }
             }
             catch (Exception) { Debug.Log("Missing action."); }
@@ -51,11 +57,15 @@ public class EquipmentMenuCanvasManager : ACanvasManager
         // Minds
         for (int n = 0; n <= playerManager.Mind.transform.childCount-1; n++)
         {
+            setPointa(11 + n);
+            Target.GetComponent<SelectableTargetManager>().TargetIcon = null;
+            Target.GetComponent<AIcon>().Icon = nullSprite;
+            Target.GetComponent<SelectableTargetManager>().SetNumber(0);
+
             if (n > playerManager.MindSlots) { }
             else 
             {
                 AIcon mindsIcon = playerManager.Mind.transform.GetChild(n).GetComponent<AIcon>();
-                setPointa(11+n);
                 Target.GetComponent<SelectableTargetManager>().TargetIcon = mindsIcon;
                 Target.GetComponent<AIcon>().Icon = mindsIcon.Icon;
             }
@@ -71,6 +81,31 @@ public class EquipmentMenuCanvasManager : ACanvasManager
     // Update is called once per frame
     void Update()
     {
+        if (ReturnedAction != null)
+        {
+            if(pointa <= 2 || pointa >= 11) { }
+            else { playerManager.actionShortcuts[pointa - 2] = ReturnedAction; }
+            ReturnedAction = null;
+            setupEquipmentMenu();
+            initPointaAndKersol();
+            moveKersol();
+        }
+        if (ReturnedMind != null)
+        {
+            Debug.Log("ReturnedMind is not null");
+            if (pointa <= 10 || pointa >= 22) { }
+            else
+            {
+                GameObject newmind = (GameObject)Instantiate(Resources.Load("Prefabs/Minds/" + ReturnedMind.Name));
+                newmind.GetComponent<AMind>().Proficiency = ReturnedMind.Proficiency;
+                newmind.transform.SetParent(playerManager.Mind);
+            }
+            ReturnedMind = null;
+            setupEquipmentMenu();
+            initPointaAndKersol();
+            moveKersol();
+        }
+
         if (nextCanvas != null)
         {
         }
@@ -107,7 +142,17 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                 else if (pointa == 2) { }// Ring
                 else if (pointa >= 3 && pointa <= 10)// Actions
                 {
-
+                    GameObject retcanvas = Instantiate(returnIMC);
+                    retcanvas.GetComponent<ReturnInventoryMenuCanvasManager>().TargetIconType = (int)IconTypeList.Action;
+                    nextCanvas = retcanvas.GetComponent<ACanvasManager>();
+                    if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
+                }
+                else if (pointa >= 11)
+                {
+                    GameObject retcanvas = Instantiate(returnIMC);
+                    retcanvas.GetComponent<ReturnInventoryMenuCanvasManager>().TargetIconType = (int)IconTypeList.Mind;
+                    nextCanvas = retcanvas.GetComponent<ACanvasManager>();
+                    if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                 }
                 else
                 {

@@ -15,10 +15,10 @@ public class PlayerCanvasManager : ACanvasManager {
     private ABuff targetBuff;
     // This is not <string> for destroying Instantiated GameObject
     public List<SelectableTargetManager> buffListSTM = new List<SelectableTargetManager>();
+    private GameObject submitActionPopUp = null;
 
     protected override void Awake()
     {
-        playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         HPBar = transform.FindChild("HPBar").GetComponent<RectTransform>();
         HPEnd = HPBar.transform.FindChild("HPEnd").GetComponent<RectTransform>();
         HPText = transform.FindChild("HPText").GetComponent<Text>();
@@ -31,6 +31,7 @@ public class PlayerCanvasManager : ACanvasManager {
         kersolPOSfix = new Vector3(-4, -4, 0);
         firstpointa = 0;
 
+        playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         initPointaAndKersol();
     }
 
@@ -46,7 +47,20 @@ public class PlayerCanvasManager : ACanvasManager {
         SPText.text = "SP    " + Mathf.RoundToInt(playerManager.SP).ToString(); SPText.GetComponent<TextShade>().TextUpdate();
 
         if (playerManager.Buffs.transform.childCount > 0) { updateBuffs(); }
-
+        if (playerManager.SubmitAction != null) {
+            if (submitActionPopUp == null)
+            {
+                GameObject sat = (GameObject)Resources.Load("Prefabs/GUI/SubmitActionPopUp");
+                sat.transform.GetChild(0).GetComponent<Text>().text = playerManager.SubmitAction.Name;
+                submitActionPopUp = Instantiate(sat);
+                submitActionPopUp.transform.SetParent(transform);
+                submitActionPopUp.transform.GetChild(0).GetComponent<TextShade>().TextUpdate();
+            }
+        }
+        else
+        {
+            if (submitActionPopUp != null) { Destroy(submitActionPopUp); }
+        }
         if (nextCanvas != null) { }
         else
         {
@@ -77,12 +91,15 @@ public class PlayerCanvasManager : ACanvasManager {
             targetBuff = playerManager.Buffs.transform.GetChild(i).GetComponent<ABuff>();
             if (targetBuff.IsDrawn)
             {
-                if (targetBuff.Sands <= 0.0f)
+                for (int j = 0; j < buffListSTM.Count; j++)
                 {
-                    for (int j = 0; j < buffListSTM.Count; j++) {
-                        if (buffListSTM[j].TargetIcon.Name == targetBuff.Name) {
+                    if (buffListSTM[j].TargetIcon.Name == targetBuff.Name)
+                    {
+                        if (targetBuff.Sands <= 0.0f)
+                        {
                             Destroy(buffListSTM[j].gameObject); buffListSTM.RemoveAt(j);
                         }
+                        else { buffListSTM[j].SetNumber(Mathf.RoundToInt(targetBuff.Sands)); }
                     }
                     Destroy(targetBuff.gameObject);
                 }

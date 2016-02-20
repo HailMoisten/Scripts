@@ -3,11 +3,13 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class TextShade : MonoBehaviour {
+    private bool duplicated;
     // Use this for initialization
-    void Start () {
-        if (transform.parent.GetComponent<TextShade>()) { }
+    void Set() {
+        if (transform.parent.GetComponent<TextShade>()) { duplicated = true; }
         else
         {
+            duplicated = true;
             GameObject main = Instantiate(gameObject);
             main.transform.SetParent(transform);
             main.transform.localPosition = Vector3.up;
@@ -18,6 +20,8 @@ public class TextShade : MonoBehaviour {
 
     public void TextUpdate ()
     {
+        if (duplicated) { }
+        else { Set(); }
         transform.GetChild(0).GetComponent<Text>().text = transform.GetComponent<Text>().text;
     }
 

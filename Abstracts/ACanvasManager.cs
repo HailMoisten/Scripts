@@ -4,14 +4,17 @@ using System;
 using System.Collections;
 
 public abstract class ACanvasManager : MonoBehaviour {
+    //    public AWeapon ReturnedWeapon = null;
+    //    public ARing ReturnedRing = null;
     public AAction ReturnedAction = null;
-    public AIcon ReturnedIcon = null;
+    public AMind ReturnedMind = null;// Only debug
     public int ReturnedInt = 0;
     public bool ReturnedBool = false;
 
+
     protected string targetIconName = string.Empty;
     private GameObject target = null;
-    protected GameObject Target { get { return target; } }
+    public GameObject Target { get { return target; } }
     private GameObject lastTarget = null;
     protected RectTransform myKersolRect = null;
     protected ACanvasManager backCanvas = null;

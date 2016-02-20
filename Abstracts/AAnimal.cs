@@ -287,7 +287,7 @@ public abstract class AAnimal : MonoBehaviour {
     public AAction[] actionShortcuts;
     protected abstract void setUtilities();
     protected abstract void setActionShortcuts();
-    protected AAction submitAction;
+    public AAction SubmitAction;
 
     private bool isPassed = false;
     private IEnumerator passedCD()
@@ -363,7 +363,7 @@ public abstract class AAnimal : MonoBehaviour {
         if (colliderInfo.gameObject.tag == "Item")
         {
             mainActionPool.GetComponent<PickUp>().TargetItem = colliderInfo.gameObject.GetComponent<AItem>();
-            submitAction = mainActionPool.GetComponent<PickUp>();
+            SubmitAction = mainActionPool.GetComponent<PickUp>();
             Debug.Log("There is an item.");
         }
     }
@@ -372,7 +372,7 @@ public abstract class AAnimal : MonoBehaviour {
     {
         if (colliderInfo.gameObject.tag == "Item")
         {
-            submitAction = null;
+            SubmitAction = null;
         }
     }
 

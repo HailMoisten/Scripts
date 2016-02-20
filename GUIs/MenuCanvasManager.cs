@@ -36,7 +36,7 @@ public class MenuCanvasManager : ACanvasManager {
         {
             if (Input.GetKeyDown(KeyCode.UpArrow)) { declementPointa(); moveKersol(); }
             if (Input.GetKeyDown(KeyCode.DownArrow)) { inclementPointa(); moveKersol(); }
-            if (Input.GetKeyDown(KeyCode.RightArrow)) { if (pointa <= 0 || pointa >= pointaNUM+1) { } else { openNextMenu(); } }
+            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetButtonDown("Submit")) { if (pointa <= 0 || pointa >= pointaNUM+1) { } else { openNextMenu(); } }
             if (Input.GetKeyDown(KeyCode.LeftArrow)) { closeAllMenu(); }
         }
         if (Input.GetButtonDown("Options"))

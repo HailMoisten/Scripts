@@ -1,7 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using IconType;
+using System;
 
 public abstract class ABuff : AIcon {
+    public override void Awake()
+    {
+        base.Awake();
+        IconType = (int)IconTypeList.Buff;
+        gameObject.tag = "Buff";
+    }
 
     public bool IsUsed { get; set; }
     public bool IsDrawn { get; set; }
@@ -21,11 +29,13 @@ public abstract class ABuff : AIcon {
     }
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
-        GameObject inst = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/PopUpTextCanvas"), Vector3.one, Quaternion.identity);
+        GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpIconCanvas"));
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
-        PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
+        PopUpIconCanvasManager ptcm = inst.GetComponent<PopUpIconCanvasManager>();
         ptcm.Title = Name;
-        ptcm.Content = "Duration " + Duration + " sec\n" + Flavor;
+        ptcm.Icon = Icon;
+        ptcm.Content = "Duration " + Duration + " sec\n";
+        ptcm.Flavor = Flavor;
         return ptcm;
     }
 }

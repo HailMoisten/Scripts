@@ -6,11 +6,11 @@ using System.Collections;
 public class InventoryMenuCanvasManager : ACanvasManager
 {
 
-    private PlayerManager playerManager;
-    private Text targetIconNameText;
-    private Sprite nullSprite;
-    private int currentInventory = 1;
-    private int currentPage = 1;
+    protected PlayerManager playerManager;
+    protected Text targetIconNameText;
+    protected Sprite nullSprite;
+    protected int currentInventory = 1;
+    protected int currentPage = 1;
 
     // Use this for initialization
     protected override void Awake()
@@ -23,14 +23,14 @@ public class InventoryMenuCanvasManager : ACanvasManager
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         targetIconNameText = gameObject.transform.FindChild("TargetNameText").GetComponent<Text>();
-        nullSprite = Resources.Load<Sprite>("Images/GUI/glass_white");
+        nullSprite = Resources.Load<Sprite>("Images/GUI/glass_black");
 
         setupInventory();
         initPointaAndKersol();
         targetIconNameText.text = targetIconName;
         moveKersol();
     }
-    private void setupInventory()
+    protected void setupInventory()
     {
         Transform target = null;
         if (currentInventory <= 1) { target = playerManager.ItemBag; }
@@ -45,6 +45,7 @@ public class InventoryMenuCanvasManager : ACanvasManager
             setPointa(5 + n);
             Target.GetComponent<SelectableTargetManager>().TargetIcon = null;
             Target.GetComponent<AIcon>().Icon = nullSprite;
+            Target.GetComponent<SelectableTargetManager>().SetNumber(0);
             try
             {
                 if (n + pagehead <= target.childCount - 1)
@@ -52,6 +53,11 @@ public class InventoryMenuCanvasManager : ACanvasManager
                     AIcon targeticon = target.GetChild(n + pagehead).GetComponent<AIcon>();
                     Target.GetComponent<SelectableTargetManager>().TargetIcon = targeticon;
                     Target.GetComponent<AIcon>().Icon = targeticon.Icon;
+                    if (targeticon.CanTogether)
+                    {
+                        Target.GetComponent<SelectableTargetManager>().SetNumber(targeticon.Number);
+                    }
+
                 }
             }
             catch (Exception) { Debug.Log("wrong calc"); }

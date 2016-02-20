@@ -6,8 +6,8 @@ public class MageMind : AMind {
 
     public override void Awake()
     {
+        base.Awake();
         _name = "Mage"; // const
-        typestring = "Mind"; // const
         flavor = "Mage is a Nuker.";
         icon = GetComponent<Image>().sprite;
         proficiency = 0;
@@ -39,6 +39,7 @@ public class MageMind : AMind {
     {
         public override void Awake()
         {
+            base.Awake();
             actioncode = 5;
             _name = "Pressure";
             flavor = "Give 1.0*MD damage as magicdamage.";
@@ -80,6 +81,7 @@ public class MageMind : AMind {
     {
         public override void Awake()
         {
+            base.Awake();
             actioncode = 5;
             _name = "Break The Limit";
             flavor = "Give buff of -Break The Limit- to you.";

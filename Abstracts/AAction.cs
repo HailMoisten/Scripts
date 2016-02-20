@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using IconType;
 
 // Actions what LifeSeeds have.
 /*    public interface IAction
@@ -10,6 +11,13 @@ using System.Collections;
 */
 public abstract class AAction : AIcon
 {
+    public override void Awake()
+    {
+        base.Awake();
+        IconType = (int)IconTypeList.Action;
+        gameObject.tag = "Action";
+    }
+
     protected int actioncode = 0;
     protected float duration = 0.0f; public float Duration { get { return duration; } }
     protected int hpCost = 0; public int HPCost { get { return hpCost; } }
@@ -90,16 +98,18 @@ public abstract class AAction : AIcon
     protected GameObject buff = null;
     public GameObject Buff { get { return buff; } }
 
-    // Please definite ACTIONCODE, DURATION and NAME and more at Start.
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
-        GameObject inst = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/PopUpTextCanvas"), Vector3.zero, Quaternion.identity);
+        GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpActionCanvas"));
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
-        PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
+        PopUpIconCanvasManager ptcm = inst.GetComponent<PopUpIconCanvasManager>();
         ptcm.Title = Name;
-        ptcm.Content = "Duration " + Duration + " sec\n" +
-            "CastTime " + CastTime + " sec\n" +
-            Flavor;
+        ptcm.Icon = Icon;
+        ptcm.Content = "Resize " + CanResize + ", OneSideLimit " + SkillScaleOneSideLimit + "\n" +
+            "Position " + CanSelectPosition + ", Range " + SkillRange + "\n" +
+            "Charge" + IsChargeSkill + ", Limit " + ChargeLimit + "\n" + 
+            "Duration " + Duration + " sec";
+        ptcm.Flavor = Flavor;
         return ptcm;
     }
 
@@ -110,6 +120,7 @@ public class IdleAction : AAction
 {
     public override void Awake()
     {
+        base.Awake();
         actioncode = 0;
         _name = "Idle";
         duration = 0.0f;
@@ -130,6 +141,7 @@ public class WalkAction : AAction
 {
     public override void Awake()
     {
+        base.Awake();
         actioncode = 1;
         _name = "Walk";
         duration = 1.0f;
@@ -193,6 +205,7 @@ public class RunAction : AAction
 {
     public override void Awake()
     {
+        base.Awake();
         actioncode = 2;
         _name = "Run";
         duration = 1.0f;
@@ -263,6 +276,7 @@ public class Stunned : AAction
 {
     public override void Awake()
     {
+        base.Awake();
         actioncode = -1;
         _name = "Stunned";
         duration = 1.0f;
@@ -285,6 +299,7 @@ public class PickUp : AAction
     public AItem TargetItem { get; set; }
     public override void Awake()
     {
+        base.Awake();
         actioncode = -2;
         _name = "PickUp";
         duration = 0.5f;
@@ -300,7 +315,11 @@ public class PickUp : AAction
     {
         if (target.ItemBag.FindChild(TargetItem.Name))
         {
-            target.ItemBag.FindChild(TargetItem.Name).GetComponent<AItem>().Number++;
+            Transform t = target.ItemBag.FindChild(TargetItem.Name);
+            if (t.GetComponent<AItem>().CanTogether)
+            {
+                t.GetComponent<AItem>().Number += TargetItem.Number;
+            }
         }
         else
         {

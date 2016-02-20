@@ -1,7 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using IconType;
 
 public abstract class AMind : AIcon {
+    public override void Awake()
+    {
+        base.Awake();
+        IconType = (int)IconTypeList.Mind;
+        gameObject.tag = "Mind";
+    }
 
     protected int proficiency = 0;
     public int Proficiency
@@ -19,11 +26,12 @@ public abstract class AMind : AIcon {
 
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
-        GameObject inst = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/PopUpTextCanvas"), Vector3.zero, Quaternion.identity);
+        GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpIconCanvas"));
         inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
-        PopUpTextCanvasManager ptcm = inst.GetComponent<PopUpTextCanvasManager>();
-        ptcm.Title = _name;
-        ptcm.Content = flavor;
+        PopUpIconCanvasManager ptcm = inst.GetComponent<PopUpIconCanvasManager>();
+        ptcm.Title = Name;
+        ptcm.Icon = Icon;
+        ptcm.Flavor = Flavor;
 
         return ptcm;
     }

@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
+using IconType;
 
 public abstract class AItem : AAction {
-    public int Number = 1;
-//    public int Number { get { return number; } set { number = value; } }
     protected string modelPass = "";
-    protected bool canTogether = false;
+    public override void Awake()
+    {
+        base.Awake();
+        CanTogether = true;
+        IconType = (int)IconTypeList.Item;
+        gameObject.tag = "Item";
+    }
 
     public override bool CanDoAction(AAnimal target)
     {
@@ -28,4 +33,16 @@ public abstract class AItem : AAction {
         Number--;
         if(Number <= 0) { Destroy(gameObject, 0.25f); }
     }
+    public override ACanvasManager Clicked(Vector3 clickedpos)
+    {
+        GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpIconCanvas"));
+        inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
+        PopUpIconCanvasManager ptcm = inst.GetComponent<PopUpIconCanvasManager>();
+        ptcm.Title = Name;
+        ptcm.Icon = Icon;
+        ptcm.Content = "Number of possession " + Number;
+        ptcm.Flavor = Flavor;
+        return ptcm;
+    }
+
 }

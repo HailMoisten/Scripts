@@ -1,13 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using IconType;
+
+namespace IconType
+{
+    enum IconTypeList { Mind, Action, Item, Weapon, Ring, Buff };
+}
 
 public abstract class AIcon : MonoBehaviour {
-
+    public int Number = 1;
+    public bool CanTogether = false;
     protected string _name = ""; // const
     public string Name { get { return _name; } }
-    protected string typestring = ""; // mind, item, action, etc...
-    public string TypeString { get { return typestring; } }
+    public int IconType;
     protected string flavor = "";
     public string Flavor
     {
@@ -23,7 +29,12 @@ public abstract class AIcon : MonoBehaviour {
             GetComponent<Image>().sprite = value;
         }
     }
-    public abstract void Awake();
+    public virtual void Awake()
+    {
+        if (gameObject.GetComponent<Image>()) { } else { gameObject.AddComponent<Image>(); }
+        icon = GetComponent<Image>().sprite;
+        gameObject.tag = "Icon";
+    }
 
     public abstract ACanvasManager Clicked(Vector3 newcanvaspos);
 
