@@ -8,6 +8,7 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
 
     public int TargetIconType;
     private SelectableTargetManager targetSTM;
+    protected AMind targetMind = null;
 
     // Use this for initialization
     protected override void Awake()
@@ -19,11 +20,22 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
     {
         if (nextCanvas != null)
         {
+            if (Input.GetButtonDown("Submit"))
+            {
+                if (targetMind.MindLevel >= nextCanvas.GetPointa())
+                {
+                    DestroyThisCanvas();
+                }
+                backCanvas.ReturnedAction = targetMind.transform.GetChild(nextCanvas.GetPointa()).GetComponent<AAction>();
+                DestroyThisCanvas();
+            }
         }
         else
         {
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
+                Debug.Log(ReturnedAction);
+
                 if (pointa <= 4) { }
                 else { setPointa(pointa - 4); }
                 targetIconNameText.text = targetIconName;
@@ -79,7 +91,9 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
                         {
                             if (targetSTM.TargetIcon.IconType == (int)IconTypeList.Mind)
                             {
-                                //ReturnMindSkillCanvas
+                                targetMind = playerManager.MindBag.GetChild(pointa - 4 - 1 - ((currentPage - 1) * 20)).GetComponent<AMind>();
+                                nextCanvas = clickTarget();
+                                if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                             }
                             else if (targetSTM.TargetIcon.IconType == (int)IconTypeList.Item)
                             {

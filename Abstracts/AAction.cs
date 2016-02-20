@@ -101,13 +101,13 @@ public abstract class AAction : AIcon
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
         GameObject inst = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PopUpActionCanvas"));
-        inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(64, 64, 0);
+        inst.transform.GetChild(0).GetComponent<RectTransform>().localPosition = clickedpos + new Vector3(60, 60, 0);
         PopUpIconCanvasManager ptcm = inst.GetComponent<PopUpIconCanvasManager>();
         ptcm.Title = Name;
         ptcm.Icon = Icon;
         ptcm.Content = "Resize " + CanResize + ", OneSideLimit " + SkillScaleOneSideLimit + "\n" +
             "Position " + CanSelectPosition + ", Range " + SkillRange + "\n" +
-            "Charge" + IsChargeSkill + ", Limit " + ChargeLimit + "\n" + 
+            "Charge " + IsChargeSkill + ", Limit " + ChargeLimit + "\n" + 
             "Duration " + Duration + " sec";
         ptcm.Flavor = Flavor;
         return ptcm;

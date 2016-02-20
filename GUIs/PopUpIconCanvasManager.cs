@@ -41,6 +41,12 @@ public class PopUpIconCanvasManager : ACanvasManager {
 
     // Update is called once per frame
     void Update () {
-        if (Input.GetButtonDown("Submit")) { DestroyThisCanvas(); }
+        if (nextCanvas != null)
+        {
+        }
+        else
+        {
+            if (Input.GetButtonDown("Submit")) { DestroyThisCanvas(); }
+        }
     }
 }

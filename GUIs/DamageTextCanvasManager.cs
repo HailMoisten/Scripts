@@ -15,6 +15,7 @@ public class DamageTextCanvasManager : ACanvasManager {
         else
         {
             adText.GetComponent<Text>().text = a.ToString();
+            adText.GetComponent<TextShade>().TextUpdate();
         }
         mdText = transform.GetChild(1);
         mdText.GetComponent<RectTransform>().localPosition = adText.GetComponent<RectTransform>().localPosition + new Vector3(0, -22, 0);
@@ -22,6 +23,7 @@ public class DamageTextCanvasManager : ACanvasManager {
         else
         {
             mdText.GetComponent<Text>().text = m.ToString();
+            mdText.GetComponent<TextShade>().TextUpdate();
         }
 
         Destroy(gameObject, 2.0f);

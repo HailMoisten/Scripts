@@ -17,8 +17,8 @@ public abstract class ACanvasManager : MonoBehaviour {
     public GameObject Target { get { return target; } }
     private GameObject lastTarget = null;
     protected RectTransform myKersolRect = null;
-    protected ACanvasManager backCanvas = null;
-    protected ACanvasManager nextCanvas = null;
+    public ACanvasManager backCanvas = null;
+    public ACanvasManager nextCanvas = null;
     public int SortOrder { get { return GetComponent<Canvas>().sortingOrder; } set { GetComponent<Canvas>().sortingOrder = value; } }
 
     // About Kersol
@@ -81,7 +81,7 @@ public abstract class ACanvasManager : MonoBehaviour {
     }
     public void SetBackCanvas(ACanvasManager backC) { backCanvas = backC; SortOrder = backC.SortOrder + 1; }
     public void DestroyThisCanvas() {
-        if (nextCanvas != null) { Destroy(nextCanvas.gameObject); }
+        if (nextCanvas != null) { nextCanvas.DestroyThisCanvas(); }
         Destroy(gameObject);
     }
     public void DestroyNextCanvas() { if (nextCanvas != null) { Destroy(nextCanvas.gameObject); } }

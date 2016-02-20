@@ -10,16 +10,15 @@ public class MageMind : AMind {
         _name = "Mage"; // const
         flavor = "Mage is a Nuker.";
         icon = GetComponent<Image>().sprite;
-        proficiency = 0;
-
+        prefabPass = "Prefabs/Minds/Mage";
+        GrowProficiency(200);
         initSkills();
     }
 
     private void initSkills()
     {
         // get from savedata
-        proficiency = 0;
-        mindlevel = 1 + (proficiency/100);
+//        GrowProficiency();
 
         transform.GetChild(0).gameObject.AddComponent<IdleAction>();
         transform.GetChild(1).gameObject.AddComponent<Pressure>();

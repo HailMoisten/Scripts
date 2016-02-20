@@ -5,7 +5,6 @@ using System.Collections;
 
 public class InventoryMenuCanvasManager : ACanvasManager
 {
-
     protected PlayerManager playerManager;
     protected Text targetIconNameText;
     protected Sprite nullSprite;
@@ -68,7 +67,6 @@ public class InventoryMenuCanvasManager : ACanvasManager
     // Update is called once per frame
     void Update()
     {
-
         if (nextCanvas != null)
         {
         }
