@@ -38,21 +38,21 @@ public class SelectableTargetManager : AIcon {
             case 3: c = c3; break;
             default: c = c0; break;
         }
-        this.GetComponent<Text>().color = c;
+        GetComponent<Text>().color = c;
     }
     private void Selected()
     {
         if (isSelected)
         {
             if (changeImageAuto) { }
-            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightYellow; }
-            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 22; }
+            if (changeTextColorAuto) { GetComponent<Text>().color = LightYellow; }
+            if (changeTextSizeAuto) { GetComponent<Text>().fontSize = 22; }
         }
         else
         {
             if (changeImageAuto) { }
-            if (changeTextColorAuto) { this.GetComponent<Text>().color = LightBlue; }
-            if (changeTextSizeAuto) { this.GetComponent<Text>().fontSize = 16; }
+            if (changeTextColorAuto) { GetComponent<Text>().color = LightBlue; }
+            if (changeTextSizeAuto) { GetComponent<Text>().fontSize = 16; }
         }
     }
 

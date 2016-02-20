@@ -40,6 +40,7 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                 if (playerManager.actionShortcuts[n].GetComponent<AIcon>())
                 {
                     AIcon actionsIcon = playerManager.actionShortcuts[n].GetComponent<AIcon>();
+                    Debug.Log(actionsIcon);
                     setPointa(2 + n);
                     Target.GetComponent<SelectableTargetManager>().TargetIcon = actionsIcon;
                     Target.GetComponent<AIcon>().Icon = actionsIcon.Icon;

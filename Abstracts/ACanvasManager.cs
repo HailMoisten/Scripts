@@ -4,7 +4,11 @@ using System;
 using System.Collections;
 
 public abstract class ACanvasManager : MonoBehaviour {
+    public AAction ReturnedAction = null;
     public AIcon ReturnedIcon = null;
+    public int ReturnedInt = 0;
+    public bool ReturnedBool = false;
+
     protected string targetIconName = string.Empty;
     private GameObject target = null;
     protected GameObject Target { get { return target; } }
