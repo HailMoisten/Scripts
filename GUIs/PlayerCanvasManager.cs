@@ -91,18 +91,24 @@ public class PlayerCanvasManager : ACanvasManager {
             targetBuff = playerManager.Buffs.transform.GetChild(i).GetComponent<ABuff>();
             if (targetBuff.IsDrawn)
             {
-                for (int j = 0; j < buffListSTM.Count; j++)
+                if (targetBuff.Sands <= 0.0f)
                 {
-                    if (buffListSTM[j].TargetIcon.Name == targetBuff.Name)
-                    {
-                        if (targetBuff.Sands <= 0.0f)
-                        {
+                    for (int j = 0; j < buffListSTM.Count; j++) {
+                        if (buffListSTM[j].TargetIcon.Name == targetBuff.Name) {
                             Destroy(buffListSTM[j].gameObject); buffListSTM.RemoveAt(j);
                         }
-                        else { buffListSTM[j].SetNumber(Mathf.RoundToInt(targetBuff.Sands)); }
                     }
                     Destroy(targetBuff.gameObject);
                 }
+                else
+                {
+                    for (int j = 0; j < buffListSTM.Count; j++) {
+                        if (buffListSTM[j].TargetIcon.Name == targetBuff.Name) {
+                            buffListSTM[j].SetNumber(Mathf.RoundToInt(targetBuff.Sands));
+                        }
+                    }
+                }
+
             }
             else
             {

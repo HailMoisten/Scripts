@@ -61,7 +61,7 @@ public class InventoryMenuCanvasManager : ACanvasManager
             }
             catch (Exception) { Debug.Log("wrong calc"); }
         }
-        setPointa(currentInventory);
+        setPointa(currentInventory); setPointa(5); moveKersol();
     }
 
     // Update is called once per frame

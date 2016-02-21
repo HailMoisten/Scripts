@@ -54,23 +54,23 @@ public class MageMind : AMind {
             isChargeSkill = true;
             chargeLimit = 5;
         }
-        public override bool CanDoAction(AAnimal target)
+        public override bool CanDoAction(AAnimal myself)
         {
-            return CanDoActionAboutHPSP(target);
+            return CanDoActionAboutHPSP(myself);
         }
-        public override void Action(AAnimal target)
+        public override void Action(AAnimal myself)
         {
-            castTime = 2.0f / target.MovementSpeed;
+            castTime = 2.0f / myself.MovementSpeed;
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            if (Charged) { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, target.MD * 2, DamageDuration, CastTime, target.targetPOS); }
-            else { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, target.MD, DamageDuration, CastTime, target.targetPOS); }
+            if (Charged) { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, myself.MD * 2, DamageDuration, CastTime, myself.targetPOS); }
+            else { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, myself.MD, DamageDuration, CastTime, myself.targetPOS); }
             if (IsChargeSkill) { chargeCount = 0; charged = false; } // Need this. if (IsChargeSkill)
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             int tempspcost = SPCost;
             spCost = Mathf.RoundToInt(SPCost * skillScale);
-            SetMotionAndDurationAndUseHPSP(target);
+            SetMotionAndDurationAndUseHPSP(myself);
             spCost = tempspcost;
         }
 
@@ -89,17 +89,17 @@ public class MageMind : AMind {
             duration = 5.0f;
             buff = (GameObject)Resources.Load("Prefabs/Buffs/Break_The_Limit");
         }
-        public override bool CanDoAction(AAnimal target)
+        public override bool CanDoAction(AAnimal myself)
         {
             return canSelectPosition;
         }
-        public override void Action(AAnimal target)
+        public override void Action(AAnimal myself)
         {
             //Give a Buff about this.
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, 0, DamageDuration, CastTime, target.nextPOS);
+            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, 0, DamageDuration, CastTime, myself.nextPOS);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
-            SetMotionAndDurationAndUseHPSP(target);
+            SetMotionAndDurationAndUseHPSP(myself);
         }
     }
 

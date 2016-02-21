@@ -26,23 +26,23 @@ public abstract class AAction : AIcon
     protected int sppercentCost = 0; public int SPPercentCost { get { return sppercentCost; } }
 
     // have to definite ACTIONCODE, DURATION and NAME at inheriting constracter
-    public abstract bool CanDoAction(AAnimal target);
-    protected bool CanDoActionAboutHPSP(AAnimal target)
+    public abstract bool CanDoAction(AAnimal myself);
+    protected bool CanDoActionAboutHPSP(AAnimal myself)
     {
-        float hp = target.HP; float sp = target.SP;
-        float[] subs = target.GetSubStatus();
+        float hp = myself.HP; float sp = myself.SP;
+        float[] subs = myself.GetSubStatus();
         hp = hp - hpCost; sp = sp - spCost;
-        hp = hp - Mathf.RoundToInt(target.MaxHP * ((float)hppercentCost / 100));
-        sp = sp - Mathf.RoundToInt(target.MaxSP * ((float)sppercentCost / 100));
+        hp = hp - Mathf.RoundToInt(myself.MaxHP * ((float)hppercentCost / 100));
+        sp = sp - Mathf.RoundToInt(myself.MaxSP * ((float)sppercentCost / 100));
         if (hp >= 0 && sp >= 0) { return true; }// Break_The_Limit
         return false;
     }
-    public abstract void Action(AAnimal target);
-    protected void SetMotionAndDurationAndUseHPSP(AAnimal target)
+    public abstract void Action(AAnimal myself);
+    protected void SetMotionAndDurationAndUseHPSP(AAnimal myself)
     {
-        target.UseHPSP(hpCost, spCost, hppercentCost, sppercentCost);
-        target.GetAnimator().SetInteger("ActionCode", actioncode);
-        target.StartCoroutine(target.DoingAction(duration));
+        myself.UseHPSP(hpCost, spCost, hppercentCost, sppercentCost);
+        myself.GetAnimator().SetInteger("ActionCode", actioncode);
+        myself.StartCoroutine(myself.DoingAction(duration));
     }
 
     protected bool canSelectPosition = false;
@@ -72,7 +72,7 @@ public abstract class AAction : AIcon
         yield return new WaitForSeconds(time);
         isCharged = false;
     }
-    public void Charge(AAnimal target)
+    public void Charge(AAnimal myself)
     {
         if (isCharged) { }
         else
@@ -80,12 +80,12 @@ public abstract class AAction : AIcon
             if (ChargeCount >= ChargeLimit)
             {
                 charged = true;
-                GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charged"), target.nextPOS + Vector3.up, Quaternion.identity);
+                GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charged"), myself.nextPOS + Vector3.up, Quaternion.identity);
                 ef.GetComponent<EffectManager>().Go();
                 Debug.Log("Charged!");
             }
-            else { chargeCount++; target.UseHPSP(0, SPCost, 0, 0); }
-            StartCoroutine(chargedCD(CastTime / target.MovementSpeed));
+            else { chargeCount++; myself.UseHPSP(0, SPCost, 0, 0); }
+            StartCoroutine(chargedCD(CastTime / myself.MovementSpeed));
         }
     }
 
@@ -126,14 +126,14 @@ public class IdleAction : AAction
         duration = 0.0f;
     }
 
-    public override bool CanDoAction(AAnimal target)
+    public override bool CanDoAction(AAnimal myself)
     {
         return true;
     }
-    public override void Action(AAnimal target)
+    public override void Action(AAnimal myself)
     {
-        duration = target.GCD;
-        SetMotionAndDurationAndUseHPSP(target);
+        duration = myself.GCD;
+        SetMotionAndDurationAndUseHPSP(myself);
     }
 
 }
@@ -147,15 +147,15 @@ public class WalkAction : AAction
         duration = 1.0f;
         spCost = 1;
     }
-    public override bool CanDoAction(AAnimal target)
+    public override bool CanDoAction(AAnimal myself)
     {
-        Vector3 dir2 = new Vector3(target.nextnextPOS.x - target.nextPOS.x, 0, target.nextnextPOS.z - target.nextPOS.z);
-        dir2 = target.RoundToIntVector3XZ(dir2);
+        Vector3 dir2 = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, 0, myself.nextnextPOS.z - myself.nextPOS.z);
+        dir2 = myself.RoundToIntVector3XZ(dir2);
         float maxd = 1.0f;
         if (dir2.x != 0 && dir2.z != 0) { maxd = 1.5f; }
         RaycastHit hitFront; RaycastHit hitDown;
-        Ray rayFront = new Ray(target.nextPOS + new Vector3(0, 1.5f, 0), dir2);
-        Ray rayDown = new Ray(target.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
+        Ray rayFront = new Ray(myself.nextPOS + new Vector3(0, 1.5f, 0), dir2);
+        Ray rayDown = new Ray(myself.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
         if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
             //            Debug.Log("hitsFront:" + hitFront.distance);
@@ -172,32 +172,32 @@ public class WalkAction : AAction
             if (hitDown.collider.tag == "Environment" ||
                 hitDown.collider.tag == "Animal")
             {
-                target.nextnextPOS = target.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
+                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
             }
             else if (hitDown.collider.tag == "Terrain")
             {
-                target.nextnextPOS = target.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(target.nextnextPOS) - target.nextnextPOS.y, 0);
+                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
             }
             return true;
         }
         return false;
     }
-    public override void Action(AAnimal target)
+    public override void Action(AAnimal myself)
     {
         float diag = 1.0f;
-        if (Mathf.Abs(target.nextPOS.x - target.nextnextPOS.x) != 0 &&
-             Mathf.Abs(target.nextPOS.z - target.nextnextPOS.z) != 0) { diag = 1.5f; }
+        if (Mathf.Abs(myself.nextPOS.x - myself.nextnextPOS.x) != 0 &&
+             Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
-        if (target.MovementSpeed == 0) { }
-        else { duration = (diag) / target.MovementSpeed; }//time
-        target.POS = target.nextPOS;
-        target.nextPOS = target.nextnextPOS;
-        iTween.MoveTo(target.gameObject,
-            iTween.Hash("position", target.nextPOS,
+        if (myself.MovementSpeed == 0) { }
+        else { duration = (diag) / myself.MovementSpeed; }//time
+        myself.POS = myself.nextPOS;
+        myself.nextPOS = myself.nextnextPOS;
+        iTween.MoveTo(myself.gameObject,
+            iTween.Hash("position", myself.nextPOS,
             "time", duration,
             "easetype", "linear"
             ));
-        SetMotionAndDurationAndUseHPSP(target);
+        SetMotionAndDurationAndUseHPSP(myself);
     }
 
 }
@@ -211,20 +211,20 @@ public class RunAction : AAction
         duration = 1.0f;
         spCost = 2;
     }
-    public override bool CanDoAction(AAnimal target)
+    public override bool CanDoAction(AAnimal myself)
     {
         // Run fix
-        float[] subs = target.GetSubStatus();
-        Vector3 dir2 = new Vector3(target.nextnextPOS.x - target.nextPOS.x, 0, target.nextnextPOS.z - target.nextPOS.z);
-        dir2 = target.RoundToIntVector3XZ(dir2);
+        float[] subs = myself.GetSubStatus();
+        Vector3 dir2 = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, 0, myself.nextnextPOS.z - myself.nextPOS.z);
+        dir2 = myself.RoundToIntVector3XZ(dir2);
 //        dir2 = dir2 * Mathf.RoundToInt(target.RunRatio);
 //        target.nextnextPOS = target.nextPOS + dir2;
 
         float maxd = 1.0f;
         if (dir2.x != 0 && dir2.z != 0) { maxd = 1.5f; }
         RaycastHit hitFront; RaycastHit hitDown;
-        Ray rayFront = new Ray(target.nextPOS + new Vector3(0, 1.5f, 0), dir2);
-        Ray rayDown = new Ray(target.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
+        Ray rayFront = new Ray(myself.nextPOS + new Vector3(0, 1.5f, 0), dir2);
+        Ray rayDown = new Ray(myself.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
         if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
             //            Debug.Log("hitsFront:" + hitFront.distance);
@@ -241,34 +241,34 @@ public class RunAction : AAction
             if (hitDown.collider.tag == "Environment" ||
                 hitDown.collider.tag == "Animal")
             {
-                target.nextnextPOS = target.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
+                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
             }
             else if (hitDown.collider.tag == "Terrain")
             {
-                target.nextnextPOS = target.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(target.nextnextPOS) - target.nextnextPOS.y, 0);
+                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
             }
             return true;
         }
         return false;
     }
-    public override void Action(AAnimal target)
+    public override void Action(AAnimal myself)
     {
         // almost same to WalkAction.Action()
         float diag = 1.0f;
-        if (Mathf.Abs(target.nextPOS.x - target.nextnextPOS.x) != 0 &&
-             Mathf.Abs(target.nextPOS.z - target.nextnextPOS.z) != 0) { diag = 1.5f; }
+        if (Mathf.Abs(myself.nextPOS.x - myself.nextnextPOS.x) != 0 &&
+             Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
-        float[] subs = target.GetSubStatus();
-        if (target.MovementSpeed * target.RunRatio == 0) { }
-        else { duration = (diag) / (target.MovementSpeed * target.RunRatio); }
-        target.POS = target.nextPOS;
-        target.nextPOS = target.nextnextPOS;
-        iTween.MoveTo(target.gameObject,
-            iTween.Hash("position", target.nextPOS,
+        float[] subs = myself.GetSubStatus();
+        if (myself.MovementSpeed * myself.RunRatio == 0) { }
+        else { duration = (diag) / (myself.MovementSpeed * myself.RunRatio); }
+        myself.POS = myself.nextPOS;
+        myself.nextPOS = myself.nextnextPOS;
+        iTween.MoveTo(myself.gameObject,
+            iTween.Hash("position", myself.nextPOS,
             "time", duration,
             "easetype", "linear"
             ));
-        SetMotionAndDurationAndUseHPSP(target);
+        SetMotionAndDurationAndUseHPSP(myself);
     }
 
 }
@@ -282,15 +282,15 @@ public class Stunned : AAction
         duration = 1.0f;
     }
 
-    public override bool CanDoAction(AAnimal target)
+    public override bool CanDoAction(AAnimal myself)
     {
         return true;
     }
-    public override void Action(AAnimal target)
+    public override void Action(AAnimal myself)
     {
-        duration = 1.0f / target.MovementSpeed;
-        SetMotionAndDurationAndUseHPSP(target);
-        target.Interrupting = false;
+        duration = 1.0f / myself.MovementSpeed;
+        SetMotionAndDurationAndUseHPSP(myself);
+        myself.Interrupting = false;
     }
 
 }
@@ -305,17 +305,17 @@ public class PickUp : AAction
         duration = 0.5f;
     }
 
-    public override bool CanDoAction(AAnimal target)
+    public override bool CanDoAction(AAnimal myself)
     {
-        Vector3 diff = target.nextPOS - TargetItem.transform.position;
+        Vector3 diff = myself.nextPOS - TargetItem.transform.position;
         if (Mathf.Abs(diff.x) < 1.5f && Mathf.Abs(diff.y) < 1.5f && Mathf.Abs(diff.z) < 1.5f) { return true; }
         return false;
     }
-    public override void Action(AAnimal target)
+    public override void Action(AAnimal myself)
     {
-        if (target.ItemBag.FindChild(TargetItem.Name))
+        if (myself.ItemBag.FindChild(TargetItem.Name))
         {
-            Transform t = target.ItemBag.FindChild(TargetItem.Name);
+            Transform t = myself.ItemBag.FindChild(TargetItem.Name);
             if (t.GetComponent<AItem>().CanTogether)
             {
                 t.GetComponent<AItem>().Number += TargetItem.Number;
@@ -325,12 +325,12 @@ public class PickUp : AAction
         {
             GameObject item = new GameObject(TargetItem.Name);
             item.AddComponent(TargetItem.GetType());
-            item.transform.SetParent(target.ItemBag.transform);
+            item.transform.SetParent(myself.ItemBag.transform);
         }
         TargetItem.PickUp();
-        duration = 0.5f / target.MovementSpeed;
+        duration = 0.5f / myself.MovementSpeed;
         TargetItem = null;
-        SetMotionAndDurationAndUseHPSP(target);
+        SetMotionAndDurationAndUseHPSP(myself);
     }
 
 }
