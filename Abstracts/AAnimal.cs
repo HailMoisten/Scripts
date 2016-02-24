@@ -194,9 +194,11 @@ public abstract class AAnimal : MonoBehaviour {
     {
         mainActionPool = new GameObject("MainActionPool");
         mainActionPool.transform.SetParent(transform);
-        mainActionPool.AddComponent<IdleAction>();
-        mainActionPool.AddComponent<WalkAction>();
-        mainActionPool.AddComponent<RunAction>();
+        mainActionPool.AddComponent<Idle>();
+        mainActionPool.AddComponent<Walk>();
+        mainActionPool.AddComponent<Run>();
+        mainActionPool.AddComponent<Attack>();
+        mainActionPool.AddComponent<Guard>();
         mainActionPool.AddComponent<Stunned>();
         mainActionPool.AddComponent<PickUp>();
     }
@@ -209,13 +211,13 @@ public abstract class AAnimal : MonoBehaviour {
             if (actionStack[0] == null)
             {
                 actionStack[0] = AnyAction;
-                actionStack[1] = mainActionPool.GetComponent<IdleAction>();
+                actionStack[1] = mainActionPool.GetComponent<Idle>();
                 actionStack[2] = null;
             }
             else
             {
                 actionStack[1] = AnyAction;
-                actionStack[2] = mainActionPool.GetComponent<IdleAction>();
+                actionStack[2] = mainActionPool.GetComponent<Idle>();
             }
         }
     }
@@ -237,7 +239,7 @@ public abstract class AAnimal : MonoBehaviour {
                 if (actionStack[0].CanDoAction(this)) { }
                 else
                 {
-                    actionStack[0] = mainActionPool.GetComponent<IdleAction>();
+                    actionStack[0] = mainActionPool.GetComponent<Idle>();
                     GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
                     ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(3);
                 }
@@ -254,6 +256,7 @@ public abstract class AAnimal : MonoBehaviour {
 
     private void doRotate()
     {
+        transform.position = nextPOS;
         iTween.RotateTo(this.gameObject, iTween.Hash("y", Quaternion.LookRotation(DIR).eulerAngles.y, "time", gcd*2));
     }
 
@@ -288,6 +291,7 @@ public abstract class AAnimal : MonoBehaviour {
     protected abstract void setUtilities();
     protected abstract void setActionShortcuts();
     public AAction SubmitAction;
+    protected AAnimal targetAnimal = null;
 
     private bool isPassed = false;
     private IEnumerator passedCD()
@@ -353,27 +357,40 @@ public abstract class AAnimal : MonoBehaviour {
         hp = HP - (MaxHP * (hppercentcost / 100)); sp = SP - (MaxSP * (sppercentcost / 100));
         if (HP < 0) { hp = 0; }
     }
+    /// <summary>
+    /// kowai
+    /// </summary>
+    /// <param name="colliderInfo"></param>
     protected void OnTriggerEnter(Collider colliderInfo)
     {
         if (colliderInfo.gameObject.tag == "Animal")
         {
-            AAnimal target = colliderInfo.gameObject.GetComponent<AAnimal>();
-            target.TakeDamage(AD, 0);
-            transform.position = POS;
+            targetAnimal = colliderInfo.gameObject.GetComponent<AAnimal>();
         }
-        if (colliderInfo.gameObject.tag == "Item")
+        else if (colliderInfo.gameObject.tag == "Item")
         {
             mainActionPool.GetComponent<PickUp>().TargetItem = colliderInfo.gameObject.GetComponent<AItem>();
             SubmitAction = mainActionPool.GetComponent<PickUp>();
-            Debug.Log("There is an item.");
+        }
+        else if (colliderInfo.gameObject.tag == "DamageField")
+        {
+            targetAnimal = colliderInfo.gameObject.GetComponent<ADamageField>().Creator;
         }
     }
-    // kowai
     protected void OnTriggerExit(Collider colliderInfo)
     {
         if (colliderInfo.gameObject.tag == "Item")
         {
             SubmitAction = null;
+        }
+    }
+    protected void OnCollisionEnter(Collision collisionInfo)
+    {
+        if (collisionInfo.gameObject.tag == "Animal")
+        {
+            AAnimal target = collisionInfo.gameObject.GetComponent<AAnimal>();
+            target.TakeDamage(AD, 0);
+            transform.position = POS;
         }
     }
 

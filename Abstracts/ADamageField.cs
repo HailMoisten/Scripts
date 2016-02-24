@@ -2,7 +2,7 @@
 using System.Collections;
 
 public abstract class ADamageField : MonoBehaviour {
-
+    public AAnimal Creator = null;
     protected int attackDamage = 0;
     protected int magicDamage = 0;
     protected float damageDuration = 1.0f;
@@ -12,9 +12,14 @@ public abstract class ADamageField : MonoBehaviour {
     protected GameObject damageEffect = null;
     protected Vector3 skillScaleVector = Vector3.one;
     protected GameObject buff = null;
-
-    public void SetMainParam(GameObject damageeffect, Vector3 skillscalevector, GameObject buff, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition)
+    protected void Awake()
     {
+        gameObject.tag = "DamageField";
+    }
+
+    public void SetMainParam(AAnimal creator, GameObject damageeffect, Vector3 skillscalevector, GameObject buff, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition)
+    {
+        this.Creator = creator;
         damageEffect = damageeffect; skillScaleVector = skillscalevector;
         this.buff = buff;
         attackDamage = attackdamage; magicDamage = magicdamage;

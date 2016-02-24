@@ -8,9 +8,11 @@ public class PlayerManager : AChild {
     private void SetnextnextPOS()
     {
         nextPOS = RoundToIntVector3XZ(nextPOS);
-        nextnextPOS = nextPOS + (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0))*
-            new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
-        nextnextPOS = RoundToIntVector3XZ(nextnextPOS);
+        nextnextPOS = nextPOS + DIR;
+    }
+    private void SettargetPOS()
+    {
+        targetPOS = nextPOS + DIR + Vector3.up;
     }
     private void SettargetPOS(int n)
     {
@@ -77,6 +79,8 @@ public class PlayerManager : AChild {
     protected override void setUtilities()
     {
         nextPOS = RoundToIntVector3XZ(transform.position);
+        SettargetPOS();
+        DIR.z = 1;
 
         Inventory = transform.FindChild("Inventory");
         ItemBag = Inventory.FindChild("ItemBag");
@@ -141,15 +145,15 @@ public class PlayerManager : AChild {
                         Input.GetButton("Action_7") || Input.GetButton("Action_8")) { }
                     else if (Input.GetKey(KeyCode.Space))
                     {
-                        AddAction(mainActionPool.GetComponent<RunAction>());
+                        AddAction(mainActionPool.GetComponent<Run>());
                     }
                     else if (Input.GetKey(KeyCode.LeftShift))
                     {
-                        AddAction(mainActionPool.GetComponent<IdleAction>());
+                        AddAction(mainActionPool.GetComponent<Idle>());
                     }
                     else
                     {
-                        AddAction(mainActionPool.GetComponent<WalkAction>());
+                        AddAction(mainActionPool.GetComponent<Walk>());
                     }
                 }
                 for (int n = 1; n <= 8; n++)
@@ -186,6 +190,16 @@ public class PlayerManager : AChild {
                         }
                     }
                 }
+
+                if (Input.GetButtonDown("Attack"))
+                {
+                    SettargetPOS();
+                    AddAction(mainActionPool.GetComponent<Attack>());
+                }
+                if (Input.GetButtonDown("Guard"))
+                {
+                    AddAction(mainActionPool.GetComponent<Guard>());
+                }
             }
             if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)
                 || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
@@ -206,15 +220,15 @@ public class PlayerManager : AChild {
                                 SetnextnextPOS();
                                 if (Input.GetKey(KeyCode.Space))
                                 {
-                                    AddAction(mainActionPool.GetComponent<RunAction>());
+                                    AddAction(mainActionPool.GetComponent<Run>());
                                 }
                                 else if (Input.GetKey(KeyCode.LeftShift))
                                 {
-                                    AddAction(mainActionPool.GetComponent<IdleAction>());
+                                    AddAction(mainActionPool.GetComponent<Idle>());
                                 }
                                 else
                                 {
-                                    AddAction(mainActionPool.GetComponent<WalkAction>());
+                                    AddAction(mainActionPool.GetComponent<Walk>());
                                 }
                             }
                         }
@@ -274,8 +288,7 @@ public class PlayerManager : AChild {
             visualAssistTarget.transform.position = targetPOS;
         }
         else {
-            if (Input.GetKey(KeyCode.LeftAlt)) { } else { targetPOS = nextPOS + Vector3.up; }
-            SettargetPOS(n);
+            if (Input.GetKey(KeyCode.LeftAlt)) { SettargetPOS(); } else { SettargetPOS(n); }
             visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
             visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
         }

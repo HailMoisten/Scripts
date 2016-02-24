@@ -22,12 +22,18 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
         {
             if (Input.GetButtonDown("Submit"))
             {
-                if (targetMind.MindLevel >= nextCanvas.GetPointa())
-                {
+                if (targetMind != null) {
+                    if (targetMind.MindLevel >= nextCanvas.GetPointa())
+                    {
+                        backCanvas.ReturnedAction = targetMind.transform.GetChild(nextCanvas.GetPointa()).GetComponent<AAction>();
+                    }
+                    else
+                    {
+                        GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
+                        ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(4);
+                    }
                     DestroyThisCanvas();
                 }
-                backCanvas.ReturnedAction = targetMind.transform.GetChild(nextCanvas.GetPointa()).GetComponent<AAction>();
-                DestroyThisCanvas();
             }
         }
         else

@@ -20,16 +20,16 @@ public class MageMind : AMind {
         // get from savedata
 //        GrowProficiency();
 
-        transform.GetChild(0).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(0).gameObject.AddComponent<Idle>();
         transform.GetChild(1).gameObject.AddComponent<Pressure>();
-        transform.GetChild(2).gameObject.AddComponent<IdleAction>();
-        transform.GetChild(3).gameObject.AddComponent<IdleAction>();
-        transform.GetChild(4).gameObject.AddComponent<IdleAction>();
-        transform.GetChild(5).gameObject.AddComponent<IdleAction>();
-        transform.GetChild(6).gameObject.AddComponent<IdleAction>();
-        transform.GetChild(7).gameObject.AddComponent<IdleAction>();
-        transform.GetChild(8).gameObject.AddComponent<IdleAction>();
-        transform.GetChild(9).gameObject.AddComponent<IdleAction>();
+        transform.GetChild(2).gameObject.AddComponent<Idle>();
+        transform.GetChild(3).gameObject.AddComponent<Idle>();
+        transform.GetChild(4).gameObject.AddComponent<Idle>();
+        transform.GetChild(5).gameObject.AddComponent<Idle>();
+        transform.GetChild(6).gameObject.AddComponent<Idle>();
+        transform.GetChild(7).gameObject.AddComponent<Idle>();
+        transform.GetChild(8).gameObject.AddComponent<Idle>();
+        transform.GetChild(9).gameObject.AddComponent<Idle>();
         transform.GetChild(10).gameObject.AddComponent<Break_The_Limit>();
 
     }
@@ -39,7 +39,7 @@ public class MageMind : AMind {
         public override void Awake()
         {
             base.Awake();
-            actioncode = 5;
+            actioncode = 6;
             _name = "Pressure";
             flavor = "Give 1.0*MD damage as magicdamage.";
             icon = GetComponent<Image>().sprite;
@@ -64,8 +64,8 @@ public class MageMind : AMind {
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            if (Charged) { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, myself.MD * 2, DamageDuration, CastTime, myself.targetPOS); }
-            else { damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, myself.MD, DamageDuration, CastTime, myself.targetPOS); }
+            if (Charged) { damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, 0, myself.MD * 2, DamageDuration, CastTime, myself.targetPOS); }
+            else { damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, 0, myself.MD, DamageDuration, CastTime, myself.targetPOS); }
             if (IsChargeSkill) { chargeCount = 0; charged = false; } // Need this. if (IsChargeSkill)
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             int tempspcost = SPCost;
@@ -97,7 +97,7 @@ public class MageMind : AMind {
         {
             //Give a Buff about this.
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            damagefield.GetComponent<ADamageField>().SetMainParam(DamageEffect, SkillScaleVector, Buff, 0, 0, DamageDuration, CastTime, myself.nextPOS);
+            damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, 0, 0, DamageDuration, CastTime, myself.nextPOS);
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
             SetMotionAndDurationAndUseHPSP(myself);
         }
