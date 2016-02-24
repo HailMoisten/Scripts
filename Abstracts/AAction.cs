@@ -116,7 +116,7 @@ public abstract class AAction : AIcon
 }
 
 // Main Actions
-public class IdleAction : AAction
+public class Idle : AAction
 {
     public override void Awake()
     {
@@ -137,7 +137,7 @@ public class IdleAction : AAction
     }
 
 }
-public class WalkAction : AAction
+public class Walk : AAction
 {
     public override void Awake()
     {
@@ -201,7 +201,7 @@ public class WalkAction : AAction
     }
 
 }
-public class RunAction : AAction
+public class Run : AAction
 {
     public override void Awake()
     {
@@ -272,6 +272,52 @@ public class RunAction : AAction
     }
 
 }
+public class Attack : AAction
+{
+    public override void Awake()
+    {
+        base.Awake();
+        actioncode = 4;
+        _name = "Attack";
+        duration = 1.0f;
+        spCost = 2;
+    }
+
+    public override bool CanDoAction(AAnimal myself)
+    {
+        return true;
+    }
+    public override void Action(AAnimal myself)
+    {
+        duration = 1.0f / myself.MovementSpeed;
+        GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
+        damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, myself.AD, 0, DamageDuration, CastTime, myself.targetPOS);
+        damagefield.GetComponent<CubeDamageField>().SetAndAwake();
+        SetMotionAndDurationAndUseHPSP(myself); SetMotionAndDurationAndUseHPSP(myself);
+    }
+}
+public class Guard : AAction
+{
+    public override void Awake()
+    {
+        base.Awake();
+        actioncode = 5;
+        _name = "Guard";
+        duration = 1.0f;
+        spCost = 2;
+    }
+
+    public override bool CanDoAction(AAnimal myself)
+    {
+        return true;
+    }
+    public override void Action(AAnimal myself)
+    {
+        duration = 1.0f / myself.MovementSpeed;
+        // Add Guard buff(Toggle) 
+        SetMotionAndDurationAndUseHPSP(myself);
+    }
+}
 public class Stunned : AAction
 {
     public override void Awake()
@@ -294,6 +340,7 @@ public class Stunned : AAction
     }
 
 }
+
 public class PickUp : AAction
 {
     public AItem TargetItem { get; set; }
