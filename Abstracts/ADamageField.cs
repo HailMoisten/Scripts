@@ -43,7 +43,7 @@ public abstract class ADamageField : MonoBehaviour {
 
     protected void OnTriggerEnter(Collider colliderInfo)
     {
-        if (colliderInfo.gameObject.tag == "Animal" || colliderInfo.gameObject.tag == "Player")
+        if (colliderInfo.gameObject.layer == LayerMask.NameToLayer("Animal"))
         {
             AAnimal target = colliderInfo.gameObject.GetComponent<AAnimal>();
             target.TakeDamage(attackDamage, magicDamage);

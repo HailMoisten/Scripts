@@ -1,9 +1,37 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public abstract class AAnimal : MonoBehaviour {
-    public abstract void Awake();
+    public virtual void Awake()
+    {
+        gameObject.tag = "Animal";
+        gameObject.layer = LayerMask.NameToLayer("Animal");
+        nextPOS = RoundToIntVector3XZ(transform.position);
+        DIR.z = 1;
+        targetPOS = nextPOS + DIR + Vector3.up;
+
+        Inventory = transform.FindChild("Inventory");
+        ItemBag = Inventory.FindChild("ItemBag");
+        WeaponBag = Inventory.FindChild("WeaponBag");
+        RingBag = Inventory.FindChild("RingBag");
+        MindBag = Inventory.FindChild("MindBag");
+
+        Equipment = transform.FindChild("Equipment");
+        Weapon = Equipment.FindChild("Weapon");
+        Ring = Equipment.FindChild("Ring");
+        Mind = Equipment.FindChild("Mind");
+
+        Buffs = transform.FindChild("Buffs");
+        visionManager = transform.FindChild("Vision").GetComponent<VisionManager>();
+        visionManager.SetMindSlots(MindSlots);
+
+        actionShortcuts = new AAction[9];
+        setMainActionPool();
+    }
+    protected abstract void Initialize();
+
     // Necessary Public Methods
     public Animator GetAnimator() { return GetComponent<Animator>(); }
     public Vector3 RoundToIntVector3XZ(Vector3 pos) { return new Vector3(Mathf.RoundToInt(pos.x), pos.y, Mathf.RoundToInt(pos.z)); }
@@ -85,14 +113,14 @@ public abstract class AAnimal : MonoBehaviour {
             vit = vit + LevelUpReward[0]; str = str + LevelUpReward[1]; agi = agi + LevelUpReward[2]; _int = _int + LevelUpReward[3]; mnd = mnd + LevelUpReward[4];
             int sum = 0;
             for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
-            if (sum == 0) { vit++; vit++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { vit++; }
+            if (sum == 0) { vit++; mnd++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { mnd++; }
             setSubStatus(calcSubStatus());
             hp = MaxHP; sp = MaxSP;
         }
     }
 
     /// <summary>
-    /// For debug or Reallocation(Soul Vessel)
+    /// For debug or Reallocation(Soul Vessel) or initialize.
     /// </summary>
     /// <returns></returns>
     protected void setMainStatus(int lv, int v, int s, int a, int i, int m)
@@ -171,6 +199,8 @@ public abstract class AAnimal : MonoBehaviour {
         vitalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 15]);
         mentalpoise = Mathf.RoundToInt(subs[subs.Length - fix + 16]);
         hp = Mathf.RoundToInt(subs[subs.Length - fix + 17]); sp = Mathf.RoundToInt(subs[subs.Length - fix + 18]);
+
+        visionManager.SetMindSlots(MindSlots);
     }
 
     // ActionManagement
@@ -287,11 +317,10 @@ public abstract class AAnimal : MonoBehaviour {
     public Transform Ring { get; set; }
     public Transform Mind { get; set; }
     public Transform Buffs { get; set; }
+    protected VisionManager visionManager;
+    protected AAnimal targetAnimal;
     public AAction[] actionShortcuts;
-    protected abstract void setUtilities();
-    protected abstract void setActionShortcuts();
     public AAction SubmitAction;
-    protected AAnimal targetAnimal = null;
 
     private bool isPassed = false;
     private IEnumerator passedCD()
@@ -363,30 +392,26 @@ public abstract class AAnimal : MonoBehaviour {
     /// <param name="colliderInfo"></param>
     protected void OnTriggerEnter(Collider colliderInfo)
     {
-        if (colliderInfo.gameObject.tag == "Animal")
-        {
-            targetAnimal = colliderInfo.gameObject.GetComponent<AAnimal>();
-        }
-        else if (colliderInfo.gameObject.tag == "Item")
+        if (colliderInfo.gameObject.layer == LayerMask.NameToLayer("Item"))
         {
             mainActionPool.GetComponent<PickUp>().TargetItem = colliderInfo.gameObject.GetComponent<AItem>();
             SubmitAction = mainActionPool.GetComponent<PickUp>();
         }
-        else if (colliderInfo.gameObject.tag == "DamageField")
+        else if (colliderInfo.gameObject.layer == LayerMask.NameToLayer("DamageField"))
         {
             targetAnimal = colliderInfo.gameObject.GetComponent<ADamageField>().Creator;
         }
     }
     protected void OnTriggerExit(Collider colliderInfo)
     {
-        if (colliderInfo.gameObject.tag == "Item")
+        if (colliderInfo.gameObject.layer == LayerMask.NameToLayer("Item"))
         {
             SubmitAction = null;
         }
     }
     protected void OnCollisionEnter(Collision collisionInfo)
     {
-        if (collisionInfo.gameObject.tag == "Animal")
+        if (collisionInfo.gameObject.layer == LayerMask.NameToLayer("Animal"))
         {
             AAnimal target = collisionInfo.gameObject.GetComponent<AAnimal>();
             target.TakeDamage(AD, 0);

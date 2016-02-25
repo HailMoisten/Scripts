@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityStandardAssets.Utility;
 using System;
+using System.Collections.Generic;
 
 public class PlayerManager : AChild {
 
@@ -65,47 +66,22 @@ public class PlayerManager : AChild {
 
     // Use this for initialization
     public override void Awake () {
-        setUtilities();
+        base.Awake();
 
-        transform.tag = "Player";
+        gameObject.tag = "Player";
         cam = GameObject.Find("Camera");
         playerCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<ACanvasManager>();
-
+        Initialize();
+    }
+    protected override void Initialize()
+    {
         setMainStatus(165, 100, 100, 100, 100, 100);
         //setMainStatus(10, 5, 10, 10, 2, 5);
-
-    }
-
-    protected override void setUtilities()
-    {
-        nextPOS = RoundToIntVector3XZ(transform.position);
-        SettargetPOS();
-        DIR.z = 1;
-
-        Inventory = transform.FindChild("Inventory");
-        ItemBag = Inventory.FindChild("ItemBag");
-        WeaponBag = Inventory.FindChild("WeaponBag");
-        RingBag = Inventory.FindChild("RingBag");
-        MindBag = Inventory.FindChild("MindBag");
-
-        Equipment = transform.FindChild("Equipment");
-        Weapon = Equipment.FindChild("Weapon");
-        Ring = Equipment.FindChild("Ring");
-        Mind = Equipment.FindChild("Mind");
-
-        Buffs = transform.FindChild("Buffs");
-
-        actionShortcuts = new AAction[9];
         GameObject item = new GameObject("AirShard");
         item.AddComponent<AirShard>();
         item.transform.SetParent(ItemBag.transform);
         GameObject mind1 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/Mage"));
         mind1.transform.SetParent(MindBag.transform);
-        setMainActionPool();
-        setActionShortcuts();
-    }
-    protected override void setActionShortcuts()
-    {
         //actionShortcuts[1] = Mind.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
         //actionShortcuts[1].Icon = Mind.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
         //actionShortcuts[2] = ItemBag.GetChild(0).GetComponent<AAction>();
@@ -143,6 +119,10 @@ public class PlayerManager : AChild {
                         Input.GetButton("Action_3") || Input.GetButton("Action_4") ||
                         Input.GetButton("Action_5") || Input.GetButton("Action_6") ||
                         Input.GetButton("Action_7") || Input.GetButton("Action_8")) { }
+                    else if (Input.GetButton("TargetSeak"))
+                    {
+                        targetAnimal = visionManager.GetNextTargetAnimal();
+                    }
                     else if (Input.GetKey(KeyCode.Space))
                     {
                         AddAction(mainActionPool.GetComponent<Run>());
@@ -243,9 +223,23 @@ public class PlayerManager : AChild {
                     SubmitAction = null;
                 }
             }
+            if (Input.GetButtonDown("TargetSeak"))
+            {
+                visionManager.OnOff(true);
+                targetAnimal = visionManager.GetNextTargetAnimal();
+            }
+            if (Input.GetButtonUp("TargetSeak"))
+            {
+                visionManager.OnOff(false);
+            }
+            if (Input.GetButtonDown("IncCurBurst"))
+            {
+            }
+            if (Input.GetButtonDown("DecCurBurst"))
+            {
+            }
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-                setActionShortcuts();
             }
             if (Input.GetKeyDown(KeyCode.RightShift))
             {
@@ -288,7 +282,7 @@ public class PlayerManager : AChild {
             visualAssistTarget.transform.position = targetPOS;
         }
         else {
-            if (Input.GetKey(KeyCode.LeftAlt)) { SettargetPOS(); } else { SettargetPOS(n); }
+            if (Input.GetKey(KeyCode.LeftControl)) { SettargetPOS(); } else { SettargetPOS(n); }
             visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
             visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
         }

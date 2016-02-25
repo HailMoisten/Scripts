@@ -159,9 +159,9 @@ public class Walk : AAction
         if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
             //            Debug.Log("hitsFront:" + hitFront.distance);
-            if (hitFront.collider.tag == "Terrain" ||
-                hitFront.collider.tag == "Environment" ||
-                hitFront.collider.tag == "Animal")
+            if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Terrain") ||
+                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
+                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
             {
                 return false;
             }
@@ -169,12 +169,12 @@ public class Walk : AAction
         if (Physics.Raycast(rayDown, out hitDown, 3.0f))
         {
             //            Debug.Log("hitDown:" + hitDown.distance);
-            if (hitDown.collider.tag == "Environment" ||
-                hitDown.collider.tag == "Animal")
+            if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
+                hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
             {
                 myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
             }
-            else if (hitDown.collider.tag == "Terrain")
+            else if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
             {
                 myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
             }
@@ -228,9 +228,9 @@ public class Run : AAction
         if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
             //            Debug.Log("hitsFront:" + hitFront.distance);
-            if (hitFront.collider.tag == "Terrain" ||
-                hitFront.collider.tag == "Environment" ||
-                hitFront.collider.tag == "Animal")
+            if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Terrain") ||
+                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
+                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
             {
                 return false;
             }
@@ -238,12 +238,12 @@ public class Run : AAction
         if (Physics.Raycast(rayDown, out hitDown, 3.0f))
         {
             //            Debug.Log("hitDown:" + hitDown.distance);
-            if (hitDown.collider.tag == "Environment" ||
-                hitDown.collider.tag == "Animal")
+            if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
+                hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
             {
                 myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
             }
-            else if (hitDown.collider.tag == "Terrain")
+            else if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
             {
                 myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
             }
