@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using IconType;
+using IconAndErrorType;
 using System;
 
 public abstract class ABuff : AIcon {

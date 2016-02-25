@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using IconType;
+using IconAndErrorType;
 
 // Actions what LifeSeeds have.
 /*    public interface IAction
@@ -26,16 +26,22 @@ public abstract class AAction : AIcon
     protected int sppercentCost = 0; public int SPPercentCost { get { return sppercentCost; } }
 
     // have to definite ACTIONCODE, DURATION and NAME at inheriting constracter
-    public abstract bool CanDoAction(AAnimal myself);
-    protected bool CanDoActionAboutHPSP(AAnimal myself)
+    /// <summary>
+    /// 0: I can do it.
+    /// others: ErrorNumber
+    /// </summary>
+    /// <param name="myself"></param>
+    /// <returns></returns>
+    public abstract int CanDoAction(AAnimal myself);
+    protected int CanDoActionAboutHPSP(AAnimal myself)
     {
         float hp = myself.HP; float sp = myself.SP;
         float[] subs = myself.GetSubStatus();
         hp = hp - hpCost; sp = sp - spCost;
         hp = hp - Mathf.RoundToInt(myself.MaxHP * ((float)hppercentCost / 100));
         sp = sp - Mathf.RoundToInt(myself.MaxSP * ((float)sppercentCost / 100));
-        if (hp >= 0 && sp >= 0) { return true; }// Break_The_Limit
-        return false;
+        if (hp >= 0 && sp >= 0) { return (int)ErrorTypeList.Nothing; }// Break_The_Limit
+        return (int)ErrorTypeList.HPSP;
     }
     public abstract void Action(AAnimal myself);
     protected void SetMotionAndDurationAndUseHPSP(AAnimal myself)
@@ -47,6 +53,8 @@ public abstract class AAction : AIcon
 
     protected bool canSelectPosition = false;
     public bool CanSelectPosition { get { return canSelectPosition; } }
+    protected Vector3 skillPOSVector = Vector3.zero;
+    public Vector3 SkillPOSVector { get { return skillPOSVector; } set { skillPOSVector = value; } }
     protected bool canResize = false;
     public bool CanResize { get { return canResize; } }
     protected Vector3 skillScaleVector = Vector3.one;
@@ -126,9 +134,9 @@ public class Idle : AAction
         duration = 0.0f;
     }
 
-    public override bool CanDoAction(AAnimal myself)
+    public override int CanDoAction(AAnimal myself)
     {
-        return true;
+        return (int)ErrorTypeList.Nothing;
     }
     public override void Action(AAnimal myself)
     {
@@ -147,7 +155,7 @@ public class Walk : AAction
         duration = 1.0f;
         spCost = 1;
     }
-    public override bool CanDoAction(AAnimal myself)
+    public override int CanDoAction(AAnimal myself)
     {
         Vector3 dir2 = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, 0, myself.nextnextPOS.z - myself.nextPOS.z);
         dir2 = myself.RoundToIntVector3XZ(dir2);
@@ -163,7 +171,7 @@ public class Walk : AAction
                 hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
                 hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
             {
-                return false;
+                return (int)ErrorTypeList.Move;
             }
         }
         if (Physics.Raycast(rayDown, out hitDown, 3.0f))
@@ -178,9 +186,9 @@ public class Walk : AAction
             {
                 myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
             }
-            return true;
+            return (int)ErrorTypeList.Nothing;
         }
-        return false;
+        return (int)ErrorTypeList.Move;
     }
     public override void Action(AAnimal myself)
     {
@@ -211,7 +219,7 @@ public class Run : AAction
         duration = 1.0f;
         spCost = 2;
     }
-    public override bool CanDoAction(AAnimal myself)
+    public override int CanDoAction(AAnimal myself)
     {
         // Run fix
         float[] subs = myself.GetSubStatus();
@@ -232,7 +240,7 @@ public class Run : AAction
                 hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
                 hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
             {
-                return false;
+                return (int)ErrorTypeList.Move;
             }
         }
         if (Physics.Raycast(rayDown, out hitDown, 3.0f))
@@ -247,9 +255,9 @@ public class Run : AAction
             {
                 myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
             }
-            return true;
+            return (int)ErrorTypeList.Nothing;
         }
-        return false;
+        return (int)ErrorTypeList.Move;
     }
     public override void Action(AAnimal myself)
     {
@@ -283,9 +291,10 @@ public class Attack : AAction
         spCost = 2;
     }
 
-    public override bool CanDoAction(AAnimal myself)
+    public override int CanDoAction(AAnimal myself)
     {
-        return true;
+        if (myself.BattleReady) { return (int)ErrorTypeList.Nothing; }
+        else { return (int)ErrorTypeList.BattleReady; }
     }
     public override void Action(AAnimal myself)
     {
@@ -307,9 +316,9 @@ public class Guard : AAction
         spCost = 2;
     }
 
-    public override bool CanDoAction(AAnimal myself)
+    public override int CanDoAction(AAnimal myself)
     {
-        return true;
+        return (int)ErrorTypeList.Nothing;
     }
     public override void Action(AAnimal myself)
     {
@@ -317,28 +326,6 @@ public class Guard : AAction
         // Add Guard buff(Toggle) 
         SetMotionAndDurationAndUseHPSP(myself);
     }
-}
-public class Stunned : AAction
-{
-    public override void Awake()
-    {
-        base.Awake();
-        actioncode = -1;
-        _name = "Stunned";
-        duration = 1.0f;
-    }
-
-    public override bool CanDoAction(AAnimal myself)
-    {
-        return true;
-    }
-    public override void Action(AAnimal myself)
-    {
-        duration = 1.0f / myself.MovementSpeed;
-        SetMotionAndDurationAndUseHPSP(myself);
-        myself.Interrupting = false;
-    }
-
 }
 
 public class PickUp : AAction
@@ -352,11 +339,12 @@ public class PickUp : AAction
         duration = 0.5f;
     }
 
-    public override bool CanDoAction(AAnimal myself)
+    public override int CanDoAction(AAnimal myself)
     {
         Vector3 diff = myself.nextPOS - TargetItem.transform.position;
-        if (Mathf.Abs(diff.x) < 1.5f && Mathf.Abs(diff.y) < 1.5f && Mathf.Abs(diff.z) < 1.5f) { return true; }
-        return false;
+        if (Mathf.Abs(diff.x) < 1.5f && Mathf.Abs(diff.y) < 1.5f && Mathf.Abs(diff.z) < 1.5f)
+        { return (int)ErrorTypeList.Nothing; }
+        return -1;
     }
     public override void Action(AAnimal myself)
     {
@@ -378,6 +366,29 @@ public class PickUp : AAction
         duration = 0.5f / myself.MovementSpeed;
         TargetItem = null;
         SetMotionAndDurationAndUseHPSP(myself);
+    }
+
+}
+
+public class Stunned : AAction
+{
+    public override void Awake()
+    {
+        base.Awake();
+        actioncode = -1;
+        _name = "Stunned";
+        duration = 1.0f;
+    }
+
+    public override int CanDoAction(AAnimal myself)
+    {
+        return (int)ErrorTypeList.Nothing;
+    }
+    public override void Action(AAnimal myself)
+    {
+        duration = 1.0f / myself.MovementSpeed;
+        SetMotionAndDurationAndUseHPSP(myself);
+        myself.Interrupting = false;
     }
 
 }

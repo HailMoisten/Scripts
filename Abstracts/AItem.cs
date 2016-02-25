@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using IconType;
+using IconAndErrorType;
 
 public abstract class AItem : AAction {
     protected string modelPass = "";
@@ -12,15 +12,13 @@ public abstract class AItem : AAction {
         gameObject.tag = "Item";
     }
 
-    public override bool CanDoAction(AAnimal target)
+    public override int CanDoAction(AAnimal target)
     {
         if (Number <= 0)
         {
-            GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
-            ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(2);
-            return false;
+            return (int)ErrorTypeList.Number;
         }
-        return true;
+        return (int)ErrorTypeList.Nothing;
     }
     public void PickUp()
     {

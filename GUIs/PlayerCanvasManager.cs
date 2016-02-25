@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class PlayerCanvasManager : ACanvasManager {
 
     private PlayerManager playerManager;
+    private Camera myCamera;
     private RectTransform HPBar;
     private RectTransform HPEnd;
     private Text HPText;
@@ -32,19 +33,13 @@ public class PlayerCanvasManager : ACanvasManager {
         firstpointa = 0;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
+        myCamera = GameObject.Find("Camera").GetComponent<Camera>();
         initPointaAndKersol();
     }
 
     // Update is called once per frame
     void Update () {
-        int hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
-        int spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
-        HPBar.sizeDelta = new Vector2(hpbarwid, HPBar.sizeDelta.y);
-        HPEnd.localPosition = new Vector3(hpbarwid, 0, 0);
-        HPText.text = "HP    " + Mathf.RoundToInt(playerManager.HP).ToString(); HPText.GetComponent<TextShade>().TextUpdate();
-        SPBar.sizeDelta = new Vector2(spbarwid, SPBar.sizeDelta.y);
-        SPEnd.localPosition = new Vector3(spbarwid, 0, 0);
-        SPText.text = "SP    " + Mathf.RoundToInt(playerManager.SP).ToString(); SPText.GetComponent<TextShade>().TextUpdate();
+        updateHPSP();
 
         if (playerManager.Buffs.transform.childCount > 0) { updateBuffs(); }
         if (playerManager.SubmitAction != null) {
@@ -61,6 +56,7 @@ public class PlayerCanvasManager : ACanvasManager {
         {
             if (submitActionPopUp != null) { Destroy(submitActionPopUp); }
         }
+
         if (nextCanvas != null) { }
         else
         {
@@ -83,6 +79,17 @@ public class PlayerCanvasManager : ACanvasManager {
         playerManager.isMenuAwake = false;
         Time.timeScale = 1.0f;
         nextCanvas.DestroyThisCanvas();
+    }
+    private void updateHPSP()
+    {
+        int hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
+        int spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
+        HPBar.sizeDelta = new Vector2(hpbarwid, HPBar.sizeDelta.y);
+        HPEnd.localPosition = new Vector3(hpbarwid, 0, 0);
+        HPText.text = "HP    " + Mathf.RoundToInt(playerManager.HP).ToString(); HPText.GetComponent<TextShade>().TextUpdate();
+        SPBar.sizeDelta = new Vector2(spbarwid, SPBar.sizeDelta.y);
+        SPEnd.localPosition = new Vector3(spbarwid, 0, 0);
+        SPText.text = "SP    " + Mathf.RoundToInt(playerManager.SP).ToString(); SPText.GetComponent<TextShade>().TextUpdate();
     }
     private void updateBuffs()
     {

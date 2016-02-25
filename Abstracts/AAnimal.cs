@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using IconAndErrorType;
 
 public abstract class AAnimal : MonoBehaviour {
     public virtual void Awake()
@@ -211,6 +212,7 @@ public abstract class AAnimal : MonoBehaviour {
         yield return new WaitForSeconds(gcd);
         isInput = false;
     }
+    public bool BattleReady { get; set; }
     public Vector3 DIR = new Vector3();
     public Vector3 POS = new Vector3();
     public Vector3 nextPOS = new Vector3();
@@ -251,7 +253,7 @@ public abstract class AAnimal : MonoBehaviour {
             }
         }
     }
-    public void DoAction()
+    public virtual void DoAction()
     {
         // Calc. buffs and regens. Check DOA.
         if (isPassed) {  }
@@ -266,12 +268,12 @@ public abstract class AAnimal : MonoBehaviour {
             else
             {
                 doRotate();
-                if (actionStack[0].CanDoAction(this)) { }
+                if (actionStack[0].CanDoAction(this) == (int)ErrorTypeList.Nothing) { }
                 else
                 {
-                    actionStack[0] = mainActionPool.GetComponent<Idle>();
                     GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
-                    ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(3);
+                    ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(actionStack[0].CanDoAction(this));
+                    actionStack[0] = mainActionPool.GetComponent<Idle>();
                 }
                 actionStack[0].Action(this);
             }
@@ -318,7 +320,7 @@ public abstract class AAnimal : MonoBehaviour {
     public Transform Mind { get; set; }
     public Transform Buffs { get; set; }
     protected VisionManager visionManager;
-    protected AAnimal targetAnimal;
+    public AAnimal focusedAnimal;
     public AAction[] actionShortcuts;
     public AAction SubmitAction;
 
@@ -399,7 +401,7 @@ public abstract class AAnimal : MonoBehaviour {
         }
         else if (colliderInfo.gameObject.layer == LayerMask.NameToLayer("DamageField"))
         {
-            targetAnimal = colliderInfo.gameObject.GetComponent<ADamageField>().Creator;
+            focusedAnimal = colliderInfo.gameObject.GetComponent<ADamageField>().Creator;
         }
     }
     protected void OnTriggerExit(Collider colliderInfo)

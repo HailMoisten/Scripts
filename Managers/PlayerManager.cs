@@ -17,21 +17,55 @@ public class PlayerManager : AChild {
     }
     private void SettargetPOS(int n)
     {
-        Vector3 sv = targetPOS - nextPOS;
-        Vector3 iv = Vector3.zero;
+        targetPOS = nextPOS + actionShortcuts[n].SkillPOSVector + Vector3.up;
+    }
+    private void SettargetPOS(int n, bool focustarget)
+    {
+        Vector3 sv = actionShortcuts[n].SkillPOSVector;
+        if (focusedAnimal != null && focustarget)
+        { sv = focusedAnimal.nextPOS - nextPOS; }
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-        {
-            iv = new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+        { sv += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
         } else {
-            iv = (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) *
+            sv += (Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) *
                 new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
         }
         int limit = actionShortcuts[n].SkillRange;
-        if (Mathf.Abs(sv.x + iv.x) > limit) { } else { sv = sv + Vector3.right * iv.x; }
-        if (Mathf.Abs(sv.y + iv.y) > limit) { } else { sv = sv + Vector3.up * iv.y; }
-        if (Mathf.Abs(sv.z + iv.z) > limit) { } else { sv = sv + Vector3.forward * iv.z; }
         sv = new Vector3(Mathf.RoundToInt(sv.x), Mathf.RoundToInt(sv.y), Mathf.RoundToInt(sv.z));
-        targetPOS = nextPOS + sv;
+        if (sv.x > limit) { sv.x = limit; } else if (sv.x < -1 * limit) { sv.x = -1 * limit; }
+        if (sv.y > limit) { sv.y = limit; } else if (sv.y < -1 * limit) { sv.y = -1 * limit; }
+        if (sv.z > limit) { sv.z = limit; } else if (sv.z < -1 * limit) { sv.z = -1 * limit; }
+        actionShortcuts[n].SkillPOSVector = sv;
+        targetPOS = nextPOS + sv + Vector3.up;
+    }
+    private void resizeVisualAssistTarget(int n)
+    {
+        Vector3 sv = actionShortcuts[n].SkillScaleVector;
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        { sv += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+        } else {
+            sv += (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+        }
+        sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
+        int limit = actionShortcuts[n].SkillScaleOneSideLimit;
+        if (sv.x > limit) { sv -= Vector3.right; } else if (sv.x < 1) { sv += Vector3.right; }
+        if (sv.y > limit) { sv -= Vector3.up; } else if (sv.y < 1) { sv += Vector3.up; }
+        if (sv.z > limit) { sv -= Vector3.forward; } else if (sv.z < 1) { sv += Vector3.forward; }
+        actionShortcuts[n].SkillScaleVector = sv;
+        visualAssistTarget.transform.localScale = sv;
+    }
+    private void controlVisualAssistTarget(int n)
+    {
+        if (visualAssistTarget != null)
+        {
+            SettargetPOS(n, false);
+            visualAssistTarget.transform.position = targetPOS;
+        }
+        else {
+            if (Input.GetKey(KeyCode.LeftControl)) { SettargetPOS(n); } else { SettargetPOS(n, true); }
+            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
+            visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
+        }
     }
     private void SetDirection()
     {
@@ -55,12 +89,14 @@ public class PlayerManager : AChild {
     private void CameraRotateDown() { cam.GetComponent<CameraManager>().inclementHeight(); }
     private void CameraZoomIn() { cam.GetComponent<CameraManager>().declementDistance(); }
     private void CameraZoomOut() { cam.GetComponent<CameraManager>().inclementDistance(); }
+
     private GameObject cam;
     private int camAngle = 0;
 
     private ACanvasManager playerCanvas;
     private GameObject visualAssist;
     private GameObject visualAssistTarget;
+    private GameObject focus = null;
 
     public bool isMenuAwake = false;
 
@@ -121,7 +157,7 @@ public class PlayerManager : AChild {
                         Input.GetButton("Action_7") || Input.GetButton("Action_8")) { }
                     else if (Input.GetButton("TargetSeak"))
                     {
-                        targetAnimal = visionManager.GetNextTargetAnimal();
+                        focusedAnimal = visionManager.GetNextTargetAnimal();
                     }
                     else if (Input.GetKey(KeyCode.Space))
                     {
@@ -171,6 +207,12 @@ public class PlayerManager : AChild {
                     }
                 }
 
+                if (Input.GetButtonDown("BattleReady"))
+                {
+                    BattleReady = !BattleReady;
+                    if (BattleReady) { }
+                    else { focusedAnimal = null; }
+                }
                 if (Input.GetButtonDown("Attack"))
                 {
                     SettargetPOS();
@@ -223,10 +265,11 @@ public class PlayerManager : AChild {
                     SubmitAction = null;
                 }
             }
+
             if (Input.GetButtonDown("TargetSeak"))
             {
                 visionManager.OnOff(true);
-                targetAnimal = visionManager.GetNextTargetAnimal();
+                focusedAnimal = visionManager.GetNextTargetAnimal();
             }
             if (Input.GetButtonUp("TargetSeak"))
             {
@@ -249,45 +292,33 @@ public class PlayerManager : AChild {
                     visualAssist = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistManhattanDiag"), nextPOS, Quaternion.identity);
                 }
             }
+
+
             // Update every flame
+            FocusControl();
             DoAction();
         }
 
     }
 
-    private void resizeVisualAssistTarget(int n)
+    private void FocusControl()
     {
-        Vector3 sv = Vector3.zero;
-        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        if (focusedAnimal != null)
         {
-            sv = actionShortcuts[n].SkillScaleVector + new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
-        }
-        else
-        {
-            sv = actionShortcuts[n].SkillScaleVector + (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
-            sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
-        }
-        int limit = actionShortcuts[n].SkillScaleOneSideLimit;
-        if (sv.x > limit) { sv -= Vector3.right; } else if (sv.x < 1) { sv += Vector3.right; }
-        if (sv.y > limit) { sv -= Vector3.up; } else if (sv.y < 1) { sv += Vector3.up; }
-        if (sv.z > limit) { sv -= Vector3.forward; } else if (sv.z < 1) { sv += Vector3.forward; }
-        actionShortcuts[n].SkillScaleVector = sv;
-        visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
-    }
-    private void controlVisualAssistTarget(int n)
-    {
-        if (visualAssistTarget != null)
-        {
-            SettargetPOS(n);
-            visualAssistTarget.transform.position = targetPOS;
+            if (focus == null)
+            {
+                focus = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/Focus"), focusedAnimal.transform.position + (2 * Vector3.up), Quaternion.identity);
+                focus.transform.SetParent(transform);
+            }
+            focus.transform.position = focusedAnimal.transform.position + (2 * Vector3.up);
         }
         else {
-            if (Input.GetKey(KeyCode.LeftControl)) { SettargetPOS(); } else { SettargetPOS(n); }
-            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
-            visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
+            if (focus)
+            {
+                Destroy(focus);
+            }
         }
     }
-
     public override void YouDied()
     {
 

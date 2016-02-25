@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
-using IconType;
+using IconAndErrorType;
 
 public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
 
@@ -30,7 +30,7 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
                     else
                     {
                         GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
-                        ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(4);
+                        ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy((int)ErrorTypeList.MindLevel);
                     }
                     DestroyThisCanvas();
                 }

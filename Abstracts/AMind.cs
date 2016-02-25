@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using IconType;
+using IconAndErrorType;
 
 public abstract class AMind : AIcon {
     protected string prefabPass = string.Empty;

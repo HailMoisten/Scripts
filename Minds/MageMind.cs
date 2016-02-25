@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using IconAndErrorType;
 
 public class MageMind : AMind {
 
@@ -54,9 +55,10 @@ public class MageMind : AMind {
             isChargeSkill = true;
             chargeLimit = 5;
         }
-        public override bool CanDoAction(AAnimal myself)
+        public override int CanDoAction(AAnimal myself)
         {
-            return CanDoActionAboutHPSP(myself);
+            if (myself.BattleReady) { return CanDoActionAboutHPSP(myself); }
+            else { return (int)ErrorTypeList.BattleReady; }
         }
         public override void Action(AAnimal myself)
         {
@@ -89,9 +91,9 @@ public class MageMind : AMind {
             duration = 5.0f;
             buff = (GameObject)Resources.Load("Prefabs/Buffs/Break_The_Limit");
         }
-        public override bool CanDoAction(AAnimal myself)
+        public override int CanDoAction(AAnimal myself)
         {
-            return canSelectPosition;
+            return (int)ErrorTypeList.Nothing;
         }
         public override void Action(AAnimal myself)
         {

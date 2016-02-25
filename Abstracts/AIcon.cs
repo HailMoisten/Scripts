@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using IconType;
+using IconAndErrorType;
 
-namespace IconType
+namespace IconAndErrorType
 {
     enum IconTypeList { Mind, Action, Item, Weapon, Ring, Buff };
+    enum ErrorTypeList { Nothing, Move, Number, HPSP, MindLevel, Level, BattleReady, Jump};
 }
 
 public abstract class AIcon : MonoBehaviour {

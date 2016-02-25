@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
-using IconType;
+using IconAndErrorType;
 
 public class EquipmentMenuCanvasManager : ACanvasManager
 {
