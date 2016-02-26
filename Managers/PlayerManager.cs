@@ -3,6 +3,7 @@ using System.Collections;
 using UnityStandardAssets.Utility;
 using System;
 using System.Collections.Generic;
+using IconAndErrorType;
 
 public class PlayerManager : AChild {
 
@@ -36,7 +37,7 @@ public class PlayerManager : AChild {
         if (sv.y > limit) { sv.y = limit; } else if (sv.y < -1 * limit) { sv.y = -1 * limit; }
         if (sv.z > limit) { sv.z = limit; } else if (sv.z < -1 * limit) { sv.z = -1 * limit; }
         actionShortcuts[n].SkillPOSVector = sv;
-        targetPOS = nextPOS + sv + Vector3.up;
+        targetPOS = nextPOS + sv + Vector3.up;// bug
     }
     private void resizeVisualAssistTarget(int n)
     {
@@ -202,10 +203,13 @@ public class PlayerManager : AChild {
                         }
                         if (Input.GetButton("Action_" + n))
                         {
-                            if (actionShortcuts[n].IsChargeSkill)
+                            if (ErrorCheck(actionShortcuts[n].CanDoAction(this)))
                             {
-                                if (actionShortcuts[n].Charged) { }
-                                else { actionShortcuts[n].Charge(this); }
+                                if (actionShortcuts[n].IsChargeSkill)
+                                {
+                                    if (actionShortcuts[n].Charged) { }
+                                    else { actionShortcuts[n].Charge(this); }
+                                }
                             }
                         }
                     }
@@ -213,9 +217,7 @@ public class PlayerManager : AChild {
 
                 if (Input.GetButtonDown("BattleReady"))
                 {
-                    BattleReady = !BattleReady;
-                    if (BattleReady) { }
-                    else { focusedAnimal = null; }
+                    ReadyToBattleToggle();
                 }
                 if (Input.GetButtonDown("Attack"))
                 {
@@ -228,11 +230,8 @@ public class PlayerManager : AChild {
                 }
                 if (Input.GetButton("Guard"))
                 {
-                    if (mainComponentPool.GetComponent<Guard>().IsChargeSkill)
-                    {
-                        if (mainComponentPool.GetComponent<Guard>().Charged) { }
-                        else { mainComponentPool.GetComponent<Guard>().Charge(this); }
-                    }
+                    if (mainComponentPool.GetComponent<Guard>().Charged) { }
+                    else { mainComponentPool.GetComponent<Guard>().Charge(this); }
                 }
             }
             if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)

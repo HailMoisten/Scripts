@@ -11,20 +11,20 @@ public abstract class ADamageField : MonoBehaviour {
     protected BoxCollider myCollider;
     protected GameObject damageEffect = null;
     protected Vector3 skillScaleVector = Vector3.one;
-    protected GameObject buff = null;
-    protected void Awake()
+    protected GameObject Buff = null;
+    protected virtual void Awake()
     {
         gameObject.tag = "DamageField";
+        gameObject.layer = LayerMask.NameToLayer("DamageField");
     }
 
-    public void SetMainParam(AAnimal creator, GameObject damageeffect, Vector3 skillscalevector, GameObject buff, int attackdamage, int magicdamage, float damageduration, float casttime, Vector3 centerposition)
+    public void SetMainParam(AAnimal creator, int attackdamage, int magicdamage, Vector3 centerposition, GameObject damageeffect, Vector3 skillscalevector, GameObject buff, float damageduration, float casttime)
     {
-        this.Creator = creator;
+        Creator = creator;
+        attackDamage = attackdamage; magicDamage = magicdamage; center = centerposition;
         damageEffect = damageeffect; skillScaleVector = skillscalevector;
-        this.buff = buff;
-        attackDamage = attackdamage; magicDamage = magicdamage;
-        this.damageDuration = damageduration; this.castTime = casttime;
-        center = centerposition;
+        Buff = buff;
+        damageDuration = damageduration; castTime = casttime;
     }
 
 
@@ -47,13 +47,13 @@ public abstract class ADamageField : MonoBehaviour {
         {
             AAnimal target = colliderInfo.gameObject.GetComponent<AAnimal>();
             target.TakeDamage(attackDamage, magicDamage);
-            if (buff != null)
+            if (Buff != null)
             {
                 foreach (Transform b in target.Buffs.transform)
                 {
-                    if (b.gameObject.GetComponent<ABuff>().Name == buff.GetComponent<ABuff>().Name) { Destroy(b.gameObject); }
+                    if (b.gameObject.GetComponent<ABuff>().Name == Buff.GetComponent<ABuff>().Name) { Destroy(b.gameObject); }
                 }
-                GameObject newbuff = (GameObject)Instantiate(buff, Vector3.zero, Quaternion.identity);
+                GameObject newbuff = (GameObject)Instantiate(Buff, Vector3.zero, Quaternion.identity);
                 newbuff.transform.SetParent(target.Buffs.transform);
             }
         }

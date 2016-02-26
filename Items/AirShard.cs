@@ -13,10 +13,13 @@ public class AirShard : AItem {
         duration = 0.5f;
         icon = Resources.Load<Sprite>("Images/Icons/Item/AirShard");
     }
-    public override void Action(AAnimal target)
+    public override void SetParamsNeedAnimal(AAnimal myself)
     {
-        duration = 0.5f / target.MovementSpeed;
-        Materialize(target.nextPOS + target.DIR);
-        SetMotionAndDurationAndUseHPSP(target);
+        duration = 0.5f / myself.MovementSpeed;
+    }
+    public override void Action(AAnimal myself)
+    {
+        Materialize(myself.nextPOS + myself.DIR);
+        SetMotionAndDurationAndUseHPSP(myself);
     }
 }

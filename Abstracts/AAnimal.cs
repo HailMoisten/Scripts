@@ -281,13 +281,9 @@ public abstract class AAnimal : MonoBehaviour {
             else
             {
                 doRotate();
-                if (actionStack[0].CanDoAction(this) == (int)ErrorTypeList.Nothing) { }
-                else
-                {
-                    GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
-                    ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(actionStack[0].CanDoAction(this));
-                    actionStack[0] = mainComponentPool.GetComponent<Idle>();
-                }
+                actionStack[0].SetParamsNeedAnimal(this);
+                if (ErrorCheck(actionStack[0].CanDoAction(this))){ }
+                else { actionStack[0] = mainComponentPool.GetComponent<Idle>(); }
                 actionStack[0].Action(this);
             }
         }
@@ -319,6 +315,29 @@ public abstract class AAnimal : MonoBehaviour {
         {
             actionStack[0] = null;
         }
+    }
+    private GameObject ecanvas;
+    protected bool ErrorCheck(int errortype)
+    {
+        if (errortype == (int)ErrorTypeList.Nothing) { return true; }
+        else
+        {
+            if (gameObject.tag == "Player")
+            {
+                if (ecanvas) { Destroy(ecanvas); }
+                ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
+                ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(errortype);
+            }
+        }
+        return false;
+    }
+    protected void ReadyToBattleToggle()
+    {
+        BattleReady = !BattleReady;
+        if (BattleReady) { }
+        else { focusedAnimal = null; }
+        Debug.Log("BattleReady " + BattleReady);
+        GetAnimator().SetBool("BattleReady", BattleReady);
     }
 
     // Utility

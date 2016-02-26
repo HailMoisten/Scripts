@@ -13,7 +13,6 @@ public class PlayerCanvasManager : ACanvasManager {
     private RectTransform SPBar;
     private RectTransform SPEnd;
     private Text SPText;
-    private bool needUpdateHPSP;
     private bool needUpdateBuffs;
     private ABuff targetBuff;
     // This is not <string> for destroying Instantiated GameObject
@@ -37,7 +36,6 @@ public class PlayerCanvasManager : ACanvasManager {
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         myCamera = GameObject.Find("Camera").GetComponent<Camera>();
         initPointaAndKersol();
-        needUpdateHPSP = true;
         needUpdateBuffs = true;
     }
 
@@ -84,11 +82,10 @@ public class PlayerCanvasManager : ACanvasManager {
         nextCanvas.DestroyThisCanvas();
     }
 
-    private int hpbarwid, spbarwid = 0;
     private void updateHPSP()
     {
-        hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
-        spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
+        int hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
+        int spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
         HPBar.sizeDelta = new Vector2(hpbarwid, HPBar.sizeDelta.y);
         HPEnd.localPosition = new Vector3(hpbarwid, 0, 0);
         HPText.text = "HP    " + Mathf.RoundToInt(playerManager.HP).ToString(); HPText.GetComponent<TextShade>().TextUpdate();

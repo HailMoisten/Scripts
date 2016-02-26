@@ -3,6 +3,10 @@ using System.Collections;
 
 public class CubeDamageField : ADamageField {
 
+    protected override void Awake()
+    {
+        base.Awake();
+    }
     public void SetAndAwake()
     {
         myCollider = GetComponent<BoxCollider>();
