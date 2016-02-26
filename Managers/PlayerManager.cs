@@ -6,21 +6,19 @@ using System.Collections.Generic;
 using IconAndErrorType;
 
 public class PlayerManager : AChild {
+    public override void YouDied()
+    {
 
-    private void SetnextnextPOS()
-    {
-        nextPOS = RoundToIntVector3XZ(nextPOS);
-        nextnextPOS = nextPOS + DIR;
     }
-    private void SettargetPOS()
+    protected override void SetDirection()
     {
-        targetPOS = nextPOS + DIR + Vector3.up;
+        DIR.x = Input.GetAxisRaw("Horizontal");
+        DIR.y = 0;
+        DIR.z = Input.GetAxisRaw("Vertical");
+        DIR = Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0)) * DIR;
+        DIR = RoundToIntVector3XZ(DIR);
     }
-    private void SettargetPOS(int n)
-    {
-        targetPOS = nextPOS + actionShortcuts[n].SkillPOSVector + Vector3.up;
-    }
-    private void SettargetPOS(int n, bool focustarget)
+    protected override void SettargetPOS(int n, bool focustarget)
     {
         Vector3 sv = actionShortcuts[n].SkillPOSVector;
         if (focusedAnimal != null && focustarget)
@@ -39,66 +37,13 @@ public class PlayerManager : AChild {
         actionShortcuts[n].SkillPOSVector = sv;
         targetPOS = nextPOS + sv + Vector3.up;// bug
     }
-    private void resizeVisualAssistTarget(int n)
-    {
-        Vector3 sv = actionShortcuts[n].SkillScaleVector;
-        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-        { sv += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
-        } else {
-            sv += (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
-        }
-        sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
-        int limit = actionShortcuts[n].SkillScaleOneSideLimit;
-        if (sv.x > limit) { sv -= Vector3.right; } else if (sv.x < 1) { sv += Vector3.right; }
-        if (sv.y > limit) { sv -= Vector3.up; } else if (sv.y < 1) { sv += Vector3.up; }
-        if (sv.z > limit) { sv -= Vector3.forward; } else if (sv.z < 1) { sv += Vector3.forward; }
-        actionShortcuts[n].SkillScaleVector = sv;
-        visualAssistTarget.transform.localScale = sv;
-    }
-    private void controlVisualAssistTarget(int n)
-    {
-        if (visualAssistTarget != null)
-        {
-            SettargetPOS(n, false);
-            visualAssistTarget.transform.position = targetPOS;
-        }
-        else {
-            if (Input.GetKey(KeyCode.LeftControl)) { SettargetPOS(n); } else { SettargetPOS(n, true); }
-            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
-            visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
-        }
-    }
-    private void SetDirection()
-    {
-        DIR.x = Input.GetAxisRaw("Horizontal");
-        DIR.y = 0;
-        DIR.z = Input.GetAxisRaw("Vertical");
-        DIR = Quaternion.AngleAxis(45 * camAngle, new Vector3(0, 1, 0))*DIR;
-        DIR = RoundToIntVector3XZ(DIR);
-    }
-    private void CameraRotateClockwise()
-    {
-        camAngle++; camAngle = camAngle % 8;
-        iTween.RotateTo(cam, iTween.Hash("y", 45 * camAngle, "easetype", "easeOutQuad"));
-    }
-    private void CameraRotateCounterclockwise()
-    {
-        camAngle--; camAngle = camAngle % 8;
-        iTween.RotateTo(cam, iTween.Hash("y", 45 * camAngle, "easetype", "easeOutQuad"));
-    }
-    private void CameraRotateUp() { cam.GetComponent<CameraManager>().declementHeight(); }
-    private void CameraRotateDown() { cam.GetComponent<CameraManager>().inclementHeight(); }
-    private void CameraZoomIn() { cam.GetComponent<CameraManager>().declementDistance(); }
-    private void CameraZoomOut() { cam.GetComponent<CameraManager>().inclementDistance(); }
 
     private GameObject cam;
     private int camAngle = 0;
-
     private ACanvasManager playerCanvas;
     private GameObject visualAssist;
     private GameObject visualAssistTarget;
     private GameObject focus = null;
-
     public bool isMenuAwake = false;
 
     // Use this for initialization
@@ -312,6 +257,9 @@ public class PlayerManager : AChild {
 
     }
 
+    /// <summary>
+    /// Only use by Player.
+    /// </summary>
     private void FocusControl()
     {
         if (focusedAnimal != null)
@@ -330,9 +278,54 @@ public class PlayerManager : AChild {
             }
         }
     }
-    public override void YouDied()
+    /// <summary>
+    /// Only use by Player.
+    /// </summary>
+    /// <param name="n"></param>
+    private void resizeVisualAssistTarget(int n)
     {
-
+        Vector3 sv = actionShortcuts[n].SkillScaleVector;
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            sv += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+        }
+        else {
+            sv += (Quaternion.AngleAxis(90 * (camAngle / 2), Vector3.up) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
+        }
+        sv = new Vector3(Mathf.RoundToInt(Mathf.Abs(sv.x)), Mathf.RoundToInt(Mathf.Abs(sv.y)), Mathf.RoundToInt(Mathf.Abs(sv.z)));
+        int limit = actionShortcuts[n].SkillScaleOneSideLimit;
+        if (sv.x > limit) { sv -= Vector3.right; } else if (sv.x < 1) { sv += Vector3.right; }
+        if (sv.y > limit) { sv -= Vector3.up; } else if (sv.y < 1) { sv += Vector3.up; }
+        if (sv.z > limit) { sv -= Vector3.forward; } else if (sv.z < 1) { sv += Vector3.forward; }
+        actionShortcuts[n].SkillScaleVector = sv;
+        visualAssistTarget.transform.localScale = sv;
     }
+    private void controlVisualAssistTarget(int n)
+    {
+        if (visualAssistTarget != null)
+        {
+            SettargetPOS(n, false);
+            visualAssistTarget.transform.position = targetPOS;
+        }
+        else {
+            if (Input.GetKey(KeyCode.LeftControl)) { SettargetPOS(n); } else { SettargetPOS(n, true); }
+            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
+            visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
+        }
+    }
+    private void CameraRotateClockwise()
+    {
+        camAngle++; camAngle = camAngle % 8;
+        iTween.RotateTo(cam, iTween.Hash("y", 45 * camAngle, "easetype", "easeOutQuad"));
+    }
+    private void CameraRotateCounterclockwise()
+    {
+        camAngle--; camAngle = camAngle % 8;
+        iTween.RotateTo(cam, iTween.Hash("y", 45 * camAngle, "easetype", "easeOutQuad"));
+    }
+    private void CameraRotateUp() { cam.GetComponent<CameraManager>().declementHeight(); }
+    private void CameraRotateDown() { cam.GetComponent<CameraManager>().inclementHeight(); }
+    private void CameraZoomIn() { cam.GetComponent<CameraManager>().declementDistance(); }
+    private void CameraZoomOut() { cam.GetComponent<CameraManager>().inclementDistance(); }
 
 }

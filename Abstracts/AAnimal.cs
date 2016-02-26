@@ -339,6 +339,21 @@ public abstract class AAnimal : MonoBehaviour {
         Debug.Log("BattleReady " + BattleReady);
         GetAnimator().SetBool("BattleReady", BattleReady);
     }
+    protected void SetnextnextPOS()
+    {
+        nextPOS = RoundToIntVector3XZ(nextPOS);
+        nextnextPOS = nextPOS + DIR;
+    }
+    protected void SettargetPOS()
+    {
+        targetPOS = nextPOS + DIR + Vector3.up;
+    }
+    protected void SettargetPOS(int n)
+    {
+        targetPOS = nextPOS + actionShortcuts[n].SkillPOSVector + Vector3.up;
+    }
+    protected abstract void SetDirection();
+    protected abstract void SettargetPOS(int n, bool focustarget);
 
     // Utility
     public Transform Inventory { get; set; }

@@ -125,7 +125,7 @@ public class PlayerCanvasManager : ACanvasManager {
                             {
                                 if (buffListSTM[j].TargetIcon.Name == targetBuff.Name)
                                 {
-                                    buffListSTM[j].SetNumber(Mathf.FloorToInt(targetBuff.Sands));
+                                    buffListSTM[j].SetNumber(Mathf.CeilToInt(targetBuff.Sands));
                                 }
                             }
                         }
