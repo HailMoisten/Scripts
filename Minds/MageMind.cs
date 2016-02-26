@@ -10,9 +10,8 @@ public class MageMind : AMind {
         base.Awake();
         _name = "Mage"; // const
         flavor = "Mage is a Nuker.";
-        icon = GetComponent<Image>().sprite;
         prefabPass = "Prefabs/Minds/Mage";
-        GrowProficiency(200);
+        GrowProficiency(900);
         initSkills();
     }
 
@@ -43,7 +42,6 @@ public class MageMind : AMind {
             actioncode = 6;
             _name = "Pressure";
             flavor = "Give 1.0*MD damage as magicdamage.";
-            icon = GetComponent<Image>().sprite;
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
             spCost = 3;
             canSelectPosition = true;
@@ -53,27 +51,34 @@ public class MageMind : AMind {
             castTime = 2.0f;
             duration = 2.0f;
             isChargeSkill = true;
-            chargeLimit = 5;
+            chargeLimit = 1;
         }
         public override int CanDoAction(AAnimal myself)
         {
-            if (myself.BattleReady) { return CanDoActionAboutHPSP(myself); }
+            if (myself.BattleReady) { }
             else { return (int)ErrorTypeList.BattleReady; }
+            return CanDoActionAboutHPSP(myself);
+        }
+        protected override void ChargeAction(AAnimal myself)
+        {
+            castTime = 2.0f / myself.MovementSpeed;
+            duration = CastTime;
+            skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
+            spCost = Mathf.RoundToInt(3 * skillScale);
+            base.ChargeAction(myself);
         }
         public override void Action(AAnimal myself)
         {
             castTime = 2.0f / myself.MovementSpeed;
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
+            spCost = Mathf.RoundToInt(3 * skillScale);
             GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            if (Charged) { damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, 0, myself.MD * 2, DamageDuration, CastTime, myself.targetPOS); }
-            else { damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, 0, myself.MD, DamageDuration, CastTime, myself.targetPOS); }
+            if (Charged) { damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, FieldBuff, 0, myself.MD * 2, DamageDuration, CastTime, myself.targetPOS); }
+            else { damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, FieldBuff, 0, myself.MD, DamageDuration, CastTime, myself.targetPOS); }
             if (IsChargeSkill) { chargeCount = 0; charged = false; } // Need this. if (IsChargeSkill)
             damagefield.GetComponent<CubeDamageField>().SetAndAwake();
-            int tempspcost = SPCost;
-            spCost = Mathf.RoundToInt(SPCost * skillScale);
             SetMotionAndDurationAndUseHPSP(myself);
-            spCost = tempspcost;
         }
 
     }
@@ -83,24 +88,22 @@ public class MageMind : AMind {
         public override void Awake()
         {
             base.Awake();
-            actioncode = 5;
+            actioncode = 6;
             _name = "Break The Limit";
             flavor = "Give buff of -Break The Limit- to you.";
-            icon = GetComponent<Image>().sprite;
             castTime = 5.0f;
             duration = 5.0f;
-            buff = (GameObject)Resources.Load("Prefabs/Buffs/Break_The_Limit");
+            sppercentCost = 10;
         }
         public override int CanDoAction(AAnimal myself)
         {
-            return (int)ErrorTypeList.Nothing;
+            castTime = 5.0f / myself.MovementSpeed;
+            duration = CastTime;
+            return CanDoActionAboutHPSP(myself);
         }
         public override void Action(AAnimal myself)
         {
-            //Give a Buff about this.
-            GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-            damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, 0, 0, DamageDuration, CastTime, myself.nextPOS);
-            damagefield.GetComponent<CubeDamageField>().SetAndAwake();
+            myself.TakeBuff("Break_The_Limit");
             SetMotionAndDurationAndUseHPSP(myself);
         }
     }

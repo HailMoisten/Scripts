@@ -29,7 +29,7 @@ public abstract class AAnimal : MonoBehaviour {
         visionManager.SetMindSlots(MindSlots);
 
         actionShortcuts = new AAction[9];
-        setMainActionPool();
+        setMainComponentPool();
     }
     protected abstract void Initialize();
 
@@ -143,7 +143,8 @@ public abstract class AAnimal : MonoBehaviour {
         for (int i = 0; i < Buffs.transform.childCount; i++ )
         {
             buff = Buffs.transform.GetChild(i).GetComponent<ABuff>();
-            mains = buff.BuffToMainStatus(mains);
+            if (buff.LastsFlag) { }
+            else { mains = buff.BuffToMainStatus(mains); }
         }
         // Calculate sub states.
         float[] subs = new float[statusGenus];
@@ -175,12 +176,24 @@ public abstract class AAnimal : MonoBehaviour {
         for (int i = 0; i < Buffs.transform.childCount; i++)
         {
             buff = Buffs.transform.GetChild(i).GetComponent<ABuff>();
-            subs = buff.BuffToSubStatus(subs);
-            subs[17] = buff.BuffToHP(subs[17]);
-            subs[18] = buff.BuffToSP(subs[18]);
-            if (buff.IsUsed) { }
-            else { subs[17] = buff.BuffToHPOnlyOnce(subs[17]); subs[18] = buff.BuffToSPOnlyOnce(subs[18]);
-                buff.Used(); }
+            if (buff.LastsFlag)
+            {
+                subs[17] = buff.BuffToHPLast(subs[17]);
+                subs[18] = buff.BuffToSPLast(subs[18]);
+                buff.UsedLasts();
+            }
+            else
+            {
+                subs = buff.BuffToSubStatus(subs);
+                subs[17] = buff.BuffToHP(subs[17]);
+                subs[18] = buff.BuffToSP(subs[18]);
+                if (buff.FirstsUsed) { }
+                else {
+                    subs[17] = buff.BuffToHPFirst(subs[17]);
+                    subs[18] = buff.BuffToSPFirst(subs[18]);
+                    buff.UsedFirsts();
+                }
+            }
         }
 
         return subs;
@@ -221,18 +234,18 @@ public abstract class AAnimal : MonoBehaviour {
     private bool isActing = false;
     public bool Interrupting { get; set; }
     public AAction[] actionStack = new AAction[3];
-    protected GameObject mainActionPool;
-    protected void setMainActionPool()
+    protected GameObject mainComponentPool;
+    protected void setMainComponentPool()
     {
-        mainActionPool = new GameObject("MainActionPool");
-        mainActionPool.transform.SetParent(transform);
-        mainActionPool.AddComponent<Idle>();
-        mainActionPool.AddComponent<Walk>();
-        mainActionPool.AddComponent<Run>();
-        mainActionPool.AddComponent<Attack>();
-        mainActionPool.AddComponent<Guard>();
-        mainActionPool.AddComponent<Stunned>();
-        mainActionPool.AddComponent<PickUp>();
+        mainComponentPool = new GameObject("MainActionPool");
+        mainComponentPool.transform.SetParent(transform);
+        mainComponentPool.AddComponent<Idle>();
+        mainComponentPool.AddComponent<Walk>();
+        mainComponentPool.AddComponent<Run>();
+        mainComponentPool.AddComponent<Attack>();
+        mainComponentPool.AddComponent<Guard>();
+        mainComponentPool.AddComponent<Stunned>();
+        mainComponentPool.AddComponent<PickUp>();
     }
 
     public void AddAction(AAction AnyAction)
@@ -243,13 +256,13 @@ public abstract class AAnimal : MonoBehaviour {
             if (actionStack[0] == null)
             {
                 actionStack[0] = AnyAction;
-                actionStack[1] = mainActionPool.GetComponent<Idle>();
+                actionStack[1] = mainComponentPool.GetComponent<Idle>();
                 actionStack[2] = null;
             }
             else
             {
                 actionStack[1] = AnyAction;
-                actionStack[2] = mainActionPool.GetComponent<Idle>();
+                actionStack[2] = mainComponentPool.GetComponent<Idle>();
             }
         }
     }
@@ -273,7 +286,7 @@ public abstract class AAnimal : MonoBehaviour {
                 {
                     GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
                     ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy(actionStack[0].CanDoAction(this));
-                    actionStack[0] = mainActionPool.GetComponent<Idle>();
+                    actionStack[0] = mainComponentPool.GetComponent<Idle>();
                 }
                 actionStack[0].Action(this);
             }
@@ -342,18 +355,50 @@ public abstract class AAnimal : MonoBehaviour {
         // Buffs
         if (SP < MentalPoise)
         {
-            bool isExhausted = false;
-            foreach(Transform b in Buffs.transform)
-            {
-                if (b.gameObject.GetComponent<ABuff>().Name == "Exhausted") { isExhausted = true; }
-            }
-            if (isExhausted) { }
-            else {
-                GameObject buff = (GameObject)Instantiate(Resources.Load("Prefabs/Buffs/Exhausted"), Vector3.zero, Quaternion.identity);
-                buff.transform.SetParent(Buffs.transform);
-            }
+            TakeBuff("Exhausted");
         }
         setSubStatus(calcSubStatus());
+    }
+    public void TakeBuff(string targetName)
+    {
+        ABuff bhave = null;
+        bool isExist = false;
+        if (Buffs.transform.childCount == 0) { }
+        else {
+            for (int i = 0; i < Buffs.transform.childCount; i++)
+            {
+                bhave = Buffs.transform.GetChild(i).GetComponent<ABuff>();
+                if (bhave.Name == targetName)
+                {
+                    if (bhave.IsToggle) { }
+                    else { bhave.Sands = bhave.Duration; }
+                    isExist = true;
+                }
+            }
+        }
+        if (isExist) { }
+        else
+        {
+            GameObject buff = Instantiate((GameObject)Resources.Load("Prefabs/Buffs/" + targetName));
+            buff.transform.SetParent(Buffs.transform);
+            buff.transform.localPosition = Vector3.zero;
+        }
+    }
+    public void RemoveBuff(string targetName)
+    {
+        ABuff bhave = null;
+        if (Buffs.transform.childCount == 0) { }
+        else {
+            for (int i = 0; i < Buffs.transform.childCount; i++)
+            {
+                bhave = Buffs.transform.GetChild(i).GetComponent<ABuff>();
+                if (bhave.Name == targetName)
+                {
+                    if (bhave.IsToggle) { bhave.Toggle = false; }
+                    else { bhave.Sands = 0.0f; }
+                }
+            }
+        }
     }
     /// <summary>
     /// Return Dead or Alive.
@@ -373,7 +418,7 @@ public abstract class AAnimal : MonoBehaviour {
         int m = Mathf.RoundToInt(magicdamage * (1 - (MR / (100 + (float)MR))));
         if (a + m >= VitalPoise)
         {
-            AddAction(mainActionPool.GetComponent<Stunned>());
+            AddAction(mainComponentPool.GetComponent<Stunned>());
             Interrupting = true;
         } 
         hp = HP - (a + m);
@@ -396,8 +441,8 @@ public abstract class AAnimal : MonoBehaviour {
     {
         if (colliderInfo.gameObject.layer == LayerMask.NameToLayer("Item"))
         {
-            mainActionPool.GetComponent<PickUp>().TargetItem = colliderInfo.gameObject.GetComponent<AItem>();
-            SubmitAction = mainActionPool.GetComponent<PickUp>();
+            mainComponentPool.GetComponent<PickUp>().TargetItem = colliderInfo.gameObject.GetComponent<AItem>();
+            SubmitAction = mainComponentPool.GetComponent<PickUp>();
         }
         else if (colliderInfo.gameObject.layer == LayerMask.NameToLayer("DamageField"))
         {

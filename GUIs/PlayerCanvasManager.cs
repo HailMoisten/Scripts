@@ -13,6 +13,8 @@ public class PlayerCanvasManager : ACanvasManager {
     private RectTransform SPBar;
     private RectTransform SPEnd;
     private Text SPText;
+    private bool needUpdateHPSP;
+    private bool needUpdateBuffs;
     private ABuff targetBuff;
     // This is not <string> for destroying Instantiated GameObject
     public List<SelectableTargetManager> buffListSTM = new List<SelectableTargetManager>();
@@ -35,13 +37,14 @@ public class PlayerCanvasManager : ACanvasManager {
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         myCamera = GameObject.Find("Camera").GetComponent<Camera>();
         initPointaAndKersol();
+        needUpdateHPSP = true;
+        needUpdateBuffs = true;
     }
 
     // Update is called once per frame
     void Update () {
         updateHPSP();
-
-        if (playerManager.Buffs.transform.childCount > 0) { updateBuffs(); }
+        updateBuffs();
         if (playerManager.SubmitAction != null) {
             if (submitActionPopUp == null)
             {
@@ -80,10 +83,12 @@ public class PlayerCanvasManager : ACanvasManager {
         Time.timeScale = 1.0f;
         nextCanvas.DestroyThisCanvas();
     }
+
+    private int hpbarwid, spbarwid = 0;
     private void updateHPSP()
     {
-        int hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
-        int spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
+        hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
+        spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
         HPBar.sizeDelta = new Vector2(hpbarwid, HPBar.sizeDelta.y);
         HPEnd.localPosition = new Vector3(hpbarwid, 0, 0);
         HPText.text = "HP    " + Mathf.RoundToInt(playerManager.HP).ToString(); HPText.GetComponent<TextShade>().TextUpdate();
@@ -93,54 +98,46 @@ public class PlayerCanvasManager : ACanvasManager {
     }
     private void updateBuffs()
     {
-        for (int i = 0; i < playerManager.Buffs.transform.childCount; i++)
+        if (playerManager.Buffs.transform.childCount == 0 &&
+            !needUpdateBuffs)
+        { }
+        else
         {
-            targetBuff = playerManager.Buffs.transform.GetChild(i).GetComponent<ABuff>();
-            if (targetBuff.IsDrawn)
+            if (playerManager.Buffs.transform.childCount == 0)
             {
-                if (targetBuff.Sands <= 0.0f)
+                for (int j = 0; j < buffListSTM.Count; j++)
                 {
-                    for (int j = 0; j < buffListSTM.Count; j++) {
-                        if (buffListSTM[j].TargetIcon.Name == targetBuff.Name) {
-                            Destroy(buffListSTM[j].gameObject); buffListSTM.RemoveAt(j);
-                        }
-                    }
-                    Destroy(targetBuff.gameObject);
+                    Destroy(buffListSTM[j].gameObject);
                 }
-                else
-                {
-                    for (int j = 0; j < buffListSTM.Count; j++) {
-                        if (buffListSTM[j].TargetIcon.Name == targetBuff.Name) {
-                            buffListSTM[j].SetNumber(Mathf.RoundToInt(targetBuff.Sands));
-                        }
-                    }
-                }
-
+                buffListSTM.Clear();
+                needUpdateBuffs = false;
             }
             else
             {
-                if (buffListSTM.Count == 0)
+                needUpdateBuffs = true;
+                // Update buffs which exist in Buffs.
+                for (int i = 0; i < playerManager.Buffs.transform.childCount; i++)
                 {
-                    GameObject temp = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/SelectableTarget"), Vector3.zero, Quaternion.identity);
-                    temp.transform.SetParent(transform);
-                    temp.GetComponent<RectTransform>().position = new Vector3(700 + (24 * i), 60, 0);
-                    buffListSTM.Add(temp.GetComponent<SelectableTargetManager>());
-                    buffListSTM[buffListSTM.Count - 1].TargetIcon = targetBuff.GetComponent<AIcon>();
-                    buffListSTM[buffListSTM.Count - 1].Icon = targetBuff.Icon;
-
-                    targetBuff.IsDrawn = true;
-                }
-                for (int j = 0; j < buffListSTM.Count; j++)
-                {
-                    if (buffListSTM[j].TargetIcon.Name == targetBuff.Name)
+                    targetBuff = playerManager.Buffs.transform.GetChild(i).GetComponent<ABuff>();
+                    if (targetBuff.IsDrawn)
                     {
-                        targetBuff.Sands = targetBuff.Duration; targetBuff.IsDrawn = true;
+                        if (targetBuff.IsToggle) { }
+                        else
+                        {
+                            for (int j = 0; j < buffListSTM.Count; j++)
+                            {
+                                if (buffListSTM[j].TargetIcon.Name == targetBuff.Name)
+                                {
+                                    buffListSTM[j].SetNumber(Mathf.FloorToInt(targetBuff.Sands));
+                                }
+                            }
+                        }
                     }
                     else
                     {
                         GameObject temp = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/SelectableTarget"), Vector3.zero, Quaternion.identity);
                         temp.transform.SetParent(transform);
-                        temp.GetComponent<RectTransform>().position = new Vector3(700 + (24 * i), 60, 0);
+                        temp.GetComponent<RectTransform>().position = new Vector3(700 + (44 * i), 60, 0);
                         buffListSTM.Add(temp.GetComponent<SelectableTargetManager>());
                         buffListSTM[buffListSTM.Count - 1].TargetIcon = targetBuff.GetComponent<AIcon>();
                         buffListSTM[buffListSTM.Count - 1].Icon = targetBuff.Icon;
@@ -148,7 +145,27 @@ public class PlayerCanvasManager : ACanvasManager {
                         targetBuff.IsDrawn = true;
                     }
                 }
+
+                // Delete buffs which do not exist in Buffs
+                for (int j = 0; j < buffListSTM.Count; j++)
+                {
+                    bool exist = false;
+                    for (int i = 0; i < playerManager.Buffs.transform.childCount; i++)
+                    {
+                        targetBuff = playerManager.Buffs.transform.GetChild(i).GetComponent<ABuff>();
+                        if (buffListSTM[j].TargetIcon.Name == targetBuff.Name)
+                        { exist = true; }
+                    }
+                    if (exist) { }
+                    else
+                    {
+                        Destroy(buffListSTM[j].gameObject); buffListSTM.RemoveAt(j);
+                    }
+                    buffListSTM[j].GetComponent<RectTransform>().position = new Vector3(700 + (44 * j), 60, 0);
+                }
+
             }
+
         }
     }
 

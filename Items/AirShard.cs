@@ -9,7 +9,7 @@ public class AirShard : AItem {
         actioncode = -2;
         _name = "AirShard";
         flavor = "This is shard of element. It will be a catalyst of magic.";
-        modelPass = "Prefabs/Items/BasicItemSymbol";
+        objectPass = "Prefabs/Items/BasicItemSymbol";
         duration = 0.5f;
         icon = Resources.Load<Sprite>("Images/Icons/Item/AirShard");
     }

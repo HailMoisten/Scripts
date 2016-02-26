@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class VisionManager : MonoBehaviour {
     private PlayerManager playerManager;
     SphereCollider myCollider = null;
-    Light myLight = null;
+    MeshRenderer myMesh = null;
     public List<AAnimal> targetAnimals;
     private int targetPointa = 0;
     public AAnimal GetNextTargetAnimal()
@@ -24,16 +24,15 @@ public class VisionManager : MonoBehaviour {
     void Awake () {
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
         myCollider = GetComponent<SphereCollider>();
-        myLight = GetComponent<Light>();
+        myMesh = GetComponent<MeshRenderer>();
         targetAnimals = new List<AAnimal>();
         targetAnimals.Capacity = 1;
         myCollider.enabled = false;
-        myLight.enabled = false;
+        myMesh.enabled = false;
     }
 
     public void SetMindSlots(int mindslots)
     {
-        myLight.range = mindslots * 3;
         transform.localScale = Vector3.one * mindslots * 3;
         targetAnimals.Capacity = mindslots;
     }
@@ -41,7 +40,7 @@ public class VisionManager : MonoBehaviour {
     public void OnOff(bool onoff)
     {
         myCollider.enabled = onoff;
-        myLight.enabled = onoff;
+        myMesh.enabled = onoff;
         targetAnimals.Clear();
     }
 

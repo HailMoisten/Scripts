@@ -69,8 +69,10 @@ public abstract class AAction : AIcon
     public bool IsChargeSkill { get { return isChargeSkill; } }
     protected bool charged = false;
     public bool Charged { get { return charged; } }
-    protected int chargeCount = 1; // Inclement a times per second.
+    protected int chargeCount = 1; // Inclement a times per casttime/movementspeed.
     public int ChargeCount { get { return chargeCount; } set { chargeCount = value; } }
+    protected int chargeSpan = 1;
+    public int ChargeSpan { get { return chargeSpan; } }
     protected int chargeLimit = 1;
     public int ChargeLimit { get { return chargeLimit; } }
     protected bool isCharged = false;
@@ -85,6 +87,8 @@ public abstract class AAction : AIcon
         if (isCharged) { }
         else
         {
+            chargeCount++;
+            myself.GetAnimator().SetInteger("ActionCode", actioncode);
             if (ChargeCount >= ChargeLimit)
             {
                 charged = true;
@@ -92,19 +96,25 @@ public abstract class AAction : AIcon
                 ef.GetComponent<EffectManager>().Go();
                 Debug.Log("Charged!");
             }
-            else { chargeCount++; myself.UseHPSP(0, SPCost, 0, 0); }
-            StartCoroutine(chargedCD(CastTime / myself.MovementSpeed));
+            else if (ChargeCount % ChargeSpan == 0) { ChargeAction(myself); }
+            myself.UseHPSP(hpCost, spCost, hppercentCost, sppercentCost);
+
+            StartCoroutine(chargedCD(CastTime));
         }
     }
-
+    protected virtual void ChargeAction(AAnimal myself)
+    {
+        GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charging"), myself.nextPOS + Vector3.up, Quaternion.identity);
+        ef.GetComponent<EffectManager>().Go();
+    }
     protected float castTime;
     public float CastTime { get { return castTime; } }
     protected float damageDuration = 0.10f;
     public float DamageDuration { get { return damageDuration; } }
     protected GameObject damageEffect = null;
     public GameObject DamageEffect { get { return damageEffect; } }
-    protected GameObject buff = null;
-    public GameObject Buff { get { return buff; } }
+    protected GameObject fieldBuff = null;
+    public GameObject FieldBuff { get { return fieldBuff; } }
 
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {
@@ -293,14 +303,15 @@ public class Attack : AAction
 
     public override int CanDoAction(AAnimal myself)
     {
-        if (myself.BattleReady) { return (int)ErrorTypeList.Nothing; }
+        if (myself.BattleReady) { }
         else { return (int)ErrorTypeList.BattleReady; }
+        return (int)ErrorTypeList.Nothing;
     }
     public override void Action(AAnimal myself)
     {
         duration = 1.0f / myself.MovementSpeed;
         GameObject damagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
-        damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, Buff, myself.AD, 0, DamageDuration, CastTime, myself.targetPOS);
+        damagefield.GetComponent<ADamageField>().SetMainParam(myself, DamageEffect, SkillScaleVector, FieldBuff, myself.AD, 0, DamageDuration, CastTime, myself.targetPOS);
         damagefield.GetComponent<CubeDamageField>().SetAndAwake();
         SetMotionAndDurationAndUseHPSP(myself); SetMotionAndDurationAndUseHPSP(myself);
     }
@@ -312,18 +323,28 @@ public class Guard : AAction
         base.Awake();
         actioncode = 5;
         _name = "Guard";
+        castTime = 1.0f;
         duration = 1.0f;
         spCost = 2;
+        isChargeSkill = true;
+        chargeSpan = 1;
+        chargeLimit = 64;
     }
-
     public override int CanDoAction(AAnimal myself)
     {
+        castTime = 1.0f / myself.MovementSpeed;
+        duration = CastTime;
         return (int)ErrorTypeList.Nothing;
+    }
+    protected override void ChargeAction(AAnimal myself)
+    {
+        castTime = 1.0f / myself.MovementSpeed;
+        duration = CastTime;
+        myself.TakeBuff("Guarding");
     }
     public override void Action(AAnimal myself)
     {
-        duration = 1.0f / myself.MovementSpeed;
-        // Add Guard buff(Toggle) 
+        myself.RemoveBuff("Guarding");
         SetMotionAndDurationAndUseHPSP(myself);
     }
 }

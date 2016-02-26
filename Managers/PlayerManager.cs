@@ -161,15 +161,15 @@ public class PlayerManager : AChild {
                     }
                     else if (Input.GetKey(KeyCode.Space))
                     {
-                        AddAction(mainActionPool.GetComponent<Run>());
+                        AddAction(mainComponentPool.GetComponent<Run>());
                     }
                     else if (Input.GetKey(KeyCode.LeftShift))
                     {
-                        AddAction(mainActionPool.GetComponent<Idle>());
+                        AddAction(mainComponentPool.GetComponent<Idle>());
                     }
                     else
                     {
-                        AddAction(mainActionPool.GetComponent<Walk>());
+                        AddAction(mainComponentPool.GetComponent<Walk>());
                     }
                 }
                 for (int n = 1; n <= 8; n++)
@@ -180,7 +180,9 @@ public class PlayerManager : AChild {
                         {
                             if (actionShortcuts[n] != null)
                             {
-                                if (actionShortcuts[n].CanSelectPosition)
+                                if (actionShortcuts[n].CanSelectPosition ||
+                                    actionShortcuts[n].CanResize ||
+                                    actionShortcuts[n].IsChargeSkill)
                                 { controlVisualAssistTarget(n); }
                                 else { AddAction(actionShortcuts[n]); }
                             }
@@ -189,7 +191,9 @@ public class PlayerManager : AChild {
                         {
                             if (actionShortcuts[n] != null)
                             {
-                                if (actionShortcuts[n].CanSelectPosition)
+                                if (actionShortcuts[n].CanSelectPosition ||
+                                    actionShortcuts[n].CanResize ||
+                                    actionShortcuts[n].IsChargeSkill)
                                 {
                                     AddAction(actionShortcuts[n]);
                                     Destroy(GameObject.Find("VisualAssistTarget(Clone)"));
@@ -216,11 +220,19 @@ public class PlayerManager : AChild {
                 if (Input.GetButtonDown("Attack"))
                 {
                     SettargetPOS();
-                    AddAction(mainActionPool.GetComponent<Attack>());
+                    AddAction(mainComponentPool.GetComponent<Attack>());
                 }
-                if (Input.GetButtonDown("Guard"))
+                if (Input.GetButtonUp("Guard"))
                 {
-                    AddAction(mainActionPool.GetComponent<Guard>());
+                    AddAction(mainComponentPool.GetComponent<Guard>());
+                }
+                if (Input.GetButton("Guard"))
+                {
+                    if (mainComponentPool.GetComponent<Guard>().IsChargeSkill)
+                    {
+                        if (mainComponentPool.GetComponent<Guard>().Charged) { }
+                        else { mainComponentPool.GetComponent<Guard>().Charge(this); }
+                    }
                 }
             }
             if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)
@@ -242,15 +254,15 @@ public class PlayerManager : AChild {
                                 SetnextnextPOS();
                                 if (Input.GetKey(KeyCode.Space))
                                 {
-                                    AddAction(mainActionPool.GetComponent<Run>());
+                                    AddAction(mainComponentPool.GetComponent<Run>());
                                 }
                                 else if (Input.GetKey(KeyCode.LeftShift))
                                 {
-                                    AddAction(mainActionPool.GetComponent<Idle>());
+                                    AddAction(mainComponentPool.GetComponent<Idle>());
                                 }
                                 else
                                 {
-                                    AddAction(mainActionPool.GetComponent<Walk>());
+                                    AddAction(mainComponentPool.GetComponent<Walk>());
                                 }
                             }
                         }

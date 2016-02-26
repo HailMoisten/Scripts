@@ -10,6 +10,7 @@ public abstract class AMind : AIcon {
         IconType = (int)IconTypeList.Mind;
         gameObject.tag = "Mind";
         NumofMindSkills = 10;
+        Proficiency = 100;
     }
 
     public float Proficiency { get; set; }
@@ -38,8 +39,8 @@ public abstract class AMind : AIcon {
 
     public void GrowProficiency(float addp) {
         Proficiency = Proficiency + addp;
-        if (Proficiency >= 900) { Proficiency = 900;}
-        MindLevel = 1 + Mathf.RoundToInt(Proficiency / 100);
+        if (Proficiency >= 1000) { Proficiency = 1000;}
+        MindLevel = Mathf.RoundToInt(Proficiency / 100);
     }
     public AAction GetMindSkill(int index)
     {

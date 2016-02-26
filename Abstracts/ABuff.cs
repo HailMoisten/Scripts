@@ -10,22 +10,36 @@ public abstract class ABuff : AIcon {
         IconType = (int)IconTypeList.Buff;
         gameObject.tag = "Buff";
     }
-
-    public bool IsUsed { get; set; }
+    public string objectPass = "";
+    public bool FirstsUsed { get; set; }
+    public bool LastsFlag { get; set; }
     public bool IsDrawn { get; set; }
+    public bool IsToggle { get; set; }
     public float Duration { get; set; }
     public float Sands { get; set; }
-    public abstract int[] BuffToMainStatus(int[] mains);
-    public abstract float[] BuffToSubStatus(float[] subs);
-    public abstract float BuffToHP(float hp);
-    public abstract float BuffToHPOnlyOnce(float hp);
-    public abstract float BuffToSP(float sp);
-    public abstract float BuffToSPOnlyOnce(float sp);
+    public bool Toggle { get; set; }
+    public virtual int[] BuffToMainStatus(int[] mains) { return mains; }
+    public virtual float[] BuffToSubStatus(float[] subs) { return subs; }
+    public virtual float BuffToHP(float hp) { return hp; }
+    public virtual float BuffToHPFirst(float hp) { return hp; }
+    public virtual float BuffToHPLast(float hp) { return hp; }
+    public virtual float BuffToSP(float sp) { return sp; }
+    public virtual float BuffToSPFirst(float sp) { return sp; }
+    public virtual float BuffToSPLast(float sp) { return sp; }
 
-    public void Used(){ IsUsed = true; Sands = Duration; }
+
+    public void UsedFirsts(){ FirstsUsed = true; Sands = Duration; }
+    public void UsedLasts() { Destroy(gameObject); }
     protected void Update()
     {
-        if (IsUsed) { Sands -= Time.deltaTime;}
+        if (IsToggle) { if (Toggle) { } else { LastsFlag = true; } }
+        else
+        {
+            if (FirstsUsed) {
+                Sands -= Time.deltaTime;
+                if (Sands <= 0.0f) { LastsFlag = true; }
+            }
+        }
     }
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {

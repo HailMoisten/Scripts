@@ -3,7 +3,7 @@ using System.Collections;
 using IconAndErrorType;
 
 public abstract class AItem : AAction {
-    protected string modelPass = "";
+    protected string objectPass = "";
     public override void Awake()
     {
         base.Awake();
@@ -26,7 +26,7 @@ public abstract class AItem : AAction {
     }
     protected void Materialize(Vector3 pos)
     {
-        GameObject temp = (GameObject)Instantiate(Resources.Load(modelPass), pos + (0.25f*Vector3.up), Quaternion.identity);
+        GameObject temp = (GameObject)Instantiate(Resources.Load(objectPass), pos + (0.25f*Vector3.up), Quaternion.identity);
         temp.AddComponent(GetType());
         Number--;
         if(Number <= 0) { Destroy(gameObject, 0.25f); }
