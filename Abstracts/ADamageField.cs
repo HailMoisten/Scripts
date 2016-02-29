@@ -11,19 +11,19 @@ public abstract class ADamageField : MonoBehaviour {
     protected BoxCollider myCollider;
     protected GameObject damageEffect = null;
     protected Vector3 skillScaleVector = Vector3.one;
-    protected GameObject Buff = null;
+    protected string BuffName = null;
     protected virtual void Awake()
     {
         gameObject.tag = "DamageField";
         gameObject.layer = LayerMask.NameToLayer("DamageField");
     }
 
-    public void SetMainParam(AAnimal creator, int attackdamage, int magicdamage, Vector3 centerposition, GameObject damageeffect, Vector3 skillscalevector, GameObject buff, float damageduration, float casttime)
+    public void SetMainParam(AAnimal creator, int attackdamage, int magicdamage, Vector3 centerposition, GameObject damageeffect, Vector3 skillscalevector, string buffname, float damageduration, float casttime)
     {
         Creator = creator;
         attackDamage = attackdamage; magicDamage = magicdamage; center = centerposition;
         damageEffect = damageeffect; skillScaleVector = skillscalevector;
-        Buff = buff;
+        BuffName = buffname;
         damageDuration = damageduration; castTime = casttime;
     }
 
@@ -47,14 +47,9 @@ public abstract class ADamageField : MonoBehaviour {
         {
             AAnimal target = colliderInfo.gameObject.GetComponent<AAnimal>();
             target.TakeDamage(attackDamage, magicDamage);
-            if (Buff != null)
+            if (BuffName != string.Empty || BuffName != "")
             {
-                foreach (Transform b in target.Buffs.transform)
-                {
-                    if (b.gameObject.GetComponent<ABuff>().Name == Buff.GetComponent<ABuff>().Name) { Destroy(b.gameObject); }
-                }
-                GameObject newbuff = (GameObject)Instantiate(Buff, Vector3.zero, Quaternion.identity);
-                newbuff.transform.SetParent(target.Buffs.transform);
+                target.TakeBuff(BuffName);
             }
         }
     }

@@ -2,17 +2,17 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class AirShard : AItem
+public class IceShard : AItem
 {
     public override void Awake()
     {
-        _name = "AirShard";
+        _name = "IceShard";
         base.Awake();
         actioncode = -2;
-        flavor = "This is shard of air element. It will be a catalyst of magic.";
+        flavor = "This is shard of ice element. It will be a catalyst of magic.";
         objectPass = "Prefabs/Items/BasicItemSymbol";
         duration = 0.5f;
-        icon = Resources.Load<Sprite>("Images/Icons/Item/AirShard");
+        icon = Resources.Load<Sprite>("Images/Icons/Item/IceShard");
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
     {

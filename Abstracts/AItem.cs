@@ -22,14 +22,14 @@ public abstract class AItem : AAction {
     }
     public void PickUp()
     {
-        Destroy(gameObject, 0.25f);
+        Destroy(gameObject);
     }
-    protected void Materialize(Vector3 pos)
+    public void Materialize(Vector3 pos)
     {
         GameObject temp = (GameObject)Instantiate(Resources.Load(objectPass), pos + (0.25f*Vector3.up), Quaternion.identity);
         temp.AddComponent(GetType());
         Number--;
-        if(Number <= 0) { Destroy(gameObject, 0.25f); }
+        if(Number <= 0) { Destroy(gameObject); }
     }
     public override ACanvasManager Clicked(Vector3 clickedpos)
     {

@@ -6,10 +6,10 @@ public class Break_The_Limit : ABuff {
 
     public override void Awake()
     {
+        _name = "Break_The_Limit";
         base.Awake();
         objectPass = "Prefabs/Buffs/Break_The_Limit";
-        Duration = 60.0f;
-        _name = "Break_The_Limit";
+        Duration = 50.0f;
         flavor = "Break your limit." + "\n" +
             "Gain a half your MaxSP and SP for a while.";
     }

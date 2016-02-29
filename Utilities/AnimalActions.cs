@@ -9,9 +9,9 @@ public class Idle : AAction
 {
     public override void Awake()
     {
+        _name = "Idle";
         base.Awake();
         actioncode = (int)ActionCodeList.Idle;
-        _name = "Idle";
         duration = 0.0f;
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
@@ -28,9 +28,9 @@ public class Walk : AAction
 {
     public override void Awake()
     {
+        _name = "Walk";
         base.Awake();
         actioncode = (int)ActionCodeList.Walk;
-        _name = "Walk";
         duration = 1.0f;
         spCost = 1;
     }
@@ -95,9 +95,9 @@ public class Run : AAction
 {
     public override void Awake()
     {
+        _name = "Run";
         base.Awake();
         actioncode = (int)ActionCodeList.Run;
-        _name = "Run";
         duration = 1.0f;
         spCost = 2;
     }
@@ -168,9 +168,9 @@ public class Attack : AAction
 {
     public override void Awake()
     {
+        _name = "Attack";
         base.Awake();
         actioncode = (int)ActionCodeList.Attack;
-        _name = "Attack";
         duration = 1.0f;
         spCost = 2;
     }
@@ -197,9 +197,9 @@ public class Guard : AAction
 {
     public override void Awake()
     {
+        _name = "Guard";
         base.Awake();
         actioncode = (int)ActionCodeList.Guard;
-        _name = "Guard";
         castTime = 1.0f;
         duration = 1.0f;
         spCost = 2;
@@ -229,9 +229,9 @@ public class PickUp : AAction
     public AItem TargetItem { get; set; }
     public override void Awake()
     {
+        _name = "PickUp";
         base.Awake();
         actioncode = -2;
-        _name = "PickUp";
         duration = 0.5f;
     }
     public override int CanDoAction(AAnimal myself)
@@ -259,7 +259,12 @@ public class PickUp : AAction
         {
             GameObject item = new GameObject(TargetItem.Name);
             item.AddComponent(TargetItem.GetType());
+            item.GetComponent<AItem>().Number = TargetItem.Number;
             item.transform.SetParent(myself.ItemBag.transform);
+        }
+        if (myself.tag == "Player")
+        {
+            GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().PickUpPopUp(TargetItem);
         }
         TargetItem.PickUp();
         TargetItem = null;
@@ -272,9 +277,9 @@ public class Stunned : AAction
 {
     public override void Awake()
     {
+        _name = "Stunned";
         base.Awake();
         actioncode = -1;
-        _name = "Stunned";
         duration = 1.0f;
     }
 

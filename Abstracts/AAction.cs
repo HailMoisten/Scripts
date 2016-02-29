@@ -57,7 +57,7 @@ public abstract class AAction : AIcon
     }
     protected void SetMotionAndDurationAndUseHPSP(AAnimal myself)
     {
-        myself.UseHPSP(hpCost, spCost, hppercentCost, sppercentCost);
+        myself.UseHPSP(HPCost, SPCost, HPPercentCost, SPPercentCost);
         myself.GetAnimator().SetInteger("ActionCode", actioncode);
         myself.StartCoroutine(myself.DoingAction(duration));
     }
@@ -109,7 +109,7 @@ public abstract class AAction : AIcon
                 Debug.Log("Charged!");
             }
             else if (ChargeCount % ChargeSpan == 0) { ChargingAction(myself); }
-            myself.UseHPSP(hpCost, spCost, hppercentCost, sppercentCost);
+            myself.UseHPSP(HPCost, SPCost, HPPercentCost, SPPercentCost);
 
             StartCoroutine(chargedCD(CastTime));
         }
@@ -125,8 +125,8 @@ public abstract class AAction : AIcon
     public float DamageDuration { get { return damageDuration; } }
     protected GameObject damageEffect = null;
     public GameObject DamageEffect { get { return damageEffect; } }
-    protected GameObject fieldBuff = null;
-    public GameObject Buff { get { return fieldBuff; } }
+    protected string fieldBuffName = string.Empty;
+    public string FieldBuffName { get { return fieldBuffName; } }
     protected void CreateCubeDamageField(AAnimal myself, int ad, int md, Vector3 pos)
     {
         GameObject cubedamagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
@@ -135,7 +135,7 @@ public abstract class AAction : AIcon
             ad, md, pos,
             DamageEffect,
             SkillScaleVector,
-            Buff,
+            FieldBuffName,
             DamageDuration,
             CastTime);
         cubedamagefield.GetComponent<CubeDamageField>().SetAndAwake();

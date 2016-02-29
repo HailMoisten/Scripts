@@ -18,7 +18,7 @@ public class EffectManager : MonoBehaviour {
         transform.localScale = Scale;
         Duration = GetComponent<ParticleSystem>().duration;
         float scaleNum = Mathf.Sqrt(Scale.x * Scale.y * Scale.z);
-        if (scaleNum > 8.0f) { scaleNum = 8; } else if (scaleNum <= 0) { scaleNum = 1; }
+        if (scaleNum > 10.0f) { scaleNum = 10; } else if (scaleNum <= 1) { scaleNum = 1; }
         Transform par = null;
         for (int n = 0; n < transform.childCount; n++)
         {

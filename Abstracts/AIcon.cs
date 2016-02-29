@@ -7,7 +7,7 @@ namespace IconAndErrorType
 {
     enum ActionCodeList { Idle, Walk, Run, Jump, Attack, Guard, MagicAttack }
     enum IconTypeList { Mind, Action, Item, Weapon, Ring, Buff };
-    enum ErrorTypeList { Nothing, Move, Number, HPSP, MindLevel, Level, BattleReady, Jump};
+    enum ErrorTypeList { Nothing, Move, Number, HPSP, MindLevel, Level, BattleReady, Catalyst, Jump};
 }
 
 public abstract class AIcon : MonoBehaviour {
@@ -33,6 +33,7 @@ public abstract class AIcon : MonoBehaviour {
     }
     public virtual void Awake()
     {
+        gameObject.name = Name;
         if (gameObject.GetComponent<Image>()) { } else { gameObject.AddComponent<Image>(); }
         icon = GetComponent<Image>().sprite;
         gameObject.tag = "Icon";
