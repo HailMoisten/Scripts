@@ -165,5 +165,16 @@ public class PlayerCanvasManager : ACanvasManager {
 
         }
     }
+    public void PickUpPopUp(AItem targetitem)
+    {
+        nextCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PickUpPopUpCanvas")).GetComponent<ACanvasManager>();
+        nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this);
+        nextCanvas.transform.FindChild("SelectableTarget").GetComponent<SelectableTargetManager>().Icon = targetitem.Icon;
+        nextCanvas.transform.FindChild("SelectableTarget").GetComponent<SelectableTargetManager>().TargetIcon = targetitem.GetComponent<AIcon>();
+        nextCanvas.transform.FindChild("NameText").GetComponent<Text>().text = targetitem.Name;
+        nextCanvas.transform.FindChild("NameText").GetComponent<TextShade>().TextUpdate();
+        nextCanvas.transform.FindChild("NumText").GetComponent<Text>().text = "x " + targetitem.Number;
+        nextCanvas.transform.FindChild("NumText").GetComponent<TextShade>().TextUpdate();
+    }
 
 }

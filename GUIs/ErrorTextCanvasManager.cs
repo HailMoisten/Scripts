@@ -12,11 +12,12 @@ public class ErrorTextCanvasManager : ACanvasManager {
         {
             case (int)ErrorTypeList.Nothing: content = "Nothing."; break;
             case (int)ErrorTypeList.Move: content = "I can not move to there."; break;
-            case (int)ErrorTypeList.Number: content = "I dont have enough number of it."; break;
+            case (int)ErrorTypeList.Number: content = "I don't have enough number of it."; break;
             case (int)ErrorTypeList.HPSP: content = "Need more HP or SP."; break;
             case (int)ErrorTypeList.MindLevel: content = "Need more MindLevel."; break;
             case (int)ErrorTypeList.Level: content = "Need more Level."; break;
             case (int)ErrorTypeList.BattleReady: content = "I am not ready to battle."; break;
+            case (int)ErrorTypeList.Catalyst: content = "I don't have any catalyst."; break;
             default: content = "Unexpected error."; break;
         }
         erTextTrans.GetComponent<Text>().text = content;
