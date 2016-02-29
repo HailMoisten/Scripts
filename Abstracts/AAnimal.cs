@@ -464,7 +464,7 @@ public abstract class AAnimal : MonoBehaviour {
     public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
     {
         hp = HP - hpcost; sp = SP - spcost;
-        hp = HP - (MaxHP * (hppercentcost / 100)); sp = SP - (MaxSP * (sppercentcost / 100));
+        hp = HP - (MaxHP * ((float)hppercentcost / 100)); sp = SP - (MaxSP * ((float)sppercentcost / 100));
         if (HP < 0) { hp = 0; }
     }
     /// <summary>
