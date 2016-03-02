@@ -78,6 +78,7 @@ public class MageMind : AMind {
             {
                 catalyst = myself.ItemBag.FindChild("AirShard").GetComponent<AItem>();
             }
+            SkillPOSFix = myself.EyeLevel;
         }
         protected override void ChargingAction(AAnimal myself)
         {
@@ -89,8 +90,8 @@ public class MageMind : AMind {
             else
             {
                 catalyst.Materialize(myself.targetPOS);
-                if (Charged) { CreateCubeDamageField(myself, 0, Mathf.RoundToInt(myself.MD * 2.0f), myself.targetPOS); }
-                else { CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS); }
+                if (Charged) { CreateCubeDamageField(myself, 0, Mathf.RoundToInt(myself.MD * 2.0f), myself.targetPOS + SkillPOSFix); }
+                else { CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix); }
             }
             base.Action(myself);
             if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
@@ -170,6 +171,7 @@ public class MageMind : AMind {
             {
                 catalyst = myself.ItemBag.FindChild("FireShard").GetComponent<AItem>();
             }
+            SkillPOSFix = myself.EyeLevel;
         }
         public override void Action(AAnimal myself)
         {
@@ -186,7 +188,7 @@ public class MageMind : AMind {
             else
             {
                 catalyst.Materialize(myself.targetPOS);
-                CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS);
+                CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix);
             }
             base.Action(myself);
             if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
@@ -267,6 +269,7 @@ public class MageMind : AMind {
             {
                 catalyst = myself.ItemBag.FindChild("IceShard").GetComponent<AItem>();
             }
+            SkillPOSFix = myself.EyeLevel;
         }
         public override void Action(AAnimal myself)
         {
@@ -283,7 +286,7 @@ public class MageMind : AMind {
             else
             {
                 catalyst.Materialize(myself.targetPOS);
-                CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS);
+                CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix);
             }
             base.Action(myself);
             if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
@@ -364,6 +367,7 @@ public class MageMind : AMind {
             {
                 catalyst = myself.ItemBag.FindChild("LightningShard").GetComponent<AItem>();
             }
+            SkillPOSFix = myself.EyeLevel;
         }
         public override void Action(AAnimal myself)
         {
@@ -380,13 +384,39 @@ public class MageMind : AMind {
             else
             {
                 catalyst.Materialize(myself.targetPOS);
-                CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS);
+                CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix);
             }
             base.Action(myself);
             if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
             if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
             if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
             if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
+            SetMotionAndDurationAndUseHPSP(myself);
+        }
+
+    }
+    public class MagicChargeIV : AAction
+    {
+        public override void Awake()
+        {
+            _name = "MagicCharge IV";
+            base.Awake();
+            actioncode = 6;
+            flavor = "Give a buff of -MagicCharge IV- to you.";
+            sppercentCost = 10;
+            castTime = 2.5f;
+            duration = 2.5f;
+        }
+        public override int CanDoAction(AAnimal myself)
+        {
+            return CanDoActionAboutHPSP(myself);
+        }
+        public override void SetParamsNeedAnimal(AAnimal myself)
+        {
+        }
+        public override void Action(AAnimal myself)
+        {
+            myself.TakeBuff("MagicChargeIV");
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
@@ -433,6 +463,7 @@ public class MageMind : AMind {
             {
                 catalyst = myself.ItemBag.FindChild("EnergyShard").GetComponent<AItem>();
             }
+            SkillPOSFix = myself.EyeLevel;
         }
         public override void Action(AAnimal myself)
         {
@@ -440,40 +471,13 @@ public class MageMind : AMind {
             else
             {
                 catalyst.Materialize(myself.targetPOS);
-                CreateCubeDamageField(myself, 0, myself.MD*5, myself.targetPOS);
+                CreateCubeDamageField(myself, 0, myself.MD * 5, myself.targetPOS + SkillPOSFix);
             }
             base.Action(myself);
             if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
             if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
             if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
             if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
-            SetMotionAndDurationAndUseHPSP(myself);
-        }
-
-    }
-
-    public class MagicChargeIV : AAction
-    {
-        public override void Awake()
-        {
-            _name = "MagicCharge IV";
-            base.Awake();
-            actioncode = 6;
-            flavor = "Give a buff of -MagicCharge IV- to you.";
-            sppercentCost = 10;
-            castTime = 2.5f;
-            duration = 2.5f;
-        }
-        public override int CanDoAction(AAnimal myself)
-        {
-            return CanDoActionAboutHPSP(myself);
-        }
-        public override void SetParamsNeedAnimal(AAnimal myself)
-        {
-        }
-        public override void Action(AAnimal myself)
-        {
-            myself.TakeBuff("MagicChargeIV");
             SetMotionAndDurationAndUseHPSP(myself);
         }
 

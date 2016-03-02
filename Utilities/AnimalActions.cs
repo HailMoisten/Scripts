@@ -184,11 +184,12 @@ public class Attack : AAction
     public override void SetParamsNeedAnimal(AAnimal myself)
     {
         duration = 1.0f / myself.MovementSpeed;
+        SkillPOSFix = myself.EyeLevel;
     }
     public override void Action(AAnimal myself)
     {
         duration = 1.0f / myself.MovementSpeed;
-        CreateCubeDamageField(myself, myself.AD, 0, myself.targetPOS);
+        CreateCubeDamageField(myself, myself.AD, 0, myself.targetPOS + SkillPOSFix);
         base.Action(myself);
         SetMotionAndDurationAndUseHPSP(myself);
     }

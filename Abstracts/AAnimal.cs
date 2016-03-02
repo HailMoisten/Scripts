@@ -12,6 +12,12 @@ public abstract class AAnimal : MonoBehaviour {
         nextPOS = RoundToIntVector3XZ(transform.position);
         DIR.z = 1;
         targetPOS = nextPOS + DIR + Vector3.up;
+        if (GetComponent<Rigidbody>()) { }
+        else { gameObject.AddComponent<Rigidbody>(); }
+        GetComponent<Rigidbody>().useGravity = false; GetComponent<Rigidbody>().isKinematic = true;
+        if (GetComponent<BoxCollider>()) { }
+        else { gameObject.AddComponent<BoxCollider>(); }
+        GetComponent<BoxCollider>().center = Vector3.up * ObjectHeight.y / 2; GetComponent<BoxCollider>().size = ObjectHeight;
 
         Inventory = transform.FindChild("Inventory");
         ItemBag = Inventory.FindChild("ItemBag");
@@ -231,6 +237,8 @@ public abstract class AAnimal : MonoBehaviour {
     public Vector3 nextPOS = new Vector3();
     public Vector3 nextnextPOS = new Vector3();
     public Vector3 targetPOS = new Vector3();
+    public Vector3 ObjectHeight = new Vector3(1, 2, 1);
+    public Vector3 EyeLevel = Vector3.up;
     private bool isActing = false;
     public bool Interrupting { get; set; }
     public AAction[] actionStack = new AAction[3];
@@ -346,11 +354,12 @@ public abstract class AAnimal : MonoBehaviour {
     }
     protected void SettargetPOS()
     {
-        targetPOS = nextPOS + DIR + Vector3.up;
+        targetPOS = nextPOS + DIR;
     }
     protected void SettargetPOS(int n)
     {
-        targetPOS = nextPOS + actionShortcuts[n].SkillPOSVector + Vector3.up;
+        actionShortcuts[n].SkillPOSVector = DIR;
+        targetPOS = nextPOS + DIR;
     }
     protected abstract void SetDirection();
     protected abstract void SettargetPOS(int n, bool focustarget);

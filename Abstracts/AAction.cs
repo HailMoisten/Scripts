@@ -66,6 +66,7 @@ public abstract class AAction : AIcon
     public bool CanSelectPosition { get { return canSelectPosition; } }
     protected Vector3 skillPOSVector = Vector3.zero;
     public Vector3 SkillPOSVector { get { return skillPOSVector; } set { skillPOSVector = value; } }
+    public Vector3 SkillPOSFix = Vector3.up;
     protected bool canResize = false;
     public bool CanResize { get { return canResize; } }
     protected Vector3 skillScaleVector = Vector3.one;
@@ -116,7 +117,7 @@ public abstract class AAction : AIcon
     }
     protected virtual void ChargingAction(AAnimal myself)
     {
-        GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charging"), myself.nextPOS + Vector3.up, Quaternion.identity);
+        GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charging"), myself.nextPOS + myself.EyeLevel, Quaternion.identity);
         ef.GetComponent<EffectManager>().Go();
     }
     protected float castTime;

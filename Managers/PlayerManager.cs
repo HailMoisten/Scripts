@@ -35,7 +35,7 @@ public class PlayerManager : AChild {
         if (sv.y > limit) { sv.y = limit; } else if (sv.y < -1 * limit) { sv.y = -1 * limit; }
         if (sv.z > limit) { sv.z = limit; } else if (sv.z < -1 * limit) { sv.z = -1 * limit; }
         actionShortcuts[n].SkillPOSVector = sv;
-        targetPOS = nextPOS + sv + Vector3.up;// bug
+        targetPOS = nextPOS + sv;
     }
 
     private GameObject cam;
@@ -197,10 +197,10 @@ public class PlayerManager : AChild {
                     {
                         if (Input.GetButton("Action_" + n))
                         {
-                            if (Input.GetKey(KeyCode.LeftShift) && actionShortcuts[n].CanResize)
-                            { resizeVisualAssistTarget(n); }
-                            else if (actionShortcuts[n].CanSelectPosition)
-                            { controlVisualAssistTarget(n); }
+                            if (actionShortcuts[n].CanSelectPosition)
+                            {
+                                controlVisualAssistTarget(n);
+                            }
                             else
                             {
                                 SetDirection();
@@ -313,12 +313,14 @@ public class PlayerManager : AChild {
     {
         if (visualAssistTarget != null)
         {
-            SettargetPOS(n, false);
-            visualAssistTarget.transform.position = targetPOS;
+            if (Input.GetKey(KeyCode.LeftShift) && actionShortcuts[n].CanResize)
+            { resizeVisualAssistTarget(n); }
+            else { SettargetPOS(n, false); }
+            visualAssistTarget.transform.position = targetPOS + actionShortcuts[n].SkillPOSFix;
         }
         else {
             if (Input.GetKey(KeyCode.LeftControl)) { SettargetPOS(n); } else { SettargetPOS(n, true); }
-            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS, Quaternion.identity);
+            visualAssistTarget = (GameObject)Instantiate(Resources.Load("Prefabs/GUI/VisualAssistTarget"), targetPOS + actionShortcuts[n].SkillPOSFix, Quaternion.identity);
             visualAssistTarget.transform.localScale = actionShortcuts[n].SkillScaleVector;
         }
     }
