@@ -38,13 +38,25 @@ public abstract class AMind : AIcon {
     /// </summary>
 
     public void GrowProficiency(float addp) {
-        Proficiency = Proficiency + addp;
-        if (Proficiency >= 1000) { Proficiency = 1000;}
-        MindLevel = Mathf.RoundToInt(Proficiency / 100);
+        int remainder = (int)Proficiency % 100;
+        if (MindLevel >= 5) { addp--; } else if (MindLevel >= 10) { addp = 0; }
+        addp -= remainder / 40;
+        if (addp <= 0) { addp = 0; }
+        else
+        {
+            Proficiency = Proficiency + addp;
+            if (Proficiency >= 1000) { Proficiency = 1000; }
+            MindLevel = Mathf.FloorToInt(Proficiency / 100);
+        }
     }
     public AAction GetMindSkill(int index)
     {
-        if (MindLevel >= index) { return transform.GetChild(index).GetComponent<AAction>(); }
+        if (MindLevel >= index)
+        {
+            if (transform.GetChild(index).GetComponent<AAction>().IsPassive)
+            { return null; }
+            return transform.GetChild(index).GetComponent<AAction>();
+        }
         else { Debug.Log("Need more MindLevel."); }
         return null;
     }
