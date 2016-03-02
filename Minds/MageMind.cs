@@ -41,7 +41,7 @@ public class MageMind : AMind {
         {
             _name = "Pressure";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give 1.0*MD damage as magicdamage.";
             spCost = 3;
             canSelectPosition = true;
@@ -107,7 +107,7 @@ public class MageMind : AMind {
         {
             _name = "MagicCharge";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give a buff of -MagicCharge- to you.";
             sppercentCost = 10;
             castTime = 2.5f;
@@ -134,7 +134,7 @@ public class MageMind : AMind {
         {
             _name = "Burn";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give 1.0 * MD damage as magicdamage."+"\n"+
                 "Give a buff of -Ablaze- to target.";
             spCost = 10;
@@ -204,7 +204,7 @@ public class MageMind : AMind {
         {
             _name = "MagicCharge II";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give a buff of -MagicCharge II- to you.";
             sppercentCost = 10;
             castTime = 2.5f;
@@ -231,7 +231,7 @@ public class MageMind : AMind {
         {
             _name = "Freeze";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give 1.0 * MD damage as magicdamage."+"\n"+
                 "Give a buff of -Chilled- to target.";
             spCost = 10;
@@ -301,7 +301,7 @@ public class MageMind : AMind {
         {
             _name = "MagicCharge III";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give a buff of -MagicCharge III- to you.";
             sppercentCost = 10;
             castTime = 2.5f;
@@ -328,7 +328,7 @@ public class MageMind : AMind {
         {
             _name = "Shock";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give 1.0 * MD damage as magicdamage." + "\n" +
                 "Give a buff of -Tender- to target.";
             spCost = 10;
@@ -398,7 +398,7 @@ public class MageMind : AMind {
         {
             _name = "Explosion";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give 5.0 * MD damage as magicdamage.";
             sppercentCost = 50;
             canSelectPosition = true;
@@ -458,7 +458,7 @@ public class MageMind : AMind {
         {
             _name = "MagicCharge IV";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give a buff of -MagicCharge IV- to you.";
             sppercentCost = 10;
             castTime = 2.5f;
@@ -484,7 +484,7 @@ public class MageMind : AMind {
         {
             _name = "Break The Limit";
             base.Awake();
-            actioncode = (int)ActionCodeList.MagicAttack;
+            actioncode = 6;
             flavor = "Give a buff of -Break The Limit- to you.";
             castTime = 5.0f;
             duration = 5.0f;

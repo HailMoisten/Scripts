@@ -11,7 +11,7 @@ public class Idle : AAction
     {
         _name = "Idle";
         base.Awake();
-        actioncode = (int)ActionCodeList.Idle;
+        actioncode = 0;
         duration = 0.0f;
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
@@ -30,7 +30,7 @@ public class Walk : AAction
     {
         _name = "Walk";
         base.Awake();
-        actioncode = (int)ActionCodeList.Walk;
+        actioncode = 1;
         duration = 1.0f;
         spCost = 1;
     }
@@ -97,7 +97,7 @@ public class Run : AAction
     {
         _name = "Run";
         base.Awake();
-        actioncode = (int)ActionCodeList.Run;
+        actioncode = 2;
         duration = 1.0f;
         spCost = 2;
     }
@@ -170,7 +170,7 @@ public class Attack : AAction
     {
         _name = "Attack";
         base.Awake();
-        actioncode = (int)ActionCodeList.Attack;
+        actioncode = 4;
         duration = 1.0f;
         spCost = 2;
     }
@@ -199,7 +199,7 @@ public class Guard : AAction
     {
         _name = "Guard";
         base.Awake();
-        actioncode = (int)ActionCodeList.Guard;
+        actioncode = 5;
         castTime = 1.0f;
         duration = 1.0f;
         spCost = 2;
