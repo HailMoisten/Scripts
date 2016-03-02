@@ -240,7 +240,7 @@ public class PickUp : AAction
         Vector3 diff = myself.nextPOS - TargetItem.transform.position;
         if (Mathf.Abs(diff.x) < 1.5f && Mathf.Abs(diff.y) < 1.5f && Mathf.Abs(diff.z) < 1.5f)
         { return (int)ErrorTypeList.Nothing; }
-        return -1;
+        return (int)ErrorTypeList.TooFar;
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
     {

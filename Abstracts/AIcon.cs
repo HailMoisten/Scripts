@@ -7,7 +7,7 @@ namespace IconAndErrorType
 {
     enum ActionCodeList { Idle, Walk, Run, Jump, Attack, Guard, MagicAttack }
     enum IconTypeList { Mind, Action, Item, Weapon, Ring, Buff };
-    enum ErrorTypeList { Nothing, Move, Number, HPSP, MindLevel, Level, BattleReady, Catalyst, Jump};
+    enum ErrorTypeList { Nothing, Move, Number, HPSP, MindLevel, Level, BattleReady, Catalyst, Jump, IsPassive, TooFar};
 }
 
 public abstract class AIcon : MonoBehaviour {

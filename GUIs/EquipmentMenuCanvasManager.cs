@@ -83,10 +83,18 @@ public class EquipmentMenuCanvasManager : ACanvasManager
     {
         if (ReturnedAction != null)
         {
-            if(pointa <= 2 || pointa >= 11) { }
-            else { playerManager.actionShortcuts[pointa - 2] = ReturnedAction; }
-            ReturnedAction = null;
-            setupEquipmentMenu();
+            if (ReturnedAction.IsPassive)
+            {
+                GameObject ecanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/ErrorTextCanvas"));
+                ecanvas.GetComponent<ErrorTextCanvasManager>().SetAndDestroy((int)ErrorTypeList.IsPassive);
+            }
+            else
+            {
+                if (pointa <= 2 || pointa >= 11) { }
+                else { playerManager.actionShortcuts[pointa - 2] = ReturnedAction; }
+                ReturnedAction = null;
+                setupEquipmentMenu();
+            }
             initPointaAndKersol();
             moveKersol();
         }

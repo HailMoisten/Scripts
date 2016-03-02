@@ -11,14 +11,14 @@ public class MageMind : AMind {
         base.Awake();
         flavor = "Mage is a Nuker.";
         prefabPass = "Prefabs/Minds/Mage";
-        GrowProficiency(900);
         initSkills();
     }
 
     private void initSkills()
     {
         // get from savedata
-//        GrowProficiency();
+        //        GrowProficiency();
+        GrowProficiency(900);
 
         transform.GetChild(0).gameObject.AddComponent<Idle>();
         transform.GetChild(1).gameObject.AddComponent<Pressure>();
@@ -31,10 +31,9 @@ public class MageMind : AMind {
         transform.GetChild(8).gameObject.AddComponent<MagicChargeIV>();
         transform.GetChild(9).gameObject.AddComponent<Explosion>();
         transform.GetChild(10).gameObject.AddComponent<Break_The_Limit>();
-
     }
 
-    public class Pressure : AAction
+    private class Pressure : AAction
     {
         private AItem catalyst = null;
         public override void Awake()
@@ -73,10 +72,13 @@ public class MageMind : AMind {
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             spCost = Mathf.RoundToInt(3 * skillScale);
-            isCharged = true;
-            if (myself.ItemBag.FindChild("AirShard"))
+            if (catalyst != null) { }
+            else
             {
-                catalyst = myself.ItemBag.FindChild("AirShard").GetComponent<AItem>();
+                if (myself.ItemBag.FindChild("AirShard"))
+                {
+                    catalyst = myself.ItemBag.FindChild("AirShard").GetComponent<AItem>();
+                }
             }
             SkillPOSFix = myself.EyeLevel;
         }
@@ -109,10 +111,10 @@ public class MageMind : AMind {
             _name = "MagicCharge";
             base.Awake();
             actioncode = 6;
-            flavor = "Give a buff of -MagicCharge- to you.";
+            flavor = "You can take buff of -MagicCharge-.";
             sppercentCost = 10;
-            castTime = 2.5f;
-            duration = 2.5f;
+            castTime = 2.0f;
+            duration = 2.0f;
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -123,12 +125,21 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
-            myself.TakeBuff("MagicCharge");
+            string buffnum = "";
+            if (myself.Mind.FindChild("Mage"))
+            {
+                AMind mage = myself.Mind.FindChild("Mage").GetComponent<AMind>();
+                if (mage.MindLevel >= 4 && myself.Buffs.FindChild("MagicCharge")) { buffnum = "II"; }
+                if (mage.MindLevel >= 6 && myself.Buffs.FindChild("MagicChargeII")) { buffnum = "III"; }
+                if (mage.MindLevel >= 8 && myself.Buffs.FindChild("MagicChargeIII")) { buffnum = "IV"; }
+            }
+            else { }
+            myself.TakeBuff("MagicCharge" + buffnum);
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
     }
-    public class Burn : AAction
+    private class Burn : AAction
     {
         private AItem catalyst = null;
         public override void Awake()
@@ -175,14 +186,9 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
-            int chargecount = 0;
-            if (myself.Buffs.FindChild("MagicCharge")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeII")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { chargecount++; }
-            if (chargecount == 2) { fieldBuffName += "II"; }
-            else if (chargecount == 3) { fieldBuffName += "III"; }
-            else if (chargecount == 4) { fieldBuffName += "IV"; }
+            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; }
 
             if (catalyst.Number <= 0) { }
             else
@@ -204,21 +210,20 @@ public class MageMind : AMind {
     {
         public override void Awake()
         {
-            _name = "MagicCharge II";
+            isPassive = true;
+            _name = "MagicChargeII";
             base.Awake();
             actioncode = 6;
-            flavor = "Give a buff of -MagicCharge II- to you.";
+            flavor = "You can take buff of -MagicCharge II- after -MagicCharge-.";
             sppercentCost = 10;
             castTime = 2.5f;
             duration = 2.5f;
         }
         public override int CanDoAction(AAnimal myself)
         {
-            return CanDoActionAboutHPSP(myself);
+            return (int)ErrorTypeList.IsPassive;
         }
-        public override void SetParamsNeedAnimal(AAnimal myself)
-        {
-        }
+        public override void SetParamsNeedAnimal(AAnimal myself) { }
         public override void Action(AAnimal myself)
         {
             myself.TakeBuff("MagicChargeII");
@@ -273,14 +278,9 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
-            int chargecount = 0;
-            if (myself.Buffs.FindChild("MagicCharge")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeII")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { chargecount++; }
-            if (chargecount == 2) { fieldBuffName += "II"; }
-            else if (chargecount == 3) { fieldBuffName += "III"; }
-            else if (chargecount == 4) { fieldBuffName += "IV"; }
+            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; }
 
             if (catalyst.Number <= 0) { }
             else
@@ -302,21 +302,20 @@ public class MageMind : AMind {
     {
         public override void Awake()
         {
-            _name = "MagicCharge III";
+            isPassive = true;
+            _name = "MagicChargeIII";
             base.Awake();
             actioncode = 6;
-            flavor = "Give a buff of -MagicCharge III- to you.";
+            flavor = "You can take buff of -MagicCharge III- after -MagicCharge II-.";
             sppercentCost = 10;
             castTime = 2.5f;
             duration = 2.5f;
         }
         public override int CanDoAction(AAnimal myself)
         {
-            return CanDoActionAboutHPSP(myself);
+            return (int)ErrorTypeList.IsPassive;
         }
-        public override void SetParamsNeedAnimal(AAnimal myself)
-        {
-        }
+        public override void SetParamsNeedAnimal(AAnimal myself) { }
         public override void Action(AAnimal myself)
         {
             myself.TakeBuff("MagicChargeIII");
@@ -371,14 +370,9 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
-            int chargecount = 0;
-            if (myself.Buffs.FindChild("MagicCharge")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeII")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { chargecount++; }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { chargecount++; }
-            if (chargecount == 2) { fieldBuffName += "II"; }
-            else if (chargecount == 3) { fieldBuffName += "III"; }
-            else if (chargecount == 4) { fieldBuffName += "IV"; }
+            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; }
 
             if (catalyst.Number <= 0) { }
             else
@@ -399,21 +393,20 @@ public class MageMind : AMind {
     {
         public override void Awake()
         {
-            _name = "MagicCharge IV";
+            isPassive = true;
+            _name = "MagicChargeIV";
             base.Awake();
             actioncode = 6;
-            flavor = "Give a buff of -MagicCharge IV- to you.";
+            flavor = "You can take buff of -MagicCharge IV- after -MagicCharge III-.";
             sppercentCost = 10;
             castTime = 2.5f;
             duration = 2.5f;
         }
         public override int CanDoAction(AAnimal myself)
         {
-            return CanDoActionAboutHPSP(myself);
+            return (int)ErrorTypeList.IsPassive;
         }
-        public override void SetParamsNeedAnimal(AAnimal myself)
-        {
-        }
+        public override void SetParamsNeedAnimal(AAnimal myself) { }
         public override void Action(AAnimal myself)
         {
             myself.TakeBuff("MagicChargeIV");

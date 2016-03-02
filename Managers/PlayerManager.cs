@@ -65,13 +65,14 @@ public class PlayerManager : AChild {
         item.GetComponent<AItem>().Number = 5;
         GameObject mind1 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/Mage"));
         mind1.transform.SetParent(MindBag.transform);
-        actionShortcuts[1] = mind1.GetComponent<AMind>().GetMindSkill(9);
+        GameObject mind2 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/Mage"));
+        mind2.transform.SetParent(Mind.transform);
+        actionShortcuts[1] = mind1.GetComponent<AMind>().GetMindSkill(1);
         actionShortcuts[2] = mind1.GetComponent<AMind>().GetMindSkill(3);
         actionShortcuts[3] = mind1.GetComponent<AMind>().GetMindSkill(5);
         actionShortcuts[4] = mind1.GetComponent<AMind>().GetMindSkill(7);
-        actionShortcuts[5] = mind1.GetComponent<AMind>().GetMindSkill(4);
-        actionShortcuts[6] = mind1.GetComponent<AMind>().GetMindSkill(6);
-        actionShortcuts[7] = mind1.GetComponent<AMind>().GetMindSkill(8);
+        actionShortcuts[5] = mind1.GetComponent<AMind>().GetMindSkill(2);
+        actionShortcuts[7] = mind1.GetComponent<AMind>().GetMindSkill(9);
         actionShortcuts[8] = mind1.GetComponent<AMind>().GetMindSkill(10);
         //actionShortcuts[1] = Mind.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
         //actionShortcuts[1].Icon = Mind.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
@@ -157,13 +158,10 @@ public class PlayerManager : AChild {
                         }
                         if (Input.GetButton("Action_" + n))
                         {
-                            if (ErrorCheck(actionShortcuts[n].CanDoAction(this)))
+                            if (actionShortcuts[n].IsChargeSkill)
                             {
-                                if (actionShortcuts[n].IsChargeSkill)
-                                {
-                                    if (actionShortcuts[n].Charged) { }
-                                    else { actionShortcuts[n].Charge(this); }
-                                }
+                                if (actionShortcuts[n].Charged) { }
+                                else { actionShortcuts[n].Charge(this); }
                             }
                         }
                     }

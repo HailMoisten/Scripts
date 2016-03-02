@@ -62,6 +62,8 @@ public abstract class AAction : AIcon
         myself.StartCoroutine(myself.DoingAction(duration));
     }
 
+    protected bool isPassive = false;
+    public bool IsPassive { get { return isPassive; } }
     protected bool canSelectPosition = false;
     public bool CanSelectPosition { get { return canSelectPosition; } }
     protected Vector3 skillPOSVector = Vector3.zero;
@@ -90,16 +92,18 @@ public abstract class AAction : AIcon
     protected bool isCharged = false;
     protected IEnumerator chargedCD(float time)
     {
-        isCharged = true;
         yield return new WaitForSeconds(time);
         isCharged = false;
     }
     public void Charge(AAnimal myself)
     {
-        SetParamsNeedAnimal(myself);
-        if (isCharged) { }
+        if (isCharged)
+        {
+            StartCoroutine(chargedCD(CastTime));
+        }
         else
         {
+            SetParamsNeedAnimal(myself);
             chargeCount++;
             myself.GetAnimator().SetInteger("ActionCode", actioncode);
             if (ChargeCount >= ChargeLimit)
@@ -110,9 +114,10 @@ public abstract class AAction : AIcon
                 Debug.Log("Charged!");
             }
             else if (ChargeCount % ChargeSpan == 0) { ChargingAction(myself); }
-            myself.UseHPSP(HPCost, SPCost, HPPercentCost, SPPercentCost);
+            if (ChargeCount == 1) { }
+            else { myself.UseHPSP(HPCost, SPCost, HPPercentCost, SPPercentCost); }
 
-            StartCoroutine(chargedCD(CastTime));
+            isCharged = true;
         }
     }
     protected virtual void ChargingAction(AAnimal myself)
