@@ -15,6 +15,42 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
     {
         base.Awake();
     }
+
+    protected override void setupInventory()
+    {
+        Transform target = null;
+        if (currentInventory <= 1) { target = playerManager.ItemBag; }
+        else if (currentInventory == 2) { target = playerManager.WeaponBag; }
+        else if (currentInventory == 3) { target = playerManager.RingBag; }
+        else if (currentInventory >= 4) { target = playerManager.Mind; }
+        int pages = 1 + (target.childCount / 20);
+        if (currentPage > pages) { currentPage = pages; } else if (currentPage < 1) { currentPage = 1; }
+        int pagehead = (currentPage - 1) * 20;
+        for (int n = 0; n <= 19; n++)
+        {
+            setPointa(5 + n);
+            Target.GetComponent<SelectableTargetManager>().TargetIcon = null;
+            Target.GetComponent<AIcon>().Icon = nullSprite;
+            Target.GetComponent<SelectableTargetManager>().SetNumber(0);
+            try
+            {
+                if (n + pagehead <= target.childCount - 1)
+                {
+                    AIcon targeticon = target.GetChild(n + pagehead).GetComponent<AIcon>();
+                    Target.GetComponent<SelectableTargetManager>().TargetIcon = targeticon;
+                    Target.GetComponent<AIcon>().Icon = targeticon.Icon;
+                    if (targeticon.CanTogether)
+                    {
+                        Target.GetComponent<SelectableTargetManager>().SetNumber(targeticon.Number);
+                    }
+
+                }
+            }
+            catch (Exception) { Debug.Log("wrong calc"); }
+        }
+        setPointa(currentInventory); setPointa(5); moveKersol();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -97,7 +133,7 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
                         {
                             if (targetSTM.TargetIcon.IconType == (int)IconTypeList.Mind)
                             {
-                                targetMind = playerManager.MindBag.GetChild(pointa - 4 - 1 - ((currentPage - 1) * 20)).GetComponent<AMind>();
+                                targetMind = playerManager.Mind.GetChild(pointa - 4 - 1 - ((currentPage - 1) * 20)).GetComponent<AMind>();
                                 nextCanvas = clickTarget();
                                 if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                             }
@@ -119,7 +155,7 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
                         }
                         else if (TargetIconType == (int)IconTypeList.Mind && targetSTM.TargetIcon.IconType == (int)IconTypeList.Mind)
                         {
-                            backCanvas.ReturnedMind = playerManager.MindBag.GetChild(pointa - 4 - 1 - ((currentPage - 1) * 20)).GetComponent<AMind>();
+                            backCanvas.ReturnedMindGO = playerManager.MindBag.GetChild(pointa - 4 - 1 - ((currentPage - 1) * 20)).gameObject;
                             DestroyThisCanvas();
                         }
                         else
@@ -128,6 +164,14 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
                             if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                         }
                     }
+                }
+            }
+            if (Input.GetButtonDown("Attack"))
+            {
+                if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
+                {
+                    nextCanvas = clickTarget();
+                    if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                 }
             }
             if (Input.GetButtonDown("Cancel"))

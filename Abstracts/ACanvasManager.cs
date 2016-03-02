@@ -7,7 +7,7 @@ public abstract class ACanvasManager : MonoBehaviour {
     //    public AWeapon ReturnedWeapon = null;
     //    public ARing ReturnedRing = null;
     public AAction ReturnedAction = null;
-    public AMind ReturnedMind = null;// Only debug
+    public GameObject ReturnedMindGO = null;// Only debug
     public int ReturnedInt = 0;
     public bool ReturnedBool = false;
 

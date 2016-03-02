@@ -10,7 +10,8 @@ public class DamageTextCanvasManager : ACanvasManager {
     public void SetAndDestroy(int a, int m, Vector3 pos)
     {
         adText = transform.GetChild(0);
-        adText.GetComponent<RectTransform>().localPosition = GameObject.Find("Camera").GetComponent<Camera>().WorldToScreenPoint(pos) + new Vector3(0, 128, 0);
+        Vector3 viewpos = GameObject.Find("Camera").GetComponent<Camera>().WorldToScreenPoint(pos);
+        adText.GetComponent<RectTransform>().localPosition = viewpos + new Vector3(0, 128, -1 * viewpos.z);
         if (a == 0) { adText.GetComponent<Text>().text = ""; }
         else
         {

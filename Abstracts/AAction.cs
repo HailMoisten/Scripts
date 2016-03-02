@@ -17,7 +17,8 @@ public abstract class AAction : AIcon
         IconType = (int)IconTypeList.Action;
         gameObject.tag = "Action";
     }
-
+    protected string mindName = "";
+    protected int profPoint = 0;
     protected int actioncode = 0;
     protected float duration = 0.0f; public float Duration { get { return duration; } }
     protected int hpCost = 0; public int HPCost { get { return hpCost; } }
@@ -137,7 +138,7 @@ public abstract class AAction : AIcon
     {
         GameObject cubedamagefield = (GameObject)Instantiate(Resources.Load("Prefabs/Utilities/CubeDamageField"), Vector3.zero, Quaternion.identity);
         cubedamagefield.GetComponent<ADamageField>().SetMainParam(
-            myself,
+            myself, mindName, profPoint, 
             ad, md, pos,
             DamageEffect,
             SkillScaleVector,
@@ -160,6 +161,15 @@ public abstract class AAction : AIcon
             "Duration " + Duration + " sec";
         ptcm.Flavor = Flavor;
         return ptcm;
+    }
+    protected void GiveProficiency(AAnimal myself)
+    {
+        if (myself.Mind.FindChild(mindName))
+        {
+            if (myself.tag == "Player")
+            { myself.Mind.FindChild(mindName).GetComponent<AMind>().GrowProficiency(profPoint, true); }
+            else { myself.Mind.FindChild(mindName).GetComponent<AMind>().GrowProficiency(profPoint, false); }
+        }
     }
 
 }

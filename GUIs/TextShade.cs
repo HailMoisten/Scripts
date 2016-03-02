@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class TextShade : MonoBehaviour {
-    private bool duplicated;
+    public bool duplicated;
     // Use this for initialization
     void Set() {
         if (transform.parent.GetComponent<TextShade>()) { duplicated = true; }

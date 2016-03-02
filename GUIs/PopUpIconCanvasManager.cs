@@ -46,6 +46,8 @@ public class PopUpIconCanvasManager : ACanvasManager {
         }
         else
         {
+            if (Input.GetButtonDown("Cancel")) { DestroyThisCanvas(); }
+            if (Input.GetButtonDown("Attack")) { DestroyThisCanvas(); }
             if (Input.GetButtonDown("Submit")) { DestroyThisCanvas(); }
         }
     }

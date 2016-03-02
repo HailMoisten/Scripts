@@ -16,10 +16,6 @@ public class MageMind : AMind {
 
     private void initSkills()
     {
-        // get from savedata
-        //        GrowProficiency();
-        GrowProficiency(900);
-
         transform.GetChild(0).gameObject.AddComponent<Idle>();
         transform.GetChild(1).gameObject.AddComponent<Pressure>();
         transform.GetChild(2).gameObject.AddComponent<MagicCharge>();
@@ -43,6 +39,7 @@ public class MageMind : AMind {
             actioncode = 6;
             flavor = "Give 1.0*MD damage as magicdamage.";
             spCost = 3;
+            mindName = "Mage";
             canSelectPosition = true;
             canResize = true;
             skillRange = 8;
@@ -51,8 +48,6 @@ public class MageMind : AMind {
             chargeLimit = 2;
 
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Pressure_Eff_Burst_2_oneshot");
-            castTime = 2.0f;
-            duration = 2.0f;
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -68,10 +63,12 @@ public class MageMind : AMind {
         }
         public override void SetParamsNeedAnimal(AAnimal myself)
         {
+            profPoint = 1;
             castTime = 2.0f / myself.MovementSpeed;
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             spCost = Mathf.RoundToInt(3 * skillScale);
+            profPoint += Mathf.FloorToInt(SkillScale / 10);
             if (catalyst != null) { }
             else
             {
@@ -88,18 +85,24 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
+            if (myself.Buffs.FindChild("MagicChargeIV")) { profPoint += 4; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { profPoint += 3; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { profPoint += 2; }
+            else if (myself.Buffs.FindChild("MagicCharge")) { profPoint += 1; }
+
             if (catalyst.Number <= 0) { }
             else
             {
                 catalyst.Materialize(myself.targetPOS);
-                if (Charged) { CreateCubeDamageField(myself, 0, Mathf.RoundToInt(myself.MD * 2.0f), myself.targetPOS + SkillPOSFix); }
+                if (Charged) { profPoint++; CreateCubeDamageField(myself, 0, Mathf.RoundToInt(myself.MD * 2.0f), myself.targetPOS + SkillPOSFix); }
                 else { CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix); }
+                profPoint = 1;
+                if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             }
             base.Action(myself);
-            if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
@@ -112,7 +115,9 @@ public class MageMind : AMind {
             base.Awake();
             actioncode = 6;
             flavor = "You can take buff of -MagicCharge-.";
-            sppercentCost = 10;
+            sppercentCost = 20;
+            mindName = "Mage";
+            profPoint = 1;
             castTime = 2.0f;
             duration = 2.0f;
         }
@@ -120,9 +125,7 @@ public class MageMind : AMind {
         {
             return CanDoActionAboutHPSP(myself);
         }
-        public override void SetParamsNeedAnimal(AAnimal myself)
-        {
-        }
+        public override void SetParamsNeedAnimal(AAnimal myself) { }
         public override void Action(AAnimal myself)
         {
             string buffnum = "";
@@ -135,6 +138,7 @@ public class MageMind : AMind {
             }
             else { }
             myself.TakeBuff("MagicCharge" + buffnum);
+            GiveProficiency(myself);
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
@@ -150,6 +154,7 @@ public class MageMind : AMind {
             flavor = "Give 1.0 * MD damage as magicdamage."+"\n"+
                 "Give a buff of -Ablaze- to target.";
             spCost = 10;
+            mindName = "Mage";
             canSelectPosition = true;
             canResize = true;
             skillRange = 8;
@@ -157,8 +162,6 @@ public class MageMind : AMind {
 
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Burn_L_Rose_fire");
             fieldBuffName = "Ablaze";
-            castTime = 2.0f;
-            duration = 2.0f;
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -174,10 +177,12 @@ public class MageMind : AMind {
         }
         public override void SetParamsNeedAnimal(AAnimal myself)
         {
+            profPoint = 2;
             castTime = 2.0f / myself.MovementSpeed;
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             spCost = Mathf.RoundToInt(3 * skillScale);
+            profPoint += Mathf.FloorToInt(SkillScale / 10);
             if (myself.ItemBag.FindChild("FireShard"))
             {
                 catalyst = myself.ItemBag.FindChild("FireShard").GetComponent<AItem>();
@@ -186,21 +191,22 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
-            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; }
-            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; }
-            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; }
+            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; profPoint += 4; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; profPoint += 3; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; profPoint += 2; }
+            else if (myself.Buffs.FindChild("MagicCharge")) { profPoint += 1; }
 
             if (catalyst.Number <= 0) { }
             else
             {
                 catalyst.Materialize(myself.targetPOS);
                 CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix);
+                if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             }
             base.Action(myself);
-            if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
@@ -215,9 +221,8 @@ public class MageMind : AMind {
             base.Awake();
             actioncode = 6;
             flavor = "You can take buff of -MagicCharge II- after -MagicCharge-.";
-            sppercentCost = 10;
-            castTime = 2.5f;
-            duration = 2.5f;
+            sppercentCost = 20;
+            mindName = "Mage";
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -242,6 +247,7 @@ public class MageMind : AMind {
             flavor = "Give 1.0 * MD damage as magicdamage."+"\n"+
                 "Give a buff of -Chilled- to target.";
             spCost = 10;
+            mindName = "Mage";
             canSelectPosition = true;
             canResize = true;
             skillRange = 8;
@@ -249,8 +255,6 @@ public class MageMind : AMind {
 
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Freeze_Eff_Aura_1_loop");
             fieldBuffName = "Chilled";
-            castTime = 2.0f;
-            duration = 2.0f;
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -266,10 +270,12 @@ public class MageMind : AMind {
         }
         public override void SetParamsNeedAnimal(AAnimal myself)
         {
+            profPoint = 3;
             castTime = 2.0f / myself.MovementSpeed;
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             spCost = Mathf.RoundToInt(3 * skillScale);
+            profPoint += Mathf.FloorToInt(SkillScale / 10);
             if (myself.ItemBag.FindChild("IceShard"))
             {
                 catalyst = myself.ItemBag.FindChild("IceShard").GetComponent<AItem>();
@@ -278,21 +284,22 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
-            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; }
-            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; }
-            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; }
+            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; profPoint += 4; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; profPoint += 3; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; profPoint += 2; }
+            else if (myself.Buffs.FindChild("MagicCharge")) { profPoint += 1; }
 
             if (catalyst.Number <= 0) { }
             else
             {
                 catalyst.Materialize(myself.targetPOS);
                 CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix);
+                if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             }
             base.Action(myself);
-            if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
@@ -307,9 +314,8 @@ public class MageMind : AMind {
             base.Awake();
             actioncode = 6;
             flavor = "You can take buff of -MagicCharge III- after -MagicCharge II-.";
-            sppercentCost = 10;
-            castTime = 2.5f;
-            duration = 2.5f;
+            sppercentCost = 20;
+            mindName = "Mage";
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -334,6 +340,7 @@ public class MageMind : AMind {
             flavor = "Give 1.0 * MD damage as magicdamage." + "\n" +
                 "Give a buff of -Tender- to target.";
             spCost = 10;
+            mindName = "Mage";
             canSelectPosition = true;
             canResize = true;
             skillRange = 8;
@@ -341,8 +348,6 @@ public class MageMind : AMind {
 
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Shock_Spark");
             fieldBuffName = "Tender";
-            castTime = 2.0f;
-            duration = 2.0f;
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -358,10 +363,12 @@ public class MageMind : AMind {
         }
         public override void SetParamsNeedAnimal(AAnimal myself)
         {
+            profPoint = 3;
             castTime = 2.0f / myself.MovementSpeed;
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             spCost = Mathf.RoundToInt(3 * skillScale);
+            profPoint += Mathf.FloorToInt(SkillScale / 10);
             if (myself.ItemBag.FindChild("LightningShard"))
             {
                 catalyst = myself.ItemBag.FindChild("LightningShard").GetComponent<AItem>();
@@ -370,21 +377,22 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
-            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; }
-            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; }
-            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; }
+            if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; profPoint += 4; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; profPoint += 3; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; profPoint += 2; }
+            else if (myself.Buffs.FindChild("MagicCharge")) { profPoint += 1; }
 
             if (catalyst.Number <= 0) { }
             else
             {
                 catalyst.Materialize(myself.targetPOS);
                 CreateCubeDamageField(myself, 0, myself.MD, myself.targetPOS + SkillPOSFix);
+                if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             }
             base.Action(myself);
-            if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
@@ -398,9 +406,8 @@ public class MageMind : AMind {
             base.Awake();
             actioncode = 6;
             flavor = "You can take buff of -MagicCharge IV- after -MagicCharge III-.";
-            sppercentCost = 10;
-            castTime = 2.5f;
-            duration = 2.5f;
+            sppercentCost = 20;
+            mindName = "Mage";
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -424,14 +431,13 @@ public class MageMind : AMind {
             actioncode = 6;
             flavor = "Give 5.0 * MD damage as magicdamage.";
             sppercentCost = 50;
+            mindName = "Mage";
             canSelectPosition = true;
             canResize = true;
             skillRange = 8;
             skillScaleOneSideLimit = 20;
 
             damageEffect = (GameObject)Resources.Load("Prefabs/Effects/Minds/MageMind/Explosion_Eff_Burst_1_oneShot");
-            castTime = 2.0f;
-            duration = 2.0f;
         }
         public override int CanDoAction(AAnimal myself)
         {
@@ -447,11 +453,13 @@ public class MageMind : AMind {
         }
         public override void SetParamsNeedAnimal(AAnimal myself)
         {
+            profPoint = 5;
             castTime = 2.0f / myself.MovementSpeed;
             duration = CastTime;
             skillScale = (float)Math.Sqrt(SkillScaleVector.x * SkillScaleVector.y * SkillScaleVector.z);
             if (SkillScale >= 50) { skillScale = 50; }
             sppercentCost = 50 + Mathf.RoundToInt(skillScale);
+            profPoint += Mathf.FloorToInt(SkillScale / 10);
             if (myself.ItemBag.FindChild("EnergyShard"))
             {
                 catalyst = myself.ItemBag.FindChild("EnergyShard").GetComponent<AItem>();
@@ -460,17 +468,22 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
+            if (myself.Buffs.FindChild("MagicChargeIV")) { profPoint += 4; }
+            else if (myself.Buffs.FindChild("MagicChargeIII")) { profPoint += 3; }
+            else if (myself.Buffs.FindChild("MagicChargeII")) { profPoint += 2; }
+            else if (myself.Buffs.FindChild("MagicCharge")) { profPoint += 1; }
+
             if (catalyst.Number <= 0) { }
             else
             {
                 catalyst.Materialize(myself.targetPOS);
                 CreateCubeDamageField(myself, 0, myself.MD * 5, myself.targetPOS + SkillPOSFix);
+                if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
+                if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             }
             base.Action(myself);
-            if (myself.Buffs.FindChild("MagicCharge")) { Destroy(myself.Buffs.FindChild("MagicCharge").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeII")) { Destroy(myself.Buffs.FindChild("MagicChargeII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIII")) { Destroy(myself.Buffs.FindChild("MagicChargeIII").gameObject); }
-            if (myself.Buffs.FindChild("MagicChargeIV")) { Destroy(myself.Buffs.FindChild("MagicChargeIV").gameObject); }
             SetMotionAndDurationAndUseHPSP(myself);
         }
 
@@ -483,9 +496,10 @@ public class MageMind : AMind {
             base.Awake();
             actioncode = 6;
             flavor = "Give a buff of -Break The Limit- to you.";
+            mindName = "Mage";
             castTime = 5.0f;
             duration = 5.0f;
-            sppercentCost = 10;
+            sppercentCost = 25;
         }
         public override int CanDoAction(AAnimal myself)
         {

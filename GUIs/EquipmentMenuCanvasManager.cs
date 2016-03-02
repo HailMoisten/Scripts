@@ -98,17 +98,16 @@ public class EquipmentMenuCanvasManager : ACanvasManager
             initPointaAndKersol();
             moveKersol();
         }
-        if (ReturnedMind != null)
+        if (ReturnedMindGO != null)
         {
             Debug.Log("ReturnedMind is not null");
             if (pointa <= 10 || pointa >= 22) { }
             else
             {
-                GameObject newmind = (GameObject)Instantiate(Resources.Load("Prefabs/Minds/" + ReturnedMind.Name));
-                newmind.GetComponent<AMind>().Proficiency = ReturnedMind.Proficiency;
+                GameObject newmind = (GameObject)Instantiate(ReturnedMindGO);
                 newmind.transform.SetParent(playerManager.Mind);
             }
-            ReturnedMind = null;
+            ReturnedMindGO = null;
             setupEquipmentMenu();
             initPointaAndKersol();
             moveKersol();
@@ -155,21 +154,44 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                     nextCanvas = retcanvas.GetComponent<ACanvasManager>();
                     if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                 }
-                else if (pointa >= 11)
+                else if (pointa >= 11) // Mind
                 {
                     GameObject retcanvas = Instantiate(returnIMC);
                     retcanvas.GetComponent<ReturnInventoryMenuCanvasManager>().TargetIconType = (int)IconTypeList.Mind;
                     nextCanvas = retcanvas.GetComponent<ACanvasManager>();
                     if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                 }
-                else
+            }
+            if (Input.GetButtonDown("Attack"))
+            {
+                if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
                 {
-                    if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
-                    {
-                        nextCanvas = clickTarget();
-                        if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
-                    }
+                    nextCanvas = clickTarget();
+                    if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
                 }
+            }
+            if (Input.GetButtonDown("Guard"))
+            {
+                if (pointa == 1) { }// Weapon
+                else if (pointa == 2) { }// Ring
+                else if (pointa >= 3 && pointa <= 10)// Actions
+                {
+                    playerManager.actionShortcuts[pointa - 2] = null;
+                    setupEquipmentMenu();
+                    initPointaAndKersol();
+                    moveKersol();
+                }
+                /*                else if (pointa >= 11) // Mind
+                                {
+                                    GameObject target = playerManager.Mind.GetChild(pointa - 11).gameObject;
+                                    GameObject copy = Instantiate(target);
+                                    copy.transform.SetParent(playerManager.MindBag);
+                                    Destroy(target);
+                                    setupEquipmentMenu();
+                                    initPointaAndKersol();
+                                    moveKersol();
+                                }
+                */
             }
         }
     }

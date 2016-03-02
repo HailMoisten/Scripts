@@ -468,7 +468,6 @@ public abstract class AAnimal : MonoBehaviour {
         if (HP < 0) { hp = 0; }
         GameObject dcanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/DamageTextCanvas"));
         dcanvas.GetComponent<DamageTextCanvasManager>().SetAndDestroy(a, m, transform.position);
-
     }
     public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
     {

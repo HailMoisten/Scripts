@@ -176,5 +176,21 @@ public class PlayerCanvasManager : ACanvasManager {
         nextCanvas.transform.FindChild("NumText").GetComponent<Text>().text = "x " + targetitem.Number;
         nextCanvas.transform.FindChild("NumText").GetComponent<TextShade>().TextUpdate();
     }
-
+    public void ShowInformationText(string content)
+    {
+        GameObject infotext = Instantiate((GameObject)Resources.Load("Prefabs/GUI/InformationText"));
+        infotext.transform.SetParent(transform);
+        infotext.GetComponent<RectTransform>().localPosition += Vector3.down * infotextcount * 24;
+        infotext.GetComponent<Text>().text = content;
+        infotext.GetComponent<TextShade>().TextUpdate();
+        StartCoroutine(InformationTextDestroy(infotext));
+    }
+    private int infotextcount = 0;
+    private IEnumerator InformationTextDestroy(GameObject infotext)
+    {
+        infotextcount++;
+        yield return new WaitForSeconds(2.0f);
+        Destroy(infotext);
+        infotextcount--;
+    }
 }

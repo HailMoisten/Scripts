@@ -53,6 +53,14 @@ public class ReturnPopUpMindCanvasManager : PopUpMindCanvasManager {
                 }
                 else { Debug.Log("Need more Mind Level"); }
             }
+            if (Input.GetButtonDown("Attack"))
+            {
+                if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
+                {
+                    nextCanvas = clickTarget();
+                    if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
+                }
+            }
             if (Input.GetButtonDown("Cancel"))
             {
                 DestroyThisCanvas();

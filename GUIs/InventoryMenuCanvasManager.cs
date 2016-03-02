@@ -29,7 +29,7 @@ public class InventoryMenuCanvasManager : ACanvasManager
         targetIconNameText.text = targetIconName;
         moveKersol();
     }
-    protected void setupInventory()
+    protected virtual void setupInventory()
     {
         Transform target = null;
         if (currentInventory <= 1) { target = playerManager.ItemBag; }
@@ -108,6 +108,18 @@ public class InventoryMenuCanvasManager : ACanvasManager
                 if (pointa <= 4) { currentInventory = pointa; setupInventory(); }
                 else if (pointa == 25) { currentPage--; setupInventory(); setPointa(25); }
                 else if (pointa == 26) { currentPage++; setupInventory(); setPointa(26); }
+                else
+                {
+                    if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
+                    {
+                        nextCanvas = clickTarget();
+                        if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
+                    }
+                }
+            }
+            if (Input.GetButtonDown("Attack"))
+            {
+                if (pointa <= 4 || pointa >= 25) { }
                 else
                 {
                     if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)

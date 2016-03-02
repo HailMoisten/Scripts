@@ -39,6 +39,7 @@ public class PlayerManager : AChild {
     }
 
     private GameObject cam;
+    private GameManager gameManager;
     private int camAngle = 0;
     private ACanvasManager playerCanvas;
     private GameObject visualAssist;
@@ -49,10 +50,13 @@ public class PlayerManager : AChild {
     // Use this for initialization
     public override void Awake () {
         base.Awake();
-
         gameObject.tag = "Player";
+
         cam = GameObject.Find("Camera");
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager.Difficulty = 30;
         playerCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<ACanvasManager>();
+
         Initialize();
     }
     protected override void Initialize()
@@ -64,9 +68,7 @@ public class PlayerManager : AChild {
         item.transform.SetParent(ItemBag.transform);
         item.GetComponent<AItem>().Number = 5;
         GameObject mind1 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/Mage"));
-        mind1.transform.SetParent(MindBag.transform);
-        GameObject mind2 = Instantiate((GameObject)Resources.Load("Prefabs/Minds/Mage"));
-        mind2.transform.SetParent(Mind.transform);
+        mind1.transform.SetParent(Mind.transform);
         actionShortcuts[1] = mind1.GetComponent<AMind>().GetMindSkill(1);
         actionShortcuts[2] = mind1.GetComponent<AMind>().GetMindSkill(3);
         actionShortcuts[3] = mind1.GetComponent<AMind>().GetMindSkill(5);

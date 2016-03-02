@@ -15,11 +15,10 @@ public class PopUpMindCanvasManager : PopUpIconCanvasManager {
         initPointaAndKersol();
         moveKersol();
     }
-    public void SetMind(AMind mind)
+    public void SetMind(GameObject mind)
     {
-        targetMind = Instantiate((GameObject)Resources.Load("Prefabs/Minds/" + mind.Name));
+        targetMind = Instantiate(mind);
         targetMind.transform.SetParent(transform);
-        targetMind.GetComponent<AMind>().GrowProficiency(mind.Proficiency);
         for (int i = 1; i <= targetMind.GetComponent<AMind>().NumofMindSkills; i++)
         {
             setPointa(i);
@@ -68,7 +67,7 @@ public class PopUpMindCanvasManager : PopUpIconCanvasManager {
                 }
             }
             if (Input.GetButtonDown("Cancel")) { DestroyThisCanvas(); }
-            if (Input.GetButtonDown("Submit"))
+            if (Input.GetButtonDown("Attack"))
             {
                 if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
                 {
