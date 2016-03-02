@@ -9,9 +9,9 @@ public class MagicChargeIV : ABuff
         _name = "MagicChargeIV";
         base.Awake();
         objectPass = "Prefabs/Buffs/MagicChargeIV";
-        Duration = 40.0f;
+        Duration = 10.0f;
         flavor = "Elements will help your magic." + "\n" +
-            "Gain a half of your MD for 40 seconds.";
+            "Gain a half of your MD for 10 seconds.";
     }
     public override float[] BuffToSubStatus(float[] subs)
     {
