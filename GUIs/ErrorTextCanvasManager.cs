@@ -18,6 +18,8 @@ public class ErrorTextCanvasManager : ACanvasManager {
             case (int)ErrorTypeList.Level: content = "Need more Level."; break;
             case (int)ErrorTypeList.BattleReady: content = "I am not ready to battle."; break;
             case (int)ErrorTypeList.Catalyst: content = "I don't have any catalyst."; break;
+            case (int)ErrorTypeList.IsPassive: content = "It is Passive skill."; break;
+            case (int)ErrorTypeList.TooFar: content = "Too far."; break;
             default: content = "Unexpected error."; break;
         }
         erTextTrans.GetComponent<Text>().text = content;
