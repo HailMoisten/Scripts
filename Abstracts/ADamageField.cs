@@ -52,8 +52,8 @@ public abstract class ADamageField : MonoBehaviour {
             if (Creator.Mind.FindChild(mindName))
             {
                 if (Creator.tag == "Player")
-                { Creator.Mind.FindChild(mindName).GetComponent<AMind>().GrowProficiency(profPoint + hitcount, true); }
-                else { Creator.Mind.FindChild(mindName).GetComponent<AMind>().GrowProficiency(profPoint + hitcount, false); }
+                { Creator.Mind.FindChild(mindName).GetComponent<AMind>().GainProficiency(profPoint + hitcount, true); }
+                else { Creator.Mind.FindChild(mindName).GetComponent<AMind>().GainProficiency(profPoint + hitcount, false); }
             }
         }
         Destroy(gameObject);

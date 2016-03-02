@@ -167,8 +167,8 @@ public abstract class AAction : AIcon
         if (myself.Mind.FindChild(mindName))
         {
             if (myself.tag == "Player")
-            { myself.Mind.FindChild(mindName).GetComponent<AMind>().GrowProficiency(profPoint, true); }
-            else { myself.Mind.FindChild(mindName).GetComponent<AMind>().GrowProficiency(profPoint, false); }
+            { myself.Mind.FindChild(mindName).GetComponent<AMind>().GainProficiency(profPoint, true); }
+            else { myself.Mind.FindChild(mindName).GetComponent<AMind>().GainProficiency(profPoint, false); }
         }
     }
 

@@ -10,6 +10,19 @@ public class PlayerManager : AChild {
     {
 
     }
+    public override void GainExperience(int gainp)
+    {
+        gainp += gameManager.Difficulty;
+        if (gainp <= 0 || Lv >= 165) { gainp = 0; }
+        else
+        {
+            exp += gainp;
+            playerCanvasManager.ShowInformationText(
+                "+ " + gainp + " Exp. (" + exp + ")");
+            int curl = Lv;
+            if (EXP > NextEXP(Lv)) { levelUp(); }
+        }
+    }
     protected override void SetDirection()
     {
         DIR.x = Input.GetAxisRaw("Horizontal");
@@ -41,7 +54,7 @@ public class PlayerManager : AChild {
     private GameObject cam;
     private GameManager gameManager;
     private int camAngle = 0;
-    private ACanvasManager playerCanvas;
+    private PlayerCanvasManager playerCanvasManager;
     private GameObject visualAssist;
     private GameObject visualAssistTarget;
     private GameObject focus = null;
@@ -54,15 +67,15 @@ public class PlayerManager : AChild {
 
         cam = GameObject.Find("Camera");
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        gameManager.Difficulty = 30;
-        playerCanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<ACanvasManager>();
+        gameManager.Difficulty = 50;
+        playerCanvasManager = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<PlayerCanvasManager>();
 
         Initialize();
     }
     protected override void Initialize()
     {
-        setMainStatus(165, 100, 100, 100, 100, 100);
-        //setMainStatus(10, 5, 10, 10, 2, 5);
+        //setMainStatus(165, 100, 100, 100, 100, 100);
+        setMainStatus(1, 5, 10, 10, 2, 5);
         GameObject item = new GameObject("AirShard");
         item.AddComponent<AirShard>();
         item.transform.SetParent(ItemBag.transform);
@@ -76,10 +89,7 @@ public class PlayerManager : AChild {
         actionShortcuts[5] = mind1.GetComponent<AMind>().GetMindSkill(2);
         actionShortcuts[7] = mind1.GetComponent<AMind>().GetMindSkill(9);
         actionShortcuts[8] = mind1.GetComponent<AMind>().GetMindSkill(10);
-        //actionShortcuts[1] = Mind.GetChild(0).GetComponent<AMind>().GetMindSkill(1);
-        //actionShortcuts[1].Icon = Mind.GetChild(0).GetChild(1).GetComponent<AAction>().Icon;
-        //actionShortcuts[2] = ItemBag.GetChild(0).GetComponent<AAction>();
-        //actionShortcuts[2].Icon = ItemBag.GetChild(0).GetComponent<AAction>().Icon;
+        UsePassiveActions();
     }
 
     // Update is called once per frame
@@ -242,6 +252,7 @@ public class PlayerManager : AChild {
             }
             if (Input.GetButtonDown("IncCurBurst"))
             {
+                GainExperience(NextEXP(Lv)-100);
             }
             if (Input.GetButtonDown("DecCurBurst"))
             {

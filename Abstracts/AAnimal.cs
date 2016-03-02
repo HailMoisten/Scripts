@@ -46,6 +46,7 @@ public abstract class AAnimal : MonoBehaviour {
     // Status
     private const int statusGenus = 19;
     private int lv = 1; public int Lv { get { return lv; } }
+    protected int exp = 0; public int EXP { get { return exp; } }
     private int vit = 1; public int VIT { get { return vit; } }
     private int str = 1; public int STR { get { return str; } }
     private int agi = 1; public int AGI { get { return agi; } }
@@ -104,26 +105,39 @@ public abstract class AAnimal : MonoBehaviour {
                 for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
                 if (sum >= 0 && sum <= 3) { LevelUpReward[n] = LevelUpReward[n] + incORdec; }
             }
-            else
-            {
-                Debug.Log("Too more/less Reward.");
-            }
+            else { }
         }
     }
     public int[] GetLevelUpReward() { return LevelUpReward; }
-    protected void levelUp()
+    protected int NextEXP(float level)
     {
-        if (lv >= 165) { }
+        float x = (3.0f * (level / 165.0f)) - 3.0f;
+        float core = (1.0f / Mathf.Sqrt(2.0f * Mathf.PI)) * Mathf.Exp(Mathf.Pow(x, 2) / 2.0f * -1.0f);
+        return Mathf.RoundToInt(core * 25000);
+    }
+    public virtual void GainExperience(int gainp)
+    {
+        if (gainp <= 0 || Lv >= 165) { gainp = 0; }
         else
         {
-            lv++;
-            vit = vit + LevelUpReward[0]; str = str + LevelUpReward[1]; agi = agi + LevelUpReward[2]; _int = _int + LevelUpReward[3]; mnd = mnd + LevelUpReward[4];
-            int sum = 0;
-            for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
-            if (sum == 0) { vit++; mnd++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { mnd++; }
-            setSubStatus(calcSubStatus());
-            hp = MaxHP; sp = MaxSP;
+            exp += gainp;
+            if (EXP > NextEXP(Lv)) { levelUp(); }
         }
+    }
+    protected void levelUp()
+    {
+        lv++; exp = 0;
+        if (gameObject.tag == "Player")
+        {
+            GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
+                "Level up to " + Lv + ". ");
+        }
+        vit = vit + LevelUpReward[0]; str = str + LevelUpReward[1]; agi = agi + LevelUpReward[2]; _int = _int + LevelUpReward[3]; mnd = mnd + LevelUpReward[4];
+        int sum = 0;
+        for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
+        if (sum == 0) { vit++; mnd++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { mnd++; }
+        setSubStatus(calcSubStatus());
+        hp = MaxHP; sp = MaxSP;
     }
 
     /// <summary>
@@ -221,6 +235,36 @@ public abstract class AAnimal : MonoBehaviour {
         hp = Mathf.RoundToInt(subs[subs.Length - fix + 17]); sp = Mathf.RoundToInt(subs[subs.Length - fix + 18]);
 
         visionManager.SetMindSlots(MindSlots);
+    }
+    public void ClearBuffs()
+    {
+        for (int n = 0; n < Buffs.childCount; n++)
+        {
+            Destroy(Buffs.GetChild(n).gameObject);
+        }
+    }
+    public void UsePassiveActions()
+    {
+        ClearBuffs();
+        Transform m = null;
+        AAction ma = null;
+        for (int n = 0; n < Mind.childCount; n++)
+        {
+            m = Mind.GetChild(n);
+            for (int mn = 0; mn < m.childCount; mn++)
+            {
+                ma = m.GetComponent<AMind>().GetMindSkill(mn);
+                if (ma != null)
+                {
+                    if (ma.IsPassive)
+                    {
+                        if (ma.FieldBuffName == string.Empty) { }
+                        else { TakeBuff(ma.FieldBuffName); }
+                    }
+                }
+            }
+        }
+
     }
 
     // ActionManagement
@@ -475,6 +519,8 @@ public abstract class AAnimal : MonoBehaviour {
         hp = HP - (MaxHP * ((float)hppercentcost / 100)); sp = SP - (MaxSP * ((float)sppercentcost / 100));
         if (HP < 0) { hp = 0; }
     }
+
+
     /// <summary>
     /// kowai
     /// </summary>

@@ -40,44 +40,50 @@ public abstract class AMind : AIcon {
     ///  - int Proficiency
     /// </summary>
 
-    public void GrowProficiency(float addp, bool isplayer) {
-        if (MindLevel >= 4) { addp--; }
-        else if (MindLevel >= 8) { addp--; addp--; }
-        else if (MindLevel >= 10) { addp = 0; }
-        if ((int)Proficiency % 100 >= 66) { addp--; }
-        addp += gameManager.Difficulty;
+    public void GainProficiency(int gainp, bool isplayer) {
+        if (MindLevel >= 4) { gainp--; }
+        else if (MindLevel >= 8) { gainp--; gainp--; }
+        else if (MindLevel >= 10) { gainp = 0; }
+        if ((int)Proficiency % 100 >= 66) { gainp--; }
+        if (isplayer) { gainp += gameManager.Difficulty; }
 
-        if (addp <= 0 || MindLevel >= 10) { addp = 0; }
+        if (gainp <= 0 || MindLevel >= 10) { gainp = 0; }
         else
         {
-            Proficiency = Proficiency + addp;
+            Proficiency = Proficiency + gainp;
             if (Proficiency >= 1000) { Proficiency = 1000; }
             if (isplayer)
             {
                 GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
-                    "+ " + addp + " Prof. (" + Proficiency + ") " + "[" + Name + "]");
+                    "+ " + gainp + " Prof. (" + Proficiency + ") " + "[" + Name + "]");
             }
             int curml = MindLevel;
             MindLevel = Mathf.FloorToInt(Proficiency / 100);
             if (curml < MindLevel)
             {
-                if (isplayer)
-                {
-                    GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
-                        "Level up to " + MindLevel + ". " + "[" + Name + "]");
-                }
+                MindLevelUp(isplayer);
             }
+        }
+    }
+    private void MindLevelUp(bool isplayer)
+    {
+        Transform animalt = transform.parent.parent.parent;
+        if (animalt.GetComponent<AAnimal>())
+        {
+            animalt.GetComponent<AAnimal>().UsePassiveActions();
+        }
+        if (isplayer)
+        {
+            GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
+                "Level up to " + MindLevel + ". " + "[" + Name + "]");
         }
     }
     public AAction GetMindSkill(int index)
     {
-        if (MindLevel >= index)
+        if (MindLevel >= index && transform.childCount >= index)
         {
-            if (transform.GetChild(index).GetComponent<AAction>().IsPassive)
-            { return null; }
             return transform.GetChild(index).GetComponent<AAction>();
         }
-        else { Debug.Log("Need more MindLevel."); }
         return null;
     }
 

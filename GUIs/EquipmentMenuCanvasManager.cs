@@ -76,6 +76,8 @@ public class EquipmentMenuCanvasManager : ACanvasManager
             Target.SetActive(false);
         }
         pointaNUM = 10 + playerManager.MindSlots;
+        playerManager.UsePassiveActions();
+
     }
 
     // Update is called once per frame
@@ -94,9 +96,9 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                 else { playerManager.actionShortcuts[pointa - 2] = ReturnedAction; }
                 ReturnedAction = null;
                 setupEquipmentMenu();
+                initPointaAndKersol();
+                moveKersol();
             }
-            initPointaAndKersol();
-            moveKersol();
         }
         if (ReturnedMindGO != null)
         {
