@@ -17,7 +17,7 @@ public abstract class AAnimal : MonoBehaviour {
         GetComponent<Rigidbody>().useGravity = false; GetComponent<Rigidbody>().isKinematic = true;
         if (GetComponent<BoxCollider>()) { }
         else { gameObject.AddComponent<BoxCollider>(); }
-        GetComponent<BoxCollider>().center = Vector3.up * ObjectHeight.y / 2; GetComponent<BoxCollider>().size = ObjectHeight;
+        GetComponent<BoxCollider>().center = Vector3.up * ObjectScale.y / 2; GetComponent<BoxCollider>().size = ObjectScale;
 
         Inventory = transform.FindChild("Inventory");
         ItemBag = Inventory.FindChild("ItemBag");
@@ -58,7 +58,7 @@ public abstract class AAnimal : MonoBehaviour {
     private int mr = 1; public int MR { get { return mr; } }
     private int mindslots = 1; public int MindSlots { get { return mindslots; } }
     private float movementspeed = 1.0f; public float MovementSpeed { get { return movementspeed; } }
-    private float runratio = 2.0f; public float RunRatio { get { return runratio; } }
+    private float movementburst = 2.0f; public float MovementBurst { get { return movementburst; } }
     private float HPGainBonus = 1.0f, HPRegenBonus = 1.0f, SPGainBonus = 1.0f, SPRegenBonus = 1.0f;
     private int maxhp = 1; public int MaxHP { get { return maxhp; } }
     private int maxsp = 1; public int MaxSP { get { return maxsp; } }
@@ -88,7 +88,7 @@ public abstract class AAnimal : MonoBehaviour {
     {
         float[] subs = new float[15];
         subs[0] = ad; subs[1] = md; subs[2] = ar; subs[3] = mr;
-        subs[4] = mindslots; subs[5] = movementspeed; subs[6] = runratio;
+        subs[4] = mindslots; subs[5] = movementspeed; subs[6] = movementburst;
         subs[7] = HP; subs[8] = HPRegen; subs[9] = MaxHP;
         subs[10] = SP; subs[11] = SPRegen; subs[12] = MaxSP;
         subs[13] = vitalpoise; subs[14] = mentalpoise;
@@ -175,7 +175,7 @@ public abstract class AAnimal : MonoBehaviour {
         subs[3] = mains[3] + ((float)mains[0] / 2);// MR
         subs[4] = 1 + (mains[4] / 10);// MindSlots
         subs[5] = ((float)mains[2] + 100) / 100;// MovementSpeed
-        subs[6] = 2 + 3*((float)mains[2] / 100);// RunRatio
+        subs[6] = 2 + 8*((float)mains[2] / 100);// RunRatio
         // second step
         subs[7] = 1.0f + (mains[1] / (100 + (float)mains[1]));// HPGainRatio
         subs[8] = 1.0f + ((mains[1] + mains[0]) / (100 + (float)mains[0]));// HPRegenRatio
@@ -225,7 +225,7 @@ public abstract class AAnimal : MonoBehaviour {
         ar = Mathf.RoundToInt(subs[subs.Length - fix + 2]); mr = Mathf.RoundToInt(subs[subs.Length - fix + 3]);
         mindslots = Mathf.RoundToInt(subs[subs.Length - fix + 4]);
         movementspeed = subs[subs.Length - fix + 5];
-        runratio = subs[subs.Length - fix + 6];
+        movementburst = subs[subs.Length - fix + 6];
         HPGainBonus = subs[subs.Length - fix + 7]; HPRegenBonus = subs[subs.Length - fix + 8];
         SPGainBonus = subs[subs.Length - fix + 9]; SPRegenBonus = subs[subs.Length - fix + 10];
         maxhp = Mathf.RoundToInt(subs[subs.Length - fix + 11]); maxsp = Mathf.RoundToInt(subs[subs.Length - fix + 12]);
@@ -281,8 +281,14 @@ public abstract class AAnimal : MonoBehaviour {
     public Vector3 nextPOS = new Vector3();
     public Vector3 nextnextPOS = new Vector3();
     public Vector3 targetPOS = new Vector3();
-    public Vector3 ObjectHeight = new Vector3(1, 2, 1);
+    public Vector3 ObjectScale = new Vector3(1, 2, 1);
     public Vector3 EyeLevel = Vector3.up;
+    protected int currentRun = 1; public int CurrentRun { get { return currentRun; } }
+    public void IncCurrentRun() { if (CurrentRun >= Mathf.FloorToInt(MovementBurst)) { } else { currentRun++; } }
+    public void DecCurrentRun() { if (CurrentRun <= 1) { } else { currentRun--; } }
+    protected int currentJump = 1; public int CurrentJump { get { return currentJump; } }
+    public void IncCurrentJump() { if (CurrentJump >= Mathf.FloorToInt(MovementBurst)) { } else { currentJump++; } }
+    public void DecCurrentJump() { if (CurrentJump <= 0) { } else { currentJump--; } }
     private bool isActing = false;
     public bool Interrupting { get; set; }
     public AAction[] actionStack = new AAction[3];

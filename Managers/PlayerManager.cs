@@ -62,6 +62,8 @@ public class PlayerManager : AChild {
 
     // Use this for initialization
     public override void Awake () {
+        ObjectScale = Vector3.one + Vector3.up;
+        EyeLevel = Vector3.up;
         base.Awake();
         gameObject.tag = "Player";
 
@@ -250,12 +252,19 @@ public class PlayerManager : AChild {
             {
                 visionManager.OnOff(false);
             }
-            if (Input.GetButtonDown("IncCurBurst"))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                if (Input.GetButtonDown("IncCurBurst")) { IncCurrentJump(); }
+                if (Input.GetButtonDown("DecCurBurst")) { DecCurrentJump(); }
+            }
+            else
+            {
+                if (Input.GetButtonDown("IncCurBurst")) { IncCurrentRun(); }
+                if (Input.GetButtonDown("DecCurBurst")) { DecCurrentRun(); }
+            }
+            if (Input.GetKeyDown(KeyCode.U))
             {
                 GainExperience(NextEXP(Lv));
-            }
-            if (Input.GetButtonDown("DecCurBurst"))
-            {
             }
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {

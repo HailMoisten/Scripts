@@ -16,9 +16,12 @@ public class PlayerCanvasManager : ACanvasManager {
     private Image BattleReadyOff;
     private Image BattleReadyOn;
     private bool lastBattleReady;
+    private bool seakingSTM;
+    private GameObject seakingSTMModeText;
+    private Text CurrentRunText;
+    private Text CurrentJumpText;
     private bool needUpdateBuffs;
     private ABuff targetBuff;
-    private bool seakingSTM;
     // This is not <string> for destroying Instantiated GameObject
     public List<SelectableTargetManager> buffListSTM = new List<SelectableTargetManager>();
     private GameObject submitActionPopUp = null;
@@ -30,10 +33,15 @@ public class PlayerCanvasManager : ACanvasManager {
         HPText = transform.FindChild("HPText").GetComponent<Text>();
         SPBar = transform.FindChild("SPBar").GetComponent<RectTransform>();
         SPEnd = SPBar.transform.FindChild("SPEnd").GetComponent<RectTransform>();
+        SPText = transform.FindChild("SPText").GetComponent<Text>();
         BattleReadyOff = transform.FindChild("BattleReadyOff").GetComponent<Image>();
         BattleReadyOn = transform.FindChild("BattleReadyOn").GetComponent<Image>();
         lastBattleReady = true;
-        SPText = transform.FindChild("SPText").GetComponent<Text>();
+        seakingSTMModeText = transform.FindChild("SeakingSTMModeText").gameObject;
+        seakingSTMModeText.SetActive(false);
+        CurrentRunText = transform.FindChild("CurrentRunText").GetComponent<Text>();
+        CurrentJumpText = transform.FindChild("CurrentJumpText").GetComponent<Text>();
+
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
         pointaNUM = 0;
@@ -52,6 +60,7 @@ public class PlayerCanvasManager : ACanvasManager {
         updateBuffs();
         updateSubmitAction();
         updateBattleReady();
+        updateCurrentRunJump();
 
         if (nextCanvas != null) { }
         else
@@ -107,6 +116,7 @@ public class PlayerCanvasManager : ACanvasManager {
         if (playerManager.isMenuAwake)
         {
             seakingSTM = true;
+            seakingSTMModeText.SetActive(true);
             Time.timeScale = 0.0f;
             pointaNUM = playerManager.Buffs.childCount;
             firstpointa = 1;
@@ -116,6 +126,7 @@ public class PlayerCanvasManager : ACanvasManager {
         else
         {
             seakingSTM = false;
+            seakingSTMModeText.SetActive(false);
             Time.timeScale = 1.0f;
             if (nextCanvas != null)
             {
@@ -244,6 +255,25 @@ public class PlayerCanvasManager : ACanvasManager {
                 BattleReadyOn.enabled = false;
                 BattleReadyOff.enabled = true;
             }
+        }
+    }
+    int lastcurRun = 0; int lastcurJump = 0;
+    private void updateCurrentRunJump()
+    {
+        if (lastcurRun == playerManager.CurrentRun) { }
+        else
+        {
+            lastcurRun = playerManager.CurrentRun;
+            CurrentRunText.text = "";
+            for (int i = 1; i <= playerManager.CurrentRun; i++) { CurrentRunText.text += "▶"; }
+        }
+        if (lastcurJump == playerManager.CurrentJump) { }
+        else
+        {
+            lastcurJump = playerManager.CurrentJump;
+            CurrentJumpText.text = "";
+            if (lastcurJump == 0) { }
+            else { for (int j = 1; j <= playerManager.CurrentJump; j++) { CurrentJumpText.text += "▶"; } }
         }
     }
     public void PickUpPopUp(AItem targetitem)

@@ -36,13 +36,29 @@ public class Walk : AAction
     }
     public override int CanDoAction(AAnimal myself)
     {
-        Vector3 dir2 = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, 0, myself.nextnextPOS.z - myself.nextPOS.z);
+        RaycastHit hitFront; RaycastHit hitDown;
+        Ray rayDown = new Ray(myself.nextnextPOS + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), Vector3.down);
+        if (Physics.Raycast(rayDown, out hitDown, 2 * (myself.ObjectScale.y - 0.5f)))
+        {
+            //            Debug.Log("hitDown:" + hitDown.distance);
+            if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
+                hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
+            {
+                myself.nextnextPOS += new Vector3(0, myself.ObjectScale.y - 0.5f - hitDown.distance, 0);
+            }
+            else if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+            {
+                myself.nextnextPOS += new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
+            }
+        }
+        Vector3 dir2 = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, myself.nextnextPOS.y - myself.nextPOS.y, myself.nextnextPOS.z - myself.nextPOS.z);
         dir2 = myself.RoundToIntVector3XZ(dir2);
         float maxd = 1.0f;
-        if (dir2.x != 0 && dir2.z != 0) { maxd = 1.5f; }
-        RaycastHit hitFront; RaycastHit hitDown;
-        Ray rayFront = new Ray(myself.nextPOS + new Vector3(0, 1.5f, 0), dir2);
-        Ray rayDown = new Ray(myself.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
+        if (dir2.x != 0 && dir2.y != 0 && dir2.z != 0) { maxd = 2.25f; }
+        else if (dir2.x != 0 && dir2.y != 0) { maxd = 1.5f; }
+        else if (dir2.y != 0 && dir2.z != 0) { maxd = 1.5f; }
+        else if (dir2.z != 0 && dir2.x != 0) { maxd = 1.5f; }
+        Ray rayFront = new Ray(myself.nextPOS + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), dir2);
         if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
             //            Debug.Log("hitsFront:" + hitFront.distance);
@@ -53,21 +69,7 @@ public class Walk : AAction
                 return (int)ErrorTypeList.Move;
             }
         }
-        if (Physics.Raycast(rayDown, out hitDown, 3.0f))
-        {
-            //            Debug.Log("hitDown:" + hitDown.distance);
-            if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
-                hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
-            {
-                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
-            }
-            else if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-            {
-                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
-            }
-            return (int)ErrorTypeList.Nothing;
-        }
-        return (int)ErrorTypeList.Move;
+        return (int)ErrorTypeList.Nothing;
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
     {
@@ -76,7 +78,8 @@ public class Walk : AAction
              Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
         if (myself.MovementSpeed == 0) { }
-        else { duration = (diag) / (myself.MovementSpeed * 2); }
+        else if (myself.MovementSpeed <= 1.0f) { duration = (diag) / (myself.MovementSpeed); }
+        else { duration = (diag) / (2.0f); }
     }
     public override void Action(AAnimal myself)
     {
@@ -148,8 +151,8 @@ public class Run : AAction
              Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
         float[] subs = myself.GetSubStatus();
-        if (myself.MovementSpeed * myself.RunRatio == 0) { }
-        else { duration = (diag) / (myself.MovementSpeed * myself.RunRatio); }
+        if (myself.MovementSpeed * myself.MovementBurst == 0) { }
+        else { duration = (diag) / (myself.MovementBurst); }
     }
     public override void Action(AAnimal myself)
     {
