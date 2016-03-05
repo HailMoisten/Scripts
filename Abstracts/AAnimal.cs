@@ -111,13 +111,13 @@ public abstract class AAnimal : MonoBehaviour {
     public int[] GetLevelUpReward() { return LevelUpReward; }
     protected int NextEXP(float level)
     {
-        float x = (3.0f * (level / 165.0f)) - 3.0f;
+        float x = (3.0f * (level / 166.0f)) - 3.0f;
         float core = (1.0f / Mathf.Sqrt(2.0f * Mathf.PI)) * Mathf.Exp(Mathf.Pow(x, 2) / 2.0f * -1.0f);
         return Mathf.RoundToInt(core * 25000);
     }
     public virtual void GainExperience(int gainp)
     {
-        if (gainp <= 0 || Lv >= 165) { gainp = 0; }
+        if (gainp <= 0 || Lv >= 166) { gainp = 0; }
         else
         {
             exp += gainp;
@@ -132,10 +132,27 @@ public abstract class AAnimal : MonoBehaviour {
             GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
                 "Level up to " + Lv + ". ");
         }
-        vit = vit + LevelUpReward[0]; str = str + LevelUpReward[1]; agi = agi + LevelUpReward[2]; _int = _int + LevelUpReward[3]; mnd = mnd + LevelUpReward[4];
+        int[] mains = GetMainStatus();
+        for (int i = 0; i <= 4; i++)
+        {
+            if (mains[i] + LevelUpReward[i] >= 101) { LevelUpReward[i] = 100 - mains[i]; }
+        }
         int sum = 0;
-        for (int i = 0; i < LevelUpReward.Length; i++) { sum = sum + LevelUpReward[i]; }
-        if (sum == 0) { vit++; mnd++; mnd++; } else if (sum == 1) { vit++; mnd++; } else if (sum == 2) { mnd++; }
+        for (int i = 0; i <= 4; i++) { sum += LevelUpReward[i]; }
+        for (int s = 0; s <= 3 - sum - 1; s++)
+        {
+            if (mains[0] + LevelUpReward[0] <= 99) { LevelUpReward[0]++; }
+            else if (mains[4] + LevelUpReward[4] <= 99) { LevelUpReward[4]++; }
+            else if (mains[2] + LevelUpReward[2] <= 99) { LevelUpReward[2]++; }
+            else if (mains[1] + LevelUpReward[1] <= 99) { LevelUpReward[1]++; }
+            else if (mains[3] + LevelUpReward[3] <= 99) { LevelUpReward[3]++; }
+        }
+        for (int i = 0; i <= 4; i++)
+        {
+            mains[i] += LevelUpReward[i];
+        }
+
+        setMainStatus(Lv, mains[0], mains[1], mains[2], mains[3], mains[4]);
         setSubStatus(calcSubStatus());
         hp = MaxHP; sp = MaxSP;
     }

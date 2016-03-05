@@ -77,7 +77,7 @@ public class Walk : AAction
         if (Mathf.Abs(myself.nextPOS.x - myself.nextnextPOS.x) != 0 &&
              Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
-        if (myself.MovementSpeed == 0) { }
+        if (myself.MovementSpeed <= 0) { }
         else if (myself.MovementSpeed <= 1.0f) { duration = (diag) / (myself.MovementSpeed); }
         else { duration = (diag) / (2.0f); }
     }
@@ -152,7 +152,7 @@ public class Run : AAction
         else { diag = 1.0f; }
         float[] subs = myself.GetSubStatus();
         if (myself.MovementSpeed * myself.MovementBurst == 0) { }
-        else { duration = (diag) / (myself.MovementBurst); }
+        else { duration = (diag) / (myself.MovementSpeed * myself.MovementBurst); }
     }
     public override void Action(AAnimal myself)
     {

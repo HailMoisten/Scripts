@@ -13,7 +13,7 @@ public class PlayerManager : AChild {
     public override void GainExperience(int gainp)
     {
         gainp += gameManager.Difficulty;
-        if (gainp <= 0 || Lv >= 165) { gainp = 0; }
+        if (gainp <= 0 || Lv >= 166) { gainp = 0; }
         else
         {
             exp += gainp;
