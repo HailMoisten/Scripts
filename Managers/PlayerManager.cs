@@ -172,7 +172,7 @@ public class PlayerManager : AChild {
                         {
                             if (actionShortcuts[n].IsChargeSkill)
                             {
-                                if (actionShortcuts[n].Charged) { }
+                                if (actionShortcuts[n].IsCharging) { }
                                 else { actionShortcuts[n].Charge(this); }
                             }
                         }
@@ -194,7 +194,7 @@ public class PlayerManager : AChild {
                 }
                 if (Input.GetButton("Guard"))
                 {
-                    if (mainComponentPool.GetComponent<Guard>().Charged) { }
+                    if (mainComponentPool.GetComponent<Guard>().IsCharging) { }
                     else { mainComponentPool.GetComponent<Guard>().Charge(this); }
                 }
             }

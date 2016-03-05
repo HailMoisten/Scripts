@@ -90,35 +90,37 @@ public abstract class AAction : AIcon
     public int ChargeSpan { get { return chargeSpan; } }
     protected int chargeLimit = 1;
     public int ChargeLimit { get { return chargeLimit; } }
-    protected bool isCharged = false;
+    public bool IsCharging = false;
     protected IEnumerator chargedCD(float time)
     {
+        IsCharging = true;
         yield return new WaitForSeconds(time);
-        isCharged = false;
+        IsCharging = false;
     }
     public void Charge(AAnimal myself)
     {
-        if (isCharged)
-        {
-            StartCoroutine(chargedCD(CastTime));
-        }
+        if (Charged) { }
         else
         {
-            SetParamsNeedAnimal(myself);
-            chargeCount++;
-            myself.GetAnimator().SetInteger("ActionCode", actioncode);
-            if (ChargeCount >= ChargeLimit)
+            if (IsCharging) { }
+            else
             {
-                charged = true;
-                GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charged"), myself.nextPOS + Vector3.up, Quaternion.identity);
-                ef.GetComponent<EffectManager>().Go();
-                Debug.Log("Charged!");
-            }
-            else if (ChargeCount % ChargeSpan == 0) { ChargingAction(myself); }
-            if (ChargeCount == 1) { }
-            else { myself.UseHPSP(HPCost, SPCost, HPPercentCost, SPPercentCost); }
+                SetParamsNeedAnimal(myself);
+                chargeCount++;
+                myself.GetAnimator().SetInteger("ActionCode", actioncode);
+                if (ChargeCount >= ChargeLimit)
+                {
+                    charged = true;
+                    GameObject ef = (GameObject)Instantiate(Resources.Load("Prefabs/Effects/Utilities/Charged"), myself.nextPOS + Vector3.up, Quaternion.identity);
+                    ef.GetComponent<EffectManager>().Go();
+                    Debug.Log("Charged!");
+                }
+                else if (ChargeCount % ChargeSpan == 0) { ChargingAction(myself); }
+                if (ChargeCount == 1) { }
+                else { myself.UseHPSP(HPCost, SPCost, HPPercentCost, SPPercentCost); }
 
-            isCharged = true;
+                StartCoroutine(chargedCD(CastTime));
+            }
         }
     }
     protected virtual void ChargingAction(AAnimal myself)
