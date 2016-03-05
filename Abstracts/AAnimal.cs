@@ -388,7 +388,6 @@ public abstract class AAnimal : MonoBehaviour {
         BattleReady = !BattleReady;
         if (BattleReady) { }
         else { focusedAnimal = null; }
-        Debug.Log("BattleReady " + BattleReady);
         GetAnimator().SetBool("BattleReady", BattleReady);
     }
     protected void SetnextnextPOS()

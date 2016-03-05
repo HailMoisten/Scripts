@@ -13,8 +13,12 @@ public class PlayerCanvasManager : ACanvasManager {
     private RectTransform SPBar;
     private RectTransform SPEnd;
     private Text SPText;
+    private Image BattleReadyOff;
+    private Image BattleReadyOn;
+    private bool lastBattleReady;
     private bool needUpdateBuffs;
     private ABuff targetBuff;
+    private bool seakingSTM;
     // This is not <string> for destroying Instantiated GameObject
     public List<SelectableTargetManager> buffListSTM = new List<SelectableTargetManager>();
     private GameObject submitActionPopUp = null;
@@ -26,6 +30,9 @@ public class PlayerCanvasManager : ACanvasManager {
         HPText = transform.FindChild("HPText").GetComponent<Text>();
         SPBar = transform.FindChild("SPBar").GetComponent<RectTransform>();
         SPEnd = SPBar.transform.FindChild("SPEnd").GetComponent<RectTransform>();
+        BattleReadyOff = transform.FindChild("BattleReadyOff").GetComponent<Image>();
+        BattleReadyOn = transform.FindChild("BattleReadyOn").GetComponent<Image>();
+        lastBattleReady = true;
         SPText = transform.FindChild("SPText").GetComponent<Text>();
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 0;
@@ -43,24 +50,37 @@ public class PlayerCanvasManager : ACanvasManager {
     void Update () {
         updateHPSP();
         updateBuffs();
-        if (playerManager.SubmitAction != null) {
-            if (submitActionPopUp == null)
-            {
-                GameObject sat = (GameObject)Resources.Load("Prefabs/GUI/SubmitActionPopUp");
-                sat.transform.GetChild(0).GetComponent<Text>().text = playerManager.SubmitAction.Name;
-                submitActionPopUp = Instantiate(sat);
-                submitActionPopUp.transform.SetParent(transform);
-                submitActionPopUp.transform.GetChild(0).GetComponent<TextShade>().TextUpdate();
-            }
-        }
-        else
-        {
-            if (submitActionPopUp != null) { Destroy(submitActionPopUp); }
-        }
+        updateSubmitAction();
+        updateBattleReady();
 
         if (nextCanvas != null) { }
         else
         {
+            if (seakingSTM)
+            {
+                if (Input.GetKeyDown(KeyCode.RightArrow))
+                {
+                    inclementPointa();
+                    moveKersol();
+                }
+                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                {
+                    declementPointa();
+                    moveKersol();
+                }
+                if (Input.GetButtonDown("Attack") || Input.GetButtonDown("Submit"))
+                {
+                    if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
+                    {
+                        nextCanvas = clickTarget();
+                        if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
+                    }
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                seakSTMToggle();
+            }
             if (Input.GetButtonDown("Options"))
             {
                 openMenu();
@@ -81,11 +101,35 @@ public class PlayerCanvasManager : ACanvasManager {
         Time.timeScale = 1.0f;
         nextCanvas.DestroyThisCanvas();
     }
+    private void seakSTMToggle()
+    {
+        playerManager.isMenuAwake = !playerManager.isMenuAwake;
+        if (playerManager.isMenuAwake)
+        {
+            seakingSTM = true;
+            Time.timeScale = 0.0f;
+            pointaNUM = playerManager.Buffs.childCount;
+            firstpointa = 1;
+            initPointaAndKersol();
+            moveKersol();
+        }
+        else
+        {
+            seakingSTM = false;
+            Time.timeScale = 1.0f;
+            if (nextCanvas != null)
+            {
+                nextCanvas.DestroyThisCanvas();
+            }
+            initPointaAndKersol();
+        }
 
+    }
+    private int hpbarwid, spbarwid;
     private void updateHPSP()
     {
-        int hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
-        int spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
+        hpbarwid = (int)(250 * playerManager.HP / playerManager.MaxHP);
+        spbarwid = (int)(250 * playerManager.SP / playerManager.MaxSP);
         HPBar.sizeDelta = new Vector2(hpbarwid, HPBar.sizeDelta.y);
         HPEnd.localPosition = new Vector3(hpbarwid, 0, 0);
         HPText.text = "HP    " + Mathf.RoundToInt(playerManager.HP).ToString(); HPText.GetComponent<TextShade>().TextUpdate();
@@ -163,6 +207,43 @@ public class PlayerCanvasManager : ACanvasManager {
 
             }
 
+        }
+    }
+    private void updateSubmitAction()
+    {
+        if (playerManager.SubmitAction != null)
+        {
+            if (submitActionPopUp == null)
+            {
+                GameObject sat = (GameObject)Resources.Load("Prefabs/GUI/SubmitActionPopUp");
+                sat.transform.GetChild(0).GetComponent<Text>().text = playerManager.SubmitAction.Name;
+                submitActionPopUp = Instantiate(sat);
+                submitActionPopUp.transform.SetParent(transform);
+                submitActionPopUp.transform.GetChild(0).GetComponent<TextShade>().TextUpdate();
+            }
+        }
+        else
+        {
+            if (submitActionPopUp != null) { Destroy(submitActionPopUp); }
+        }
+    }
+
+    private void updateBattleReady()
+    {
+        if (lastBattleReady == playerManager.BattleReady) { }
+        else
+        {
+            lastBattleReady = playerManager.BattleReady;
+            if (lastBattleReady)
+            {
+                BattleReadyOn.enabled = true;
+                BattleReadyOff.enabled = false;
+            }
+            else
+            {
+                BattleReadyOn.enabled = false;
+                BattleReadyOff.enabled = true;
+            }
         }
     }
     public void PickUpPopUp(AItem targetitem)

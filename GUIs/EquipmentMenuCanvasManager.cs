@@ -26,6 +26,7 @@ public class EquipmentMenuCanvasManager : ACanvasManager
         returnIMC = (GameObject)Resources.Load("Prefabs/GUI/ReturnInventoryMenuCanvas");
 
         setupEquipmentMenu();
+        setupMindNum();
         initPointaAndKersol();
         targetIconNameText.text = targetIconName;
         moveKersol();
@@ -70,14 +71,16 @@ public class EquipmentMenuCanvasManager : ACanvasManager
                 Target.GetComponent<AIcon>().Icon = mindsIcon.Icon;
             }
         }
+        playerManager.UsePassiveActions();
+    }
+    private void setupMindNum()
+    {
         for (int n = 21; n >= 11 + playerManager.MindSlots; n--)
         {
             setPointa(n);
             Target.SetActive(false);
         }
         pointaNUM = 10 + playerManager.MindSlots;
-        playerManager.UsePassiveActions();
-
     }
 
     // Update is called once per frame

@@ -76,7 +76,7 @@ public class Walk : AAction
              Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
         if (myself.MovementSpeed == 0) { }
-        else { duration = (diag) / myself.MovementSpeed; }
+        else { duration = (diag) / (myself.MovementSpeed * 2); }
     }
     public override void Action(AAnimal myself)
     {

@@ -67,7 +67,7 @@ public class PlayerManager : AChild {
 
         cam = GameObject.Find("Camera");
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        gameManager.Difficulty = 50;
+        gameManager.Difficulty = 200;
         playerCanvasManager = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<PlayerCanvasManager>();
 
         Initialize();
@@ -75,7 +75,8 @@ public class PlayerManager : AChild {
     protected override void Initialize()
     {
         //setMainStatus(165, 100, 100, 100, 100, 100);
-        setMainStatus(1, 5, 10, 10, 2, 5);
+        //setMainStatus(10, 5, 10, 10, 2, 5);
+        setMainStatus(1, 1, 1, 1, 1, 1);
         GameObject item = new GameObject("AirShard");
         item.AddComponent<AirShard>();
         item.transform.SetParent(ItemBag.transform);
@@ -179,10 +180,6 @@ public class PlayerManager : AChild {
                     }
                 }
 
-                if (Input.GetButtonDown("BattleReady"))
-                {
-                    ReadyToBattleToggle();
-                }
                 if (Input.GetButtonDown("Attack"))
                 {
                     SettargetPOS();
@@ -240,7 +237,10 @@ public class PlayerManager : AChild {
                     SubmitAction = null;
                 }
             }
-
+            if (Input.GetButtonDown("BattleReady"))
+            {
+                ReadyToBattleToggle();
+            }
             if (Input.GetButtonDown("TargetSeak"))
             {
                 visionManager.OnOff(true);
@@ -252,7 +252,7 @@ public class PlayerManager : AChild {
             }
             if (Input.GetButtonDown("IncCurBurst"))
             {
-                GainExperience(NextEXP(Lv)-100);
+                GainExperience(NextEXP(Lv));
             }
             if (Input.GetButtonDown("DecCurBurst"))
             {

@@ -191,6 +191,7 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
+            fieldBuffName = "Ablaze";
             if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; profPoint += 4; }
             else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; profPoint += 3; }
             else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; profPoint += 2; }
@@ -284,6 +285,7 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
+            fieldBuffName = "Chilled";
             if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; profPoint += 4; }
             else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; profPoint += 3; }
             else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; profPoint += 2; }
@@ -377,6 +379,7 @@ public class MageMind : AMind {
         }
         public override void Action(AAnimal myself)
         {
+            fieldBuffName = "Tender";
             if (myself.Buffs.FindChild("MagicChargeIV")) { fieldBuffName += "IV"; profPoint += 4; }
             else if (myself.Buffs.FindChild("MagicChargeIII")) { fieldBuffName += "III"; profPoint += 3; }
             else if (myself.Buffs.FindChild("MagicChargeII")) { fieldBuffName += "II"; profPoint += 2; }
