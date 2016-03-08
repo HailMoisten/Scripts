@@ -47,6 +47,7 @@ public abstract class AAnimal : MonoBehaviour {
     private const int statusGenus = 19;
     private int lv = 1; public int Lv { get { return lv; } }
     protected int exp = 0; public int EXP { get { return exp; } }
+    public int TotalEXP { get; set; }
     private int vit = 1; public int VIT { get { return vit; } }
     private int str = 1; public int STR { get { return str; } }
     private int agi = 1; public int AGI { get { return agi; } }
@@ -120,41 +121,47 @@ public abstract class AAnimal : MonoBehaviour {
         if (gainp <= 0 || Lv >= 166) { gainp = 0; }
         else
         {
-            exp += gainp;
+            exp += gainp; TotalEXP += gainp;
             if (EXP > NextEXP(Lv)) { levelUp(); }
         }
     }
     protected void levelUp()
     {
-        lv++; exp = 0;
-        if (gameObject.tag == "Player")
+        if (Lv >= 166) { }
+        else
         {
-            GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
-                "Level up to " + Lv + ". ");
-        }
-        int[] mains = GetMainStatus();
-        for (int i = 0; i <= 4; i++)
-        {
-            if (mains[i] + LevelUpReward[i] >= 101) { LevelUpReward[i] = 100 - mains[i]; }
-        }
-        int sum = 0;
-        for (int i = 0; i <= 4; i++) { sum += LevelUpReward[i]; }
-        for (int s = 0; s <= 3 - sum - 1; s++)
-        {
-            if (mains[0] + LevelUpReward[0] <= 99) { LevelUpReward[0]++; }
-            else if (mains[4] + LevelUpReward[4] <= 99) { LevelUpReward[4]++; }
-            else if (mains[2] + LevelUpReward[2] <= 99) { LevelUpReward[2]++; }
-            else if (mains[1] + LevelUpReward[1] <= 99) { LevelUpReward[1]++; }
-            else if (mains[3] + LevelUpReward[3] <= 99) { LevelUpReward[3]++; }
-        }
-        for (int i = 0; i <= 4; i++)
-        {
-            mains[i] += LevelUpReward[i];
-        }
+            exp -= NextEXP(Lv);
+            lv++;
+            if (gameObject.tag == "Player")
+            {
+                GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
+                    "Level up to " + Lv + ". ");
+            }
+            int[] mains = GetMainStatus();
+            for (int i = 0; i <= 4; i++)
+            {
+                if (mains[i] + LevelUpReward[i] >= 101) { LevelUpReward[i] = 100 - mains[i]; }
+            }
+            int sum = 0;
+            for (int i = 0; i <= 4; i++) { sum += LevelUpReward[i]; }
+            for (int s = 0; s <= 3 - sum - 1; s++)
+            {
+                if (mains[0] + LevelUpReward[0] <= 99) { LevelUpReward[0]++; }
+                else if (mains[4] + LevelUpReward[4] <= 99) { LevelUpReward[4]++; }
+                else if (mains[2] + LevelUpReward[2] <= 99) { LevelUpReward[2]++; }
+                else if (mains[1] + LevelUpReward[1] <= 99) { LevelUpReward[1]++; }
+                else if (mains[3] + LevelUpReward[3] <= 99) { LevelUpReward[3]++; }
+            }
+            for (int i = 0; i <= 4; i++)
+            {
+                mains[i] += LevelUpReward[i];
+            }
 
-        setMainStatus(Lv, mains[0], mains[1], mains[2], mains[3], mains[4]);
-        setSubStatus(calcSubStatus());
-        hp = MaxHP; sp = MaxSP;
+            setMainStatus(Lv, mains[0], mains[1], mains[2], mains[3], mains[4]);
+            setSubStatus(calcSubStatus());
+            hp = MaxHP; sp = MaxSP;
+        }
+        if (EXP >= NextEXP(Lv)) { levelUp(); }
     }
 
     /// <summary>
@@ -192,7 +199,7 @@ public abstract class AAnimal : MonoBehaviour {
         subs[3] = mains[3] + ((float)mains[0] / 2);// MR
         subs[4] = 1 + (mains[4] / 10);// MindSlots
         subs[5] = ((float)mains[2] + 100) / 100;// MovementSpeed
-        subs[6] = 2 + 8*((float)mains[2] / 100);// RunRatio
+        subs[6] = 2 + 3*((float)mains[2] / 100);// RunRatio
         // second step
         subs[7] = 1.0f + (mains[1] / (100 + (float)mains[1]));// HPGainRatio
         subs[8] = 1.0f + ((mains[1] + mains[0]) / (100 + (float)mains[0]));// HPRegenRatio
@@ -301,10 +308,10 @@ public abstract class AAnimal : MonoBehaviour {
     public Vector3 ObjectScale = new Vector3(1, 2, 1);
     public Vector3 EyeLevel = Vector3.up;
     protected int currentRun = 1; public int CurrentRun { get { return currentRun; } }
-    public void IncCurrentRun() { if (CurrentRun >= Mathf.FloorToInt(MovementBurst)) { } else { currentRun++; } }
+    public void IncCurrentRun() { if (CurrentRun >= Mathf.FloorToInt(MovementBurst * MovementSpeed)) { } else { currentRun++; } }
     public void DecCurrentRun() { if (CurrentRun <= 1) { } else { currentRun--; } }
     protected int currentJump = 1; public int CurrentJump { get { return currentJump; } }
-    public void IncCurrentJump() { if (CurrentJump >= Mathf.FloorToInt(MovementBurst)) { } else { currentJump++; } }
+    public void IncCurrentJump() { if (CurrentJump >= Mathf.FloorToInt(MovementBurst * MovementSpeed)) { } else { currentJump++; } }
     public void DecCurrentJump() { if (CurrentJump <= 0) { } else { currentJump--; } }
     private bool isActing = false;
     public bool Interrupting { get; set; }
@@ -372,7 +379,6 @@ public abstract class AAnimal : MonoBehaviour {
 
     private void doRotate()
     {
-        transform.position = nextPOS;
         iTween.RotateTo(this.gameObject, iTween.Hash("y", Quaternion.LookRotation(DIR).eulerAngles.y, "time", gcd*2));
     }
 
@@ -535,10 +541,10 @@ public abstract class AAnimal : MonoBehaviour {
         GameObject dcanvas = Instantiate((GameObject)Resources.Load("Prefabs/GUI/DamageTextCanvas"));
         dcanvas.GetComponent<DamageTextCanvasManager>().SetAndDestroy(a, m, transform.position);
     }
-    public void UseHPSP(int hpcost, int spcost, int hppercentcost, int sppercentcost)
+    public void UseHPSP(float hpcost, float spcost, float hppercentcost, float sppercentcost)
     {
         hp = HP - hpcost; sp = SP - spcost;
-        hp = HP - (MaxHP * ((float)hppercentcost / 100)); sp = SP - (MaxSP * ((float)sppercentcost / 100));
+        hp = HP - (MaxHP * (hppercentcost / 100)); sp = SP - (MaxSP * (sppercentcost / 100));
         if (HP < 0) { hp = 0; }
     }
 
