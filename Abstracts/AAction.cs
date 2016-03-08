@@ -21,10 +21,10 @@ public abstract class AAction : AIcon
     protected int profPoint = 0;
     protected int actioncode = 0;
     protected float duration = 0.0f; public float Duration { get { return duration; } }
-    protected int hpCost = 0; public int HPCost { get { return hpCost; } }
-    protected int spCost = 0; public int SPCost { get { return spCost; } }
-    protected int hppercentCost = 0; public int HPPercentCost { get { return hppercentCost; } }
-    protected int sppercentCost = 0; public int SPPercentCost { get { return sppercentCost; } }
+    protected float hpCost = 0; public float HPCost { get { return hpCost; } }
+    protected float spCost = 0; public float SPCost { get { return spCost; } }
+    protected float hppercentCost = 0; public float HPPercentCost { get { return hppercentCost; } }
+    protected float sppercentCost = 0; public float SPPercentCost { get { return sppercentCost; } }
 
     // have to definite ACTIONCODE, DURATION and NAME at inheriting constracter
     /// <summary>

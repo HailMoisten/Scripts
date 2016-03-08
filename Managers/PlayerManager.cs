@@ -16,11 +16,11 @@ public class PlayerManager : AChild {
         if (gainp <= 0 || Lv >= 166) { gainp = 0; }
         else
         {
-            exp += gainp;
+            exp += gainp; TotalEXP += gainp;
             playerCanvasManager.ShowInformationText(
                 "+ " + gainp + " Exp. (" + exp + ")");
             int curl = Lv;
-            if (EXP > NextEXP(Lv)) { levelUp(); }
+            if (EXP >= NextEXP(Lv)) { levelUp(); }
         }
     }
     protected override void SetDirection()

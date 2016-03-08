@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Collections;
 using IconAndErrorType;
 
@@ -32,15 +33,15 @@ public class Walk : AAction
         base.Awake();
         actioncode = 1;
         duration = 1.0f;
-        spCost = 1;
+        spCost = 0.5f;
     }
     public override int CanDoAction(AAnimal myself)
     {
         RaycastHit hitFront; RaycastHit hitDown;
         Ray rayDown = new Ray(myself.nextnextPOS + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), Vector3.down);
+
         if (Physics.Raycast(rayDown, out hitDown, 2 * (myself.ObjectScale.y - 0.5f)))
         {
-            //            Debug.Log("hitDown:" + hitDown.distance);
             if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
                 hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
             {
@@ -51,20 +52,32 @@ public class Walk : AAction
                 myself.nextnextPOS += new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
             }
         }
-        Vector3 dir2 = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, myself.nextnextPOS.y - myself.nextPOS.y, myself.nextnextPOS.z - myself.nextPOS.z);
-        dir2 = myself.RoundToIntVector3XZ(dir2);
+        else
+        {
+            return (int)ErrorTypeList.Move;
+        }
+
+        Vector3 dir = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, myself.nextnextPOS.y - myself.nextPOS.y, myself.nextnextPOS.z - myself.nextPOS.z);
+        dir = myself.RoundToIntVector3XZ(dir);
         float maxd = 1.0f;
-        if (dir2.x != 0 && dir2.y != 0 && dir2.z != 0) { maxd = 2.25f; }
-        else if (dir2.x != 0 && dir2.y != 0) { maxd = 1.5f; }
-        else if (dir2.y != 0 && dir2.z != 0) { maxd = 1.5f; }
-        else if (dir2.z != 0 && dir2.x != 0) { maxd = 1.5f; }
-        Ray rayFront = new Ray(myself.nextPOS + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), dir2);
+        if (dir.x != 0 && dir.y != 0 && dir.z != 0) { maxd = 2.25f; }
+        else if (dir.x != 0 && dir.y != 0) { maxd = 1.5f; }
+        else if (dir.y != 0 && dir.z != 0) { maxd = 1.5f; }
+        else if (dir.z != 0 && dir.x != 0) { maxd = 1.5f; }
+
+        Ray rayFront = new Ray(myself.nextPOS + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), dir);
         if (Physics.Raycast(rayFront, out hitFront, maxd))
         {
-            //            Debug.Log("hitsFront:" + hitFront.distance);
-            if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Terrain") ||
-                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
-                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
+            if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
+            {
+                if (myself.name == hitFront.collider.gameObject.name) { }
+                else
+                {
+                    return (int)ErrorTypeList.Move;
+                }
+            }
+            else if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Terrain") ||
+                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment"))
             {
                 return (int)ErrorTypeList.Move;
             }
@@ -96,74 +109,136 @@ public class Walk : AAction
 }
 public class Run : AAction
 {
+    private Vector3[] runRoute;
+    private float[] runLength;
     public override void Awake()
     {
         _name = "Run";
         base.Awake();
         actioncode = 2;
         duration = 1.0f;
-        spCost = 2;
+        spCost = 1;
     }
     public override int CanDoAction(AAnimal myself)
     {
-        // Run fix
-        float[] subs = myself.GetSubStatus();
-        Vector3 dir2 = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, 0, myself.nextnextPOS.z - myself.nextPOS.z);
-        dir2 = myself.RoundToIntVector3XZ(dir2);
-        //        dir2 = dir2 * Mathf.RoundToInt(target.RunRatio);
-        //        target.nextnextPOS = target.nextPOS + dir2;
-
-        float maxd = 1.0f;
-        if (dir2.x != 0 && dir2.z != 0) { maxd = 1.5f; }
+        runRoute = new Vector3[myself.CurrentRun + 1];
+        runRoute[0] = myself.nextPOS;
+        runLength = new float[myself.CurrentRun + 1];
+        runLength[0] = 1.0f;
+        bool endrun = false;
         RaycastHit hitFront; RaycastHit hitDown;
-        Ray rayFront = new Ray(myself.nextPOS + new Vector3(0, 1.5f, 0), dir2);
-        Ray rayDown = new Ray(myself.nextnextPOS + new Vector3(0, 1.5f, 0), new Vector3(0, -1, 0));
-        if (Physics.Raycast(rayFront, out hitFront, maxd))
+        Ray rayDown, rayFront;
+        Vector3 dir;
+        dir = new Vector3(myself.nextnextPOS.x - myself.nextPOS.x, 0, myself.nextnextPOS.z - myself.nextPOS.z);
+        dir = myself.RoundToIntVector3XZ(dir);
+
+        for (int i = 1; i <= myself.CurrentRun; i++)
         {
-            //            Debug.Log("hitsFront:" + hitFront.distance);
-            if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Terrain") ||
-                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
-                hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
+            if (endrun) { runRoute[i] = Vector3.zero; runLength[i] = 0.0f; }
+            else
             {
-                return (int)ErrorTypeList.Move;
+                runLength[i] = 1.0f;
+                runRoute[i] = runRoute[i - 1] + new Vector3(dir.x, 0, dir.z);
+                rayDown = new Ray(runRoute[i] + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), Vector3.down);
+                if (Physics.Raycast(rayDown, out hitDown, 2 * (myself.ObjectScale.y - 0.5f)))
+                {
+                    //            Debug.Log("hitDown:" + hitDown.distance);
+                    if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
+                        hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
+                    {
+                        runRoute[i] += new Vector3(0, myself.ObjectScale.y - 0.5f - hitDown.distance, 0);
+                    }
+                    else if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+                    {
+                        runRoute[i] += new Vector3(0, Terrain.activeTerrain.SampleHeight(runRoute[i]) - runRoute[i].y, 0);
+                    }
+                }
+                else
+                {
+                    endrun = true;
+                    if (i == 1) { return (int)ErrorTypeList.Move; }
+                }
+
+                if (endrun) { }
+                else
+                {
+                    dir = new Vector3(runRoute[i].x - runRoute[i - 1].x, runRoute[i].y - runRoute[i - 1].y, runRoute[i].z - runRoute[i - 1].z);
+                    dir = myself.RoundToIntVector3XZ(dir);
+                    if (dir.x != 0 && dir.y != 0 && dir.z != 0) { runLength[i] = 2.25f; }
+                    else if (dir.x != 0 && dir.y != 0) { runLength[i] = 1.5f; }
+                    else if (dir.y != 0 && dir.z != 0) { runLength[i] = 1.5f; }
+                    else if (dir.z != 0 && dir.x != 0) { runLength[i] = 1.5f; }
+
+                    rayFront = new Ray(runRoute[i - 1] + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), dir);
+                    if (Physics.Raycast(rayFront, out hitFront, runLength[i]))
+                    {
+                        //            Debug.Log("hitsFront:" + hitFront.distance);
+                        if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
+                        {
+                            if (myself.name == hitFront.collider.gameObject.name) { }
+                            else
+                            {
+                                endrun = true;
+                                if (i == 1) { return (int)ErrorTypeList.Move; }
+                            }
+                        }
+                        else if (hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Terrain") ||
+                            hitFront.collider.gameObject.layer == LayerMask.NameToLayer("Environment"))
+                        {
+                            endrun = true;
+                            if (i == 1) { return (int)ErrorTypeList.Move; }
+                        }
+                    }
+                }
+                if (endrun) { runRoute[i] = Vector3.zero; runLength[i] = 0.0f; }
+
             }
         }
-        if (Physics.Raycast(rayDown, out hitDown, 3.0f))
-        {
-            //            Debug.Log("hitDown:" + hitDown.distance);
-            if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
-                hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
-            {
-                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, 1.5f - hitDown.distance, 0);
-            }
-            else if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-            {
-                myself.nextnextPOS = myself.nextnextPOS + new Vector3(0, Terrain.activeTerrain.SampleHeight(myself.nextnextPOS) - myself.nextnextPOS.y, 0);
-            }
-            return (int)ErrorTypeList.Nothing;
-        }
-        return (int)ErrorTypeList.Move;
+        return (int)ErrorTypeList.Nothing;
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
     {
-        float diag = 1.0f;
-        if (Mathf.Abs(myself.nextPOS.x - myself.nextnextPOS.x) != 0 &&
-             Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
-        else { diag = 1.0f; }
-        float[] subs = myself.GetSubStatus();
-        if (myself.MovementSpeed * myself.MovementBurst == 0) { }
-        else { duration = (diag) / (myself.MovementSpeed * myself.MovementBurst); }
     }
     public override void Action(AAnimal myself)
     {
+        StartCoroutine(running(myself));
+    }
+    private IEnumerator running(AAnimal myself)
+    {
+        duration = 0.1f; // for noise
+        float speed = 1.0f;
+        if (myself.MovementSpeed * myself.MovementBurst == 0) { }
+        else { speed = myself.MovementSpeed * myself.MovementBurst; }
+        Vector3 endPOS = myself.nextnextPOS;
+        for (int i = 1; i <= runRoute.Length - 1; i++)
+        {
+            if (runLength[i] <= 0.0f) { }
+            else { duration += runLength[i] / speed; }
+            if (runRoute[i] == Vector3.zero) { }
+            else { endPOS = runRoute[i]; }
+        }
+
+        myself.GetAnimator().SetInteger("CurrentRun", runRoute.Length - 1);
+        myself.GetAnimator().SetInteger("ActionCode", actioncode);
+        myself.StartCoroutine(myself.DoingAction(duration));
         myself.POS = myself.nextPOS;
-        myself.nextPOS = myself.nextnextPOS;
-        iTween.MoveTo(myself.gameObject,
-            iTween.Hash("position", myself.nextPOS,
-            "time", duration,
-            "easetype", "linear"
-            ));
-        SetMotionAndDurationAndUseHPSP(myself);
+        myself.nextPOS = endPOS;
+        float sectorduration = 0.0f;
+        for (int i = 1; i <= runRoute.Length - 1; i++)
+        {
+            if (runRoute[i] == Vector3.zero) { }
+            else
+            {
+                sectorduration = runLength[i] / speed;
+                iTween.MoveTo(myself.gameObject,
+                    iTween.Hash("position", runRoute[i],
+                    "time", sectorduration,
+                    "easetype", "linear"
+                    ));
+                myself.UseHPSP(HPCost, SPCost, HPPercentCost, SPPercentCost);
+                yield return new WaitForSeconds(sectorduration);
+            }
+        }
     }
 
 }
