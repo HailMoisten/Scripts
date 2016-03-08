@@ -26,22 +26,29 @@ public class StatusMenuCanvasManager : ACanvasManager
     {
         setupColorLevelUpReward();
         // Level
-        int level = playerManager.Lv;
-        GameObject.Find("LevelText").GetComponent<Text>().text = "" + level;
+        transform.FindChild("LevelText").GetComponent<Text>().text = "" + playerManager.Lv;
+        transform.FindChild("ExpText").GetComponent<Text>().text = playerManager.EXP + " / " + NextEXP(playerManager.Lv) + "\n" + playerManager.TotalEXP;
         // Main Status
-        GameObject.Find("MainStatusText").GetComponent<Text>().text =
+        transform.FindChild("MainStatusText").GetComponent<Text>().text =
             playerManager.VIT + "\n" + playerManager.STR + "\n" + playerManager.AGI + "\n" + playerManager.INT + "\n" + playerManager.MND;
         // Sub Status
         float[] subs = playerManager.GetSubStatus();
         string[] floatsubs = new string[4];
         floatsubs[0] = string.Format("{0:f2}\r", subs[5]); floatsubs[1] = string.Format("{0:f2}\r", subs[6]);
         floatsubs[2] = string.Format("{0:f1}\r", subs[8]); floatsubs[3] = string.Format("{0:f1}\r", subs[11]);
-        GameObject.Find("SubStatusText").GetComponent<Text>().text = 
+        transform.FindChild("SubStatusText").GetComponent<Text>().text = 
             subs[0] + "\n" + subs[1] + "\n" + subs[2] + "\n" + subs[3] + "\n" + subs[4] + "\n" +
             floatsubs[0] + "\n" + floatsubs[1] + "\n" +
             Mathf.RoundToInt(subs[7]) + " + " + floatsubs[2] + " / " + subs[9] + "\n" +
             Mathf.RoundToInt(subs[10]) + " + " + floatsubs[3] + " / " + subs[12] + "\n" +
             subs[13] + "\n" + subs[14];
+    }
+
+    protected int NextEXP(float level)
+    {
+        float x = (3.0f * (level / 166.0f)) - 3.0f;
+        float core = (1.0f / Mathf.Sqrt(2.0f * Mathf.PI)) * Mathf.Exp(Mathf.Pow(x, 2) / 2.0f * -1.0f);
+        return Mathf.RoundToInt(core * 25000);
     }
 
     void Update()
