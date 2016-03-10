@@ -19,11 +19,11 @@ namespace UnityStandardAssets.Utility
         [SerializeField]
 		private float height = 4.5f;
         public void inclementHeight() { if (height <= 9.5f) { height++; } }
-        public void declementHeight() { if (height >= 0.5f) { height--; } }
+        public void declementHeight() { if (height >= 1.0f) { height--; } }
         [SerializeField]
 		private float rotationDamping = 0.0f;
 		[SerializeField]
-		private float heightDamping = 3.0f;
+		private float heightDamping = 128.0f;
 
 		// Use this for initialization
 		void Start()

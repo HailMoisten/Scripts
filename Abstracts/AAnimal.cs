@@ -324,6 +324,7 @@ public abstract class AAnimal : MonoBehaviour {
         mainComponentPool.AddComponent<Idle>();
         mainComponentPool.AddComponent<Walk>();
         mainComponentPool.AddComponent<Run>();
+        mainComponentPool.AddComponent<Jump>();
         mainComponentPool.AddComponent<Attack>();
         mainComponentPool.AddComponent<Guard>();
         mainComponentPool.AddComponent<Stunned>();

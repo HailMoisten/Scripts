@@ -130,7 +130,7 @@ public class PlayerManager : AChild {
                     {
                         focusedAnimal = visionManager.GetNextTargetAnimal();
                     }
-                    else if (Input.GetKey(KeyCode.Space))
+                    else if (Input.GetButton("Jump"))
                     {
                         AddAction(mainComponentPool.GetComponent<Run>());
                     }
@@ -143,6 +143,11 @@ public class PlayerManager : AChild {
                         AddAction(mainComponentPool.GetComponent<Walk>());
                     }
                 }
+                else if (Input.GetButtonDown("Jump"))
+                {
+                    AddAction(mainComponentPool.GetComponent<Jump>());
+                }
+
                 for (int n = 1; n <= 8; n++)
                 {
                     if (actionShortcuts[n] != null)
