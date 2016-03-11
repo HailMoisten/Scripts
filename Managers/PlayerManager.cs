@@ -130,11 +130,7 @@ public class PlayerManager : AChild {
                     {
                         focusedAnimal = visionManager.GetNextTargetAnimal();
                     }
-                    else if (Input.GetButtonDown("Jump"))
-                    {
-                        AddAction(mainComponentPool.GetComponent<Jump>());
-                    }
-                    else if (Input.GetButton("Jump"))
+                    else if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
                     {
                         AddAction(mainComponentPool.GetComponent<Run>());
                     }
@@ -147,8 +143,11 @@ public class PlayerManager : AChild {
                         AddAction(mainComponentPool.GetComponent<Walk>());
                     }
                 }
-                else if (Input.GetButtonDown("Jump"))
+
+                if (Input.GetButtonDown("Jump"))
                 {
+                    if (Input.GetKey(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+                    { SetDirection(); }
                     AddAction(mainComponentPool.GetComponent<Jump>());
                 }
 

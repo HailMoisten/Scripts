@@ -231,8 +231,8 @@ public class Jump : AAction
 {
     private List<Vector3> jumpRouteList = new List<Vector3>();
     private Vector3 nextpos;
-    private int currentRun;
-    private int currentJump;
+    private float currentRun;
+    private float currentJump;
 
     public override void Awake()
     {
@@ -249,38 +249,101 @@ public class Jump : AAction
         jumpRouteList.Add(nextpos);
         currentRun = myself.CurrentRun;
         currentJump = myself.CurrentJump;
+        bool landed = false;
+        Vector3 endpos = myself.nextPOS;
+        bool clashed = false;
+        Vector3 dir = myself.DIR;
         float jumpsum = 0.0f;
         for (int i = 1; i <= currentJump; i++) { jumpsum += i; }
         RaycastHit hit;
         Ray ray;
-        float distance;
-//        if (myself.DIR == Vector3.zero)
-//        {
-            distance = myself.CurrentJump;
-            Ray rayUp = new Ray(nextpos + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), Vector3.up);
-            RaycastHit hitUp;
-            if (Physics.Raycast(rayUp, out hitUp, distance))
-            {
-                return (int)ErrorTypeList.Jump;
-            }
-            else
-            {
-                float sum = 0.0f;
-            for (int i = 0; i <= currentJump * 2; i++)
-            {
-                if (i == currentJump) { }
-                else
+        float distance = 1.0f;
+
+        float sum = 0.0f;
+        float r = 0;
+        float j = 0;
+        while (!landed && j <= 32)
+        {
+            //for (j = 0; j <= currentJump * 2; j++)
+            //{
+            //if (landed) { }
+            //else
+            //{
+            // Horizontal Check
+            if (dir == Vector3.zero || clashed) { }
+            else {
+                ray = new Ray(nextpos
+                    + (currentRun * r * dir * (1.0f / (currentJump * 2.0f)))
+                    + ((sum / jumpsum) * currentJump * Vector3.up)
+                    + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), dir);
+                distance = currentRun / (currentJump * 2);
+                if (dir.x != 0 && dir.z != 0) { distance = distance * 1.5f; }
+                if (Physics.Raycast(ray, out hit, distance))
                 {
-                    sum += currentJump - i;
-                    jumpRouteList.Add(nextpos + ((sum / jumpsum) * currentJump * Vector3.up));
+                    Debug.Log("hitfront");
+                    clashed = true;
+                }
+
+            }
+            if (clashed) { }
+            else { r++; }
+
+            // Vertical Check
+            if (j < currentJump)
+            {
+                ray = new Ray(nextpos
+                    + ((currentRun * r * (1.0f / (currentJump * 2.0f))) * dir)
+                    + ((sum / jumpsum) * currentJump * Vector3.up)
+                    + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), Vector3.up);
+                distance = Mathf.Abs(((currentJump - j) / jumpsum) * currentJump) + 0.5f;
+                if (Physics.Raycast(ray, out hit, distance))
+                {
+                    Debug.Log("hitup");
+                    j = currentJump;
                 }
             }
+            else if (j > currentJump)
+            {
+                ray = new Ray(nextpos
+                    + ((currentRun * r * (1.0f / (currentJump * 2.0f))) * dir)
+                    + ((sum / jumpsum) * currentJump * Vector3.up)
+                    + new Vector3(0, 0.5f, 0), Vector3.down);
+                distance = Mathf.Abs(((currentJump - j) / jumpsum) * currentJump) + 0.5f;
+                if (Physics.Raycast(ray, out hit, distance))
+                {
+                    Debug.Log("landed");
+                    if (myself.name == hit.collider.gameObject.name) { }
+                    else
+                    {
+                        endpos = myself.RoundToIntVector3XZ(hit.point);
+                        landed = true;
+                    }
+                }
+            }
+
+            // Fix and Add
+
+            if (j == currentJump)
+            {
+                r--;
+            }
+            else if (landed)
+            {
+                jumpRouteList.Add(endpos);
+            }
+            else {
+                sum += currentJump - j;
+                jumpRouteList.Add(nextpos
+                    + ((currentRun * r * (1.0f / (currentJump * 2.0f))) * dir)
+                    + ((sum / jumpsum) * currentJump * Vector3.up));
+            }
+            //            }
+            //            }
+            j++;
+
         }
-        //        }
-        //else
-        //{
-        //    distance = Mathf.Sqrt(Mathf.Pow(myself.CurrentJump, 2) + Mathf.Pow(myself.CurrentRun / 2, 2));
-        //}
+        if (landed) { }
+        else { return (int)ErrorTypeList.Jump; }
         return (int)ErrorTypeList.Nothing;
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
@@ -288,29 +351,28 @@ public class Jump : AAction
     }
     public override void Action(AAnimal myself)
     {
-        Vector3[] jumpRouteXZ = new Vector3[2];
-        jumpRouteXZ[0] = myself.nextPOS + (myself.DIR * myself.CurrentRun * 0.5f);
-        jumpRouteXZ[1] = myself.nextPOS + (myself.DIR * myself.CurrentRun);
-        Vector3[] jumpRouteY = new Vector3[2];
-        jumpRouteY[0] = myself.nextPOS + (Vector3.up * myself.CurrentJump);
-        jumpRouteY[1] = myself.nextPOS;
         float speed = 1.0f;
         if (myself.MovementSpeed * myself.MovementBurst == 0) { }
         else { speed = myself.MovementSpeed * myself.MovementBurst; }
 
-
         Vector3[] jumpRoute = new Vector3[jumpRouteList.Count];
         for (int c = 0; c <= jumpRouteList.Count - 1; c++) { jumpRoute[c] = jumpRouteList[c]; }
         for (int c = 0; c <= jumpRoute.Length - 1; c++) { Debug.Log(jumpRoute[c]); }
-        duration = ((currentJump + 5) / 6) * (jumpRoute.Length / (1 + (currentJump * 2)));
-        if (duration < 1.0f) { duration = 1.0f; }
 
-        myself.POS = myself.nextPOS;
-        myself.nextPOS = jumpRoute[jumpRoute.Length - 1];
-        iTween.MoveTo(myself.gameObject,
-            iTween.Hash("path", jumpRoute, "movetopath", false, "time", duration, "easetype", "linear"));
+        if (jumpRouteList.Count <= 2)
+        { duration = 0.0f; }
+        else
+        {
+            duration = ((currentJump + 7) / 8) * (jumpRoute.Length / (1 + (currentJump * 2)));
+            if (duration < 1.0f) { duration = 1.0f; }
 
-        myself.GetAnimator().SetFloat("Speed", speed);
+            myself.POS = myself.nextPOS;
+            myself.nextPOS = jumpRoute[jumpRoute.Length - 1];
+            iTween.MoveTo(myself.gameObject,
+                iTween.Hash("path", jumpRoute, "movetopath", false, "time", duration, "easetype", "linear"));
+
+            myself.GetAnimator().SetFloat("Speed", speed);
+        }
         SetMotionAndDurationAndUseHPSP(myself);
     }
 }

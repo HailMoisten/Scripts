@@ -380,7 +380,8 @@ public abstract class AAnimal : MonoBehaviour {
 
     private void doRotate()
     {
-        iTween.RotateTo(this.gameObject, iTween.Hash("y", Quaternion.LookRotation(DIR).eulerAngles.y, "time", gcd*2));
+        if (DIR == Vector3.zero) { }
+        else { iTween.RotateTo(this.gameObject, iTween.Hash("y", Quaternion.LookRotation(DIR).eulerAngles.y, "time", gcd * 2)); }
     }
 
     private void endAction()
