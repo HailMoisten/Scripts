@@ -130,6 +130,10 @@ public class PlayerManager : AChild {
                     {
                         focusedAnimal = visionManager.GetNextTargetAnimal();
                     }
+                    else if (Input.GetButtonDown("Jump"))
+                    {
+                        AddAction(mainComponentPool.GetComponent<Jump>());
+                    }
                     else if (Input.GetButton("Jump"))
                     {
                         AddAction(mainComponentPool.GetComponent<Run>());

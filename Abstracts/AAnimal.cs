@@ -146,9 +146,9 @@ public abstract class AAnimal : MonoBehaviour {
             for (int i = 0; i <= 4; i++) { sum += LevelUpReward[i]; }
             for (int s = 0; s <= 3 - sum - 1; s++)
             {
-                if (mains[0] + LevelUpReward[0] <= 99) { LevelUpReward[0]++; }
+                if (mains[2] + LevelUpReward[2] <= 99) { LevelUpReward[2]++; }
                 else if (mains[4] + LevelUpReward[4] <= 99) { LevelUpReward[4]++; }
-                else if (mains[2] + LevelUpReward[2] <= 99) { LevelUpReward[2]++; }
+                else if (mains[0] + LevelUpReward[0] <= 99) { LevelUpReward[0]++; }
                 else if (mains[1] + LevelUpReward[1] <= 99) { LevelUpReward[1]++; }
                 else if (mains[3] + LevelUpReward[3] <= 99) { LevelUpReward[3]++; }
             }
@@ -311,8 +311,8 @@ public abstract class AAnimal : MonoBehaviour {
     public void IncCurrentRun() { if (CurrentRun >= Mathf.FloorToInt(MovementBurst * MovementSpeed)) { } else { currentRun++; } }
     public void DecCurrentRun() { if (CurrentRun <= 1) { } else { currentRun--; } }
     protected int currentJump = 1; public int CurrentJump { get { return currentJump; } }
-    public void IncCurrentJump() { if (CurrentJump >= Mathf.FloorToInt(MovementBurst * MovementSpeed)) { } else { currentJump++; } }
-    public void DecCurrentJump() { if (CurrentJump <= 0) { } else { currentJump--; } }
+    public void IncCurrentJump() { if (CurrentJump >= Mathf.FloorToInt(2 + ((STR / 25) * MovementSpeed))) { } else { currentJump++; } }
+    public void DecCurrentJump() { if (CurrentJump <= 1) { } else { currentJump--; } }
     private bool isActing = false;
     public bool Interrupting { get; set; }
     public AAction[] actionStack = new AAction[3];

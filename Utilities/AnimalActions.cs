@@ -229,16 +229,10 @@ public class Run : AAction
 }
 public class Jump : AAction
 {
-    private Vector3 jumpDistination;
-    private float jumpLength;
-    private bool crashed;
-    private bool jumping;
-    private bool rising;
-    private bool falling;
-    private float speed;
-    private AAnimal myself;
-    private float riselength;
-    private float falllength;
+    private List<Vector3> jumpRouteList = new List<Vector3>();
+    private Vector3 nextpos;
+    private int currentRun;
+    private int currentJump;
 
     public override void Awake()
     {
@@ -248,85 +242,44 @@ public class Jump : AAction
         duration = 1.0f;
         spCost = 2;
     }
-    public void Update()
-    {
-        if (jumping)
-        {
-            if (rising)
-            {
-
-            }
-            else if (falling)
-            {
-
-                jumping = false;
-            }
-        }
-    }
     public override int CanDoAction(AAnimal myself)
     {
-        this.myself = myself;
-        jumpDistination = Vector3.one;
-        jumpLength = 0.0f;
-        crashed = false;
-
-        RaycastHit hitRise; RaycastHit hitFall;
-        Ray rayRise, rayFall;
+        jumpRouteList.Clear();
+        nextpos = myself.nextPOS;
+        jumpRouteList.Add(nextpos);
+        currentRun = myself.CurrentRun;
+        currentJump = myself.CurrentJump;
+        float jumpsum = 0.0f;
+        for (int i = 1; i <= currentJump; i++) { jumpsum += i; }
+        RaycastHit hit;
+        Ray ray;
         float distance;
-        if (myself.DIR == Vector3.zero) { distance = myself.CurrentJump; }
-        else { distance = Mathf.Sqrt(Mathf.Pow(myself.CurrentJump, 2) + Mathf.Pow(myself.CurrentRun / 2, 2)); }
-        Vector3 dir = ((myself.DIR * myself.CurrentRun) + (Vector3.up * myself.CurrentJump)) / distance;
-        rayRise = new Ray(myself.nextPOS + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), dir);
-        if (Physics.Raycast(rayRise, out hitRise, distance))
-        {
-            if (hitRise.collider.gameObject.layer == LayerMask.NameToLayer("Environment") ||
-                hitRise.collider.gameObject.layer == LayerMask.NameToLayer("Animal") ||
-                hitRise.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+//        if (myself.DIR == Vector3.zero)
+//        {
+            distance = myself.CurrentJump;
+            Ray rayUp = new Ray(nextpos + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), Vector3.up);
+            RaycastHit hitUp;
+            if (Physics.Raycast(rayUp, out hitUp, distance))
             {
-                crashed = true;
-                if (hitRise.distance <= 1.0f)
-                {
-                    return (int)ErrorTypeList.Move;
-                }
-                jumpDistination = myself.RoundToIntVector3XZ(hitRise.point - (dir / 2));
-                Vector3 jumpDiff = jumpDistination - myself.nextPOS;
-                jumpLength = Mathf.Sqrt(Mathf.Pow(jumpDiff.x, 2) + Mathf.Pow(jumpDiff.y, 2) + Mathf.Pow(jumpDiff.z, 2));
+                return (int)ErrorTypeList.Jump;
             }
             else
             {
-
+                float sum = 0.0f;
+            for (int i = 0; i <= currentJump * 2; i++)
+            {
+                if (i == currentJump) { }
+                else
+                {
+                    sum += currentJump - i;
+                    jumpRouteList.Add(nextpos + ((sum / jumpsum) * currentJump * Vector3.up));
+                }
             }
         }
-        else
-        {
-        }
-
-        //dir = new Vector3(jumpRoute[i].x - jumpRoute[i - 1].x, jumpRoute[i].y - jumpRoute[i - 1].y, jumpRoute[i].z - jumpRoute[i - 1].z);
-        //dir = myself.RoundToIntVector3XZ(dir);
-        //if (dir.x != 0 && dir.y != 0 && dir.z != 0) { jumpLength[i] = 2.25f; }
-        //else if (dir.x != 0 && dir.y != 0) { jumpLength[i] = 1.5f; }
-        //else if (dir.y != 0 && dir.z != 0) { jumpLength[i] = 1.5f; }
-        //else if (dir.z != 0 && dir.x != 0) { jumpLength[i] = 1.5f; }
-
-        //rayFall = new Ray(jumpRoute[i - 1] + new Vector3(0, myself.ObjectScale.y - 0.5f, 0), dir);
-        //if (Physics.Raycast(rayFall, out hitRise, jumpLength[i]))
-        //{
-        //    Debug.Log("hitsFront:" + hitFront.distance);
-        //    if (hitRise.collider.gameObject.layer == LayerMask.NameToLayer("Animal"))
-        //    {
-        //        if (myself.name == hitRise.collider.gameObject.name) { }
-        //        else
-        //        {
-        //            endrun = true;
-        //            if (i == 1) { return (int)ErrorTypeList.Move; }
         //        }
-        //    }
-        //    else if (hitRise.collider.gameObject.layer == LayerMask.NameToLayer("Terrain") ||
-        //        hitRise.collider.gameObject.layer == LayerMask.NameToLayer("Environment"))
-        //    {
-        //        endrun = true;
-        //        if (i == 1) { return (int)ErrorTypeList.Move; }
-        //    }
+        //else
+        //{
+        //    distance = Mathf.Sqrt(Mathf.Pow(myself.CurrentJump, 2) + Mathf.Pow(myself.CurrentRun / 2, 2));
         //}
         return (int)ErrorTypeList.Nothing;
     }
@@ -344,13 +297,18 @@ public class Jump : AAction
         float speed = 1.0f;
         if (myself.MovementSpeed * myself.MovementBurst == 0) { }
         else { speed = myself.MovementSpeed * myself.MovementBurst; }
-        if (myself.CurrentJump == 0) { duration = myself.CurrentRun / speed; }
-        else { duration = myself.CurrentJump / speed; }
+
+
+        Vector3[] jumpRoute = new Vector3[jumpRouteList.Count];
+        for (int c = 0; c <= jumpRouteList.Count - 1; c++) { jumpRoute[c] = jumpRouteList[c]; }
+        for (int c = 0; c <= jumpRoute.Length - 1; c++) { Debug.Log(jumpRoute[c]); }
+        duration = ((currentJump + 5) / 6) * (jumpRoute.Length / (1 + (currentJump * 2)));
+        if (duration < 1.0f) { duration = 1.0f; }
 
         myself.POS = myself.nextPOS;
-        myself.nextPOS = jumpRouteXZ[1];
+        myself.nextPOS = jumpRoute[jumpRoute.Length - 1];
         iTween.MoveTo(myself.gameObject,
-            iTween.Hash("path", jumpRouteXZ, "time", duration, "easetype", "linear"));
+            iTween.Hash("path", jumpRoute, "movetopath", false, "time", duration, "easetype", "linear"));
 
         myself.GetAnimator().SetFloat("Speed", speed);
         SetMotionAndDurationAndUseHPSP(myself);
