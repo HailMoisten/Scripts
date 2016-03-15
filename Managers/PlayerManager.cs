@@ -99,12 +99,18 @@ public class PlayerManager : AChild {
     void Update ()
     {
         // Inputs(GUI and Camera)
-        if (Input.GetButtonDown("CameraRotate")) { CameraRotateClockwise(); }
-        if (Input.GetButtonDown("CameraRotateCounter")) { CameraRotateCounterclockwise(); }
-        if (Input.GetButtonDown("CameraRotateUp")) { CameraRotateUp(); }
-        if (Input.GetButtonDown("CameraRotateDown")) { CameraRotateDown(); }
-        if (Input.GetButtonDown("CameraZoomIn")) { CameraZoomIn(); }
-        if (Input.GetButtonDown("CameraZoomOut")) { CameraZoomOut(); }
+        if (Input.GetButtonDown("CameraRotate"))
+        {
+            if (Input.GetKey(KeyCode.A)) { CameraRotateUp(); }
+            else if (Input.GetKey(KeyCode.Z)) { CameraZoomIn(); }
+            else { CameraRotateClockwise(); }
+        }
+        if (Input.GetButtonDown("CameraRotateCounter"))
+        {
+            if (Input.GetKey(KeyCode.A)) { CameraRotateDown(); }
+            else if (Input.GetKey(KeyCode.Z)) { CameraZoomOut(); }
+            else { CameraRotateCounterclockwise(); }
+        }
 
         //On Menu
         if (isMenuAwake)
@@ -130,7 +136,7 @@ public class PlayerManager : AChild {
                     {
                         focusedAnimal = visionManager.GetNextTargetAnimal();
                     }
-                    else if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+                    else if (Input.GetKey(KeyCode.Space))
                     {
                         AddAction(mainComponentPool.GetComponent<Run>());
                     }
@@ -146,7 +152,7 @@ public class PlayerManager : AChild {
 
                 if (Input.GetButtonDown("Jump"))
                 {
-                    if (Input.GetKey(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+                    if (Input.GetKey(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
                     { SetDirection(); }
                     AddAction(mainComponentPool.GetComponent<Jump>());
                 }
