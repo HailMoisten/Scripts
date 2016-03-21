@@ -16,6 +16,9 @@ public class PlayerCanvasManager : ACanvasManager {
     private Image BattleReadyOff;
     private Image BattleReadyOn;
     private bool lastBattleReady;
+    private Image CurrentActionIcon;
+    private Image NextActionIcon;
+    private Sprite nullIcon;
     private bool seakingSTM;
     private GameObject seakingSTMModeText;
     private Text CurrentRunText;
@@ -37,6 +40,9 @@ public class PlayerCanvasManager : ACanvasManager {
         BattleReadyOff = transform.FindChild("BattleReadyOff").GetComponent<Image>();
         BattleReadyOn = transform.FindChild("BattleReadyOn").GetComponent<Image>();
         lastBattleReady = true;
+        CurrentActionIcon = transform.FindChild("CurrentActionIcon").GetComponent<Image>();
+        NextActionIcon = transform.FindChild("NextActionIcon").GetComponent<Image>();
+        nullIcon = Resources.Load<Sprite>("Images/GUI/glass_black");
         seakingSTMModeText = transform.FindChild("SeakingSTMModeText").gameObject;
         seakingSTMModeText.SetActive(false);
         CurrentRunText = transform.FindChild("CurrentRunText").GetComponent<Text>();
@@ -54,6 +60,7 @@ public class PlayerCanvasManager : ACanvasManager {
         needUpdateBuffs = true;
     }
 
+    private bool updateActionStackFlag = false;
     // Update is called once per frame
     void Update () {
         updateHPSP();
@@ -61,6 +68,9 @@ public class PlayerCanvasManager : ACanvasManager {
         updateSubmitAction();
         updateBattleReady();
         updateCurrentRunJump();
+
+        updateActionStackFlag = !updateActionStackFlag;
+        if (updateActionStackFlag) { updateActionStack(); }
 
         if (nextCanvas != null) { }
         else
@@ -255,6 +265,33 @@ public class PlayerCanvasManager : ACanvasManager {
                 BattleReadyOn.enabled = false;
                 BattleReadyOff.enabled = true;
             }
+        }
+    }
+    private string lastCurrentActionName = "";
+    private string lastNextActionName = "";
+    private void updateActionStack()
+    {
+        if (playerManager.actionStack[0] == null) {
+            if (lastCurrentActionName == "null") { }
+            else { CurrentActionIcon.sprite = nullIcon; lastCurrentActionName = "null"; }
+        }
+        else if (lastCurrentActionName == playerManager.actionStack[0].Name) { }
+        else
+        {
+            CurrentActionIcon.sprite = playerManager.actionStack[0].Icon;
+            lastCurrentActionName = playerManager.actionStack[0].Name;
+        }
+
+        if (playerManager.actionStack[1] == null)
+        {
+            if (lastNextActionName == "null") { }
+            else { NextActionIcon.sprite = nullIcon; lastNextActionName = "null"; }
+        }
+        else if (lastNextActionName == playerManager.actionStack[1].Name) { }
+        else
+        {
+            NextActionIcon.sprite = playerManager.actionStack[1].Icon;
+            lastNextActionName = playerManager.actionStack[1].Name;
         }
     }
     int lastcurRun = 0; int lastcurJump = 0;

@@ -14,6 +14,7 @@ public class Idle : AAction
         base.Awake();
         actioncode = 0;
         duration = 0.0f;
+        icon = Resources.Load<Sprite>("Images/GUI/glass_black");
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
     {
@@ -34,6 +35,7 @@ public class Walk : AAction
         actioncode = 1;
         duration = 1.0f;
         spCost = 0.5f;
+        icon = Resources.Load<Sprite>("Images/Icons/Utility/Walk");
     }
     public override int CanDoAction(AAnimal myself)
     {
@@ -120,6 +122,7 @@ public class Run : AAction
         actioncode = 2;
         duration = 1.0f;
         spCost = 1;
+        icon = Resources.Load<Sprite>("Images/Icons/Utility/Run");
     }
     public override int CanDoAction(AAnimal myself)
     {
@@ -241,6 +244,7 @@ public class Jump : AAction
         actioncode = 3;
         duration = 1.0f;
         spCost = 2;
+        icon = Resources.Load<Sprite>("Images/Icons/Utility/Jump");
     }
     public override int CanDoAction(AAnimal myself)
     {
@@ -385,6 +389,7 @@ public class Attack : AAction
         actioncode = 4;
         duration = 1.0f;
         spCost = 2;
+        icon = Resources.Load<Sprite>("Images/Icons/Utility/BattleReadyOn");
     }
 
     public override int CanDoAction(AAnimal myself)
@@ -419,6 +424,7 @@ public class Guard : AAction
         isChargeSkill = true;
         chargeSpan = 1;
         chargeLimit = 64;
+        icon = Resources.Load<Sprite>("Images/Icons/Buff/Guard");
     }
     public override void SetParamsNeedAnimal(AAnimal myself)
     {
@@ -446,6 +452,7 @@ public class PickUp : AAction
         base.Awake();
         actioncode = -2;
         duration = 0.5f;
+        icon = Resources.Load<Sprite>("Images/Icons/Utility/PickUp");
     }
     public override int CanDoAction(AAnimal myself)
     {
@@ -494,6 +501,7 @@ public class Stunned : AAction
         base.Awake();
         actioncode = -1;
         duration = 1.0f;
+        icon = Resources.Load<Sprite>("Images/Icons/Utility/Stunned");
     }
 
     public override void SetParamsNeedAnimal(AAnimal myself)
