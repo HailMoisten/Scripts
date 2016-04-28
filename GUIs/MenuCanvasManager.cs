@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuCanvasManager : ACanvasManager {
 
@@ -22,6 +23,10 @@ public class MenuCanvasManager : ACanvasManager {
         nextMenus[1] = (GameObject)Resources.Load("Prefabs/GUI/EquipmentMenuCanvas");
         nextMenus[2] = (GameObject)Resources.Load("Prefabs/GUI/StatusMenuCanvas");
         nextMenus[3] = (GameObject)Resources.Load("Prefabs/GUI/ControlsMenuCanvas");
+        if (SceneManager.GetActiveScene().name == "Flash")
+        {
+            transform.FindChild("SelectableTarget (5)").GetComponent<Text>().text = "Leave the flash";
+        }
 
         initPointaAndKersol();
     }
@@ -48,7 +53,7 @@ public class MenuCanvasManager : ACanvasManager {
 
         if (ReturnedBool)
         {
-            if (pointa == 5) { EnterTheFlash();}
+            if (pointa == 5) { PassTheFlashGate();}
             else if (pointa == 6) { StartCoroutine(BackToTitle());}
             ReturnedBool = false;
         }
@@ -68,7 +73,11 @@ public class MenuCanvasManager : ACanvasManager {
             YesNoPopUpTextCanvasManager yesnoptcm = nextCanvas.GetComponent<YesNoPopUpTextCanvasManager>();
             nextCanvas.SetBackCanvas(this);
             yesnoptcm.Title = "Confirmation";
-            if (pointa == 5) { yesnoptcm.Content = "Enter the flash soon. Are you sure?"; }
+            if (pointa == 5)
+            {
+                if (SceneManager.GetActiveScene().name == "Flash") { yesnoptcm.Content = "Leave the flash soon. Are you sure?";}
+                else { yesnoptcm.Content = "Enter the flash soon. Are you sure?"; }
+            }
             else if (pointa == 6) { yesnoptcm.Content = "Back to title soon. Are you sure?"; }
         } else
         {
@@ -77,11 +86,14 @@ public class MenuCanvasManager : ACanvasManager {
         }
     }
 
-    private void EnterTheFlash()
+    private void PassTheFlashGate()
     {
-        FadeManager.Instance.LoadLevel("Title", 3.0f, 5.0f);
+        if (SceneManager.GetActiveScene().name == "Flash")
+        { FadeManager.Instance.LoadLevel("AlmaVillage", 3.0f, 5.0f); }
+        else { FadeManager.Instance.LoadLevel("Flash", 3.0f, 5.0f); }
         playerCanvas.CloseMenu();
     }
+
     private IEnumerator BackToTitle()
     {
         Debug.Log("BackToTitle.");
