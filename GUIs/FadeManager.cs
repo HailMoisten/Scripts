@@ -5,11 +5,11 @@ using System.Collections;
 /// <summary>
 /// シーン遷移時のフェードイン・アウトを制御するためのクラス
 /// </summary>
-public class FadeManager : MonoBehaviour {
+public class FadeManager : SingletonMonoBehaviour<FadeManager> {
 
-//    private static FadeManager instance;
+    private static FadeManager instance;
     /// <summary>暗転用黒テクスチャ</summary>
-    private Texture2D blackTexture;
+    private Texture2D blackTexture = null;
     /// <summary>フェード中の透明度</summary>
     private float fadeAlpha = 0;
     /// <summary>フェード中かどうか</summary>
@@ -17,7 +17,7 @@ public class FadeManager : MonoBehaviour {
 
     public void Awake()
     {
-/*        if (instance != null)
+        if (instance != null)
         {
             Destroy(this.gameObject);
         }
@@ -27,9 +27,20 @@ public class FadeManager : MonoBehaviour {
         }
 
         DontDestroyOnLoad(this.gameObject);
+
+        StartCoroutine(makeBlackTexture());
+/*        //ここで黒テクスチャ作る
+        this.blackTexture = new Texture2D(32, 32, TextureFormat.RGB24, false);
+        this.blackTexture.ReadPixels(new Rect(0, 0, 32, 32), 0, 0, false);
+        this.blackTexture.SetPixel(0, 0, Color.white);
+        this.blackTexture.Apply();
 */
+    }
+    private IEnumerator makeBlackTexture()
+    {
         //ここで黒テクスチャ作る
         this.blackTexture = new Texture2D(32, 32, TextureFormat.RGB24, false);
+        yield return new WaitForEndOfFrame();
         this.blackTexture.ReadPixels(new Rect(0, 0, 32, 32), 0, 0, false);
         this.blackTexture.SetPixel(0, 0, Color.white);
         this.blackTexture.Apply();
@@ -72,6 +83,11 @@ public class FadeManager : MonoBehaviour {
     private IEnumerator TransScene(string scene, float intervalOut, float intervalIn)
     {
         //だんだん暗く
+        if (this.isFading)
+        {
+            this.isFading = false;
+            yield return new WaitForSeconds(0.1f);
+        }
         this.isFading = true;
         float time = 0;
         while (time <= intervalOut)
@@ -100,7 +116,7 @@ public class FadeManager : MonoBehaviour {
         //だんだん明るく
         this.isFading = true;
         float time = 0;
-        while (time <= intervalIn) {
+        while (time <= intervalIn && this.isFading) {
             this.fadeAlpha = Mathf.Lerp(1f, 0f, time / intervalIn);
             time += Time.deltaTime;
             yield return 0;
@@ -114,7 +130,7 @@ public class FadeManager : MonoBehaviour {
         //だんだん暗く
         this.isFading = true;
         float time = 0;
-        while (time <= intervalOut)
+        while (time <= intervalOut && this.isFading)
         {
             this.fadeAlpha = Mathf.Lerp(0f, 1f, time / intervalOut);
             time += Time.deltaTime;

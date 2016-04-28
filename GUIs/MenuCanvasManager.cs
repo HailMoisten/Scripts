@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class MenuCanvasManager : ACanvasManager {
 
@@ -10,7 +12,7 @@ public class MenuCanvasManager : ACanvasManager {
     {
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
         pointa = 1;
-        pointaNUM = 4;
+        pointaNUM = 6;
         kersolPOSfix = new Vector3(0, -8, 0);
         firstpointa = 0;
 
@@ -44,6 +46,12 @@ public class MenuCanvasManager : ACanvasManager {
             closeAllMenu();
         }
 
+        if (ReturnedBool)
+        {
+            if (pointa == 5) { EnterTheFlash();}
+            else if (pointa == 6) { StartCoroutine(BackToTitle());}
+            ReturnedBool = false;
+        }
     }
 
     private void closeAllMenu()
@@ -55,8 +63,31 @@ public class MenuCanvasManager : ACanvasManager {
     {
         setPointa(pointa);
         moveKersol();
-        nextCanvas = Instantiate(nextMenus[pointa-1]).GetComponent<ACanvasManager>();
-        nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this);
+        if (pointa == 5 || pointa == 6) {
+            nextCanvas = Instantiate ((GameObject)Resources.Load ("Prefabs/GUI/YesNoPopUpTextCanvas")).GetComponent<ACanvasManager>();
+            YesNoPopUpTextCanvasManager yesnoptcm = nextCanvas.GetComponent<YesNoPopUpTextCanvasManager>();
+            nextCanvas.SetBackCanvas(this);
+            yesnoptcm.Title = "Confirmation";
+            if (pointa == 5) { yesnoptcm.Content = "Enter the flash soon. Are you sure?"; }
+            else if (pointa == 6) { yesnoptcm.Content = "Back to title soon. Are you sure?"; }
+        } else
+        {
+            nextCanvas = Instantiate(nextMenus[pointa-1]).GetComponent<ACanvasManager>();
+            nextCanvas.SetBackCanvas(this);
+        }
+    }
+
+    private void EnterTheFlash()
+    {
+        FadeManager.Instance.LoadLevel("Title", 3.0f, 5.0f);
+        playerCanvas.CloseMenu();
+    }
+    private IEnumerator BackToTitle()
+    {
+        Debug.Log("BackToTitle.");
+        yield return new WaitForEndOfFrame();
+        FadeManager.Instance.LoadLevel("Title", 3.0f, 5.0f);
+        playerCanvas.CloseMenu();
     }
 
 }

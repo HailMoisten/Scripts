@@ -38,7 +38,7 @@ public class YesNoPopUpTextCanvasManager : ACanvasManager {
         // Should give pointa;
         if (Input.GetButtonDown("Submit"))
         {
-            if (pointa <= 1) { backCanvas.ReturnedBool = true; }
+            if (pointa >= 2) { backCanvas.ReturnedBool = true; }
             else { backCanvas.ReturnedBool = false; }
             DestroyThisCanvas();
         }

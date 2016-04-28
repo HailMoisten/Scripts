@@ -9,8 +9,7 @@ public class TitleCanvasManager : ACanvasManager
 
     protected override void Awake()
     {
-        fade = GetComponent<FadeManager>();
-        fade.FadeIn(5.0f);
+        FadeManager.Instance.FadeIn(5.0f);
         configCanvas = (GameObject)Resources.Load("Prefabs/GUI/ConfigCanvas");
 
         myKersolRect = transform.FindChild("Kersol").GetComponent<RectTransform>();
@@ -39,9 +38,7 @@ public class TitleCanvasManager : ACanvasManager
             {
                 if (pointa == 1)
                 {
-                    fade.LoadLevel("EzeVillage", 3.0f, 1.5f);
-                    //                    fade.FadeOut(3.0f);
-                    //                    newGame(3.0f);
+                    FadeManager.Instance.LoadLevel("AlmaVillage", 3.0f, 1.5f);
                 }
                 else if (pointa == 2){
                     nextCanvas = Instantiate(configCanvas).GetComponent<ACanvasManager>();
@@ -52,12 +49,6 @@ public class TitleCanvasManager : ACanvasManager
             {
             }
         }
-    }
-
-    private IEnumerator newGame(float waittime)
-    {
-        yield return new WaitForSeconds(waittime);
-        SceneManager.LoadScene("EzeVillage");
     }
 
 }
