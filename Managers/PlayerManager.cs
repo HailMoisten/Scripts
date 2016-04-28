@@ -12,7 +12,7 @@ public class PlayerManager : AChild {
     }
     public override void GainExperience(int gainp)
     {
-        gainp += gameManager.Difficulty;
+        gainp += GameManager.Difficulty;
         if (gainp <= 0 || Lv >= 166) { gainp = 0; }
         else
         {
@@ -52,7 +52,6 @@ public class PlayerManager : AChild {
     }
 
     private GameObject cam;
-    private GameManager gameManager;
     private int camAngle = 0;
     private PlayerCanvasManager playerCanvasManager;
     private GameObject visualAssist;
@@ -68,8 +67,6 @@ public class PlayerManager : AChild {
         gameObject.tag = "Player";
 
         cam = GameObject.Find("Camera");
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        gameManager.Difficulty = 200;
         playerCanvasManager = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<PlayerCanvasManager>();
 
         Initialize();

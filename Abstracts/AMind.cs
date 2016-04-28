@@ -4,11 +4,9 @@ using IconAndErrorType;
 
 public abstract class AMind : AIcon {
     protected string prefabPass = string.Empty;
-    private GameManager gameManager = null;
     public override void Awake()
     {
         base.Awake();
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         IconType = (int)IconTypeList.Mind;
         gameObject.tag = "Mind";
         NumofMindSkills = 10;
@@ -45,7 +43,7 @@ public abstract class AMind : AIcon {
         else if (MindLevel >= 8) { gainp--; gainp--; }
         else if (MindLevel >= 10) { gainp = 0; }
         if ((int)Proficiency % 100 >= 66) { gainp--; }
-        if (isplayer) { gainp += gameManager.Difficulty; }
+        if (isplayer) { gainp += GameManager.Difficulty; }
 
         if (gainp <= 0 || MindLevel >= 10) { gainp = 0; }
         else
