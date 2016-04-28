@@ -22,7 +22,11 @@ public class ReturnInventoryMenuCanvasManager : InventoryMenuCanvasManager {
         if (currentInventory <= 1) { target = playerManager.ItemBag; }
         else if (currentInventory == 2) { target = playerManager.WeaponBag; }
         else if (currentInventory == 3) { target = playerManager.RingBag; }
-        else if (currentInventory >= 4) { target = playerManager.Mind; }
+        else if (currentInventory >= 4)
+        {
+            if (TargetIconType == (int)IconTypeList.Action) { target = playerManager.Mind; }
+            else if (TargetIconType == (int)IconTypeList.Mind) { target = playerManager.MindBag; }
+        }
         int pages = 1 + (target.childCount / 20);
         if (currentPage > pages) { currentPage = pages; } else if (currentPage < 1) { currentPage = 1; }
         int pagehead = (currentPage - 1) * 20;
