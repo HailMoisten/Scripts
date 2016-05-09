@@ -7,6 +7,7 @@ public class PlayerCanvasManager : ACanvasManager {
 
     private PlayerManager playerManager;
     private Camera myCamera;
+	private bool UIVisualized = true;
     private RectTransform HPBar;
     private RectTransform HPEnd;
     private Text HPText;
@@ -60,51 +61,83 @@ public class PlayerCanvasManager : ACanvasManager {
         needUpdateBuffs = true;
     }
 
+	public void UIOnOff()
+	{
+		UIVisualized = !UIVisualized;
+		transform.FindChild("HPBar").gameObject.SetActive(UIVisualized);
+		transform.FindChild("HPText").gameObject.SetActive(UIVisualized);
+		transform.FindChild("SPBar").gameObject.SetActive(UIVisualized);
+		transform.FindChild("SPText").gameObject.SetActive(UIVisualized);
+		transform.FindChild("BattleReadyOff").gameObject.SetActive(UIVisualized);
+		transform.FindChild("BattleReadyOn").gameObject.SetActive(UIVisualized);
+		transform.FindChild("BattleReadyPanel").gameObject.SetActive(UIVisualized);
+		transform.FindChild("CurrentActionIcon").gameObject.SetActive(UIVisualized);
+		transform.FindChild("NextActionIcon").gameObject.SetActive(UIVisualized);
+		transform.FindChild("CurrentActionIconBack").gameObject.SetActive(UIVisualized);
+		transform.FindChild("NextActionIconBack").gameObject.SetActive(UIVisualized);
+		transform.FindChild("CurrentRunText").gameObject.SetActive(UIVisualized);
+		transform.FindChild("CurrentJumpText").gameObject.SetActive(UIVisualized);
+	}
+
     private bool updateActionStackFlag = false;
     // Update is called once per frame
     void Update () {
-        updateHPSP();
-        updateBuffs();
-        updateSubmitAction();
-        updateBattleReady();
-        updateCurrentRunJump();
+		if (UIVisualized)
+		{
+			updateHPSP();
+			updateBuffs();
+			updateSubmitAction();
+			updateBattleReady();
+			updateCurrentRunJump();
 
-        updateActionStackFlag = !updateActionStackFlag;
-        if (updateActionStackFlag) { updateActionStack(); }
+			updateActionStackFlag = !updateActionStackFlag;
+			if (updateActionStackFlag)
+			{
+				updateActionStack();
+			}
 
-        if (nextCanvas != null) { }
-        else
-        {
-            if (seakingSTM)
-            {
-                if (Input.GetKeyDown(KeyCode.RightArrow))
-                {
-                    inclementPointa();
-                    moveKersol();
-                }
-                if (Input.GetKeyDown(KeyCode.LeftArrow))
-                {
-                    declementPointa();
-                    moveKersol();
-                }
-                if (Input.GetButtonDown("Attack") || Input.GetButtonDown("Submit"))
-                {
-                    if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
-                    {
-                        nextCanvas = clickTarget();
-                        if (nextCanvas != null) { nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this); }
-                    }
-                }
-            }
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                seakSTMToggle();
-            }
-            if (Input.GetButtonDown("Options"))
-            {
-                openMenu();
-            }
-        }
+			if (nextCanvas != null)
+			{
+			}
+			else
+			{
+				if (seakingSTM)
+				{
+					if (Input.GetKeyDown(KeyCode.RightArrow))
+					{
+						inclementPointa();
+						moveKersol();
+					}
+					if (Input.GetKeyDown(KeyCode.LeftArrow))
+					{
+						declementPointa();
+						moveKersol();
+					}
+					if (Input.GetButtonDown("Attack") || Input.GetButtonDown("Submit"))
+					{
+						if (Target.GetComponent<SelectableTargetManager>().TargetIcon != null)
+						{
+							nextCanvas = clickTarget();
+							if (nextCanvas != null)
+							{
+								nextCanvas.GetComponent<ACanvasManager>().SetBackCanvas(this);
+							}
+						}
+					}
+				}
+				if (Input.GetKeyDown(KeyCode.Tab))
+				{
+					seakSTMToggle();
+				}
+				if (Input.GetButtonDown("Options"))
+				{
+					openMenu();
+				}
+			}
+		}
+		else
+		{
+		}
 
     }
     private void openMenu()
