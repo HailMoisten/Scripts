@@ -13,13 +13,25 @@ public class ItemSymbolManager : MonoBehaviour {
         if (usedGravity) { }
         else
         {
-            Vector3 surface = transform.position + new Vector3(0, Terrain.activeTerrain.SampleHeight(transform.position) - transform.position.y, 0);
+			usedGravity = true;
+			RaycastHit hitDown;
+			Vector3 surface = transform.position;
+			if (Physics.Raycast(new Ray(transform.position, Vector3.down), out hitDown, 128.0f))
+			{
+				if (hitDown.collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+				{
+					surface = transform.position + new Vector3(0, Terrain.activeTerrain.SampleHeight(transform.position) - transform.position.y, 0);
+				}
+				else
+				{
+					surface = transform.position + new Vector3(0, -1 * hitDown.distance, 0);
+				}
+			}
             iTween.MoveTo(gameObject,
                 iTween.Hash("position", surface,
                 "time", 2.0f,
                 "easetype", "linear"
                 ));
-            usedGravity = true;
         }
 
         transform.rotation = Quaternion.Euler(
