@@ -18,7 +18,7 @@ public class MenuCanvasManager : ACanvasManager {
         firstpointa = 0;
 
         playerManager = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerManager>();
-        playerCanvas = GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>();
+        playerCanvas = GameObject.Find("PlayerCanvas").GetComponent<PlayerCanvasManager>();
         nextMenus[0] = (GameObject)Resources.Load("Prefabs/GUI/InventoryMenuCanvas");
         nextMenus[1] = (GameObject)Resources.Load("Prefabs/GUI/EquipmentMenuCanvas");
         nextMenus[2] = (GameObject)Resources.Load("Prefabs/GUI/StatusMenuCanvas");

@@ -52,7 +52,7 @@ public abstract class AMind : AIcon {
             if (Proficiency >= 1000) { Proficiency = 1000; }
             if (isplayer)
             {
-                GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
+                GameObject.Find("PlayerCanvas").GetComponent<PlayerCanvasManager>().ShowInformationText(
                     "+ " + gainp + " Prof. (" + Proficiency + ") " + "[" + Name + "]");
             }
             int curml = MindLevel;
@@ -72,7 +72,7 @@ public abstract class AMind : AIcon {
         }
         if (isplayer)
         {
-            GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
+            GameObject.Find("PlayerCanvas").GetComponent<PlayerCanvasManager>().ShowInformationText(
                 "Level up to " + MindLevel + ". " + "[" + Name + "]");
         }
     }

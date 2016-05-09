@@ -67,15 +67,15 @@ public class PlayerManager : AChild {
         gameObject.tag = "Player";
 
         cam = GameObject.Find("Camera");
-        playerCanvasManager = Instantiate((GameObject)Resources.Load("Prefabs/GUI/PlayerCanvas")).GetComponent<PlayerCanvasManager>();
+		playerCanvasManager = GameObject.Find("PlayerCanvas").GetComponent<PlayerCanvasManager>();
 
         Initialize();
     }
     protected override void Initialize()
     {
         //setMainStatus(165, 100, 100, 100, 100, 100);
-        //setMainStatus(10, 5, 10, 10, 2, 5);
-        setMainStatus(1, 1, 1, 1, 1, 1);
+        setMainStatus(14, 5, 10, 22, 2, 5);
+        //setMainStatus(1, 1, 1, 1, 1, 1);
         GameObject item = new GameObject("AirShard");
         item.AddComponent<AirShard>();
         item.transform.SetParent(ItemBag.transform);

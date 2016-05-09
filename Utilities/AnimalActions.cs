@@ -93,8 +93,8 @@ public class Walk : AAction
              Mathf.Abs(myself.nextPOS.z - myself.nextnextPOS.z) != 0) { diag = 1.5f; }
         else { diag = 1.0f; }
         if (myself.MovementSpeed <= 0) { }
-        else if (myself.MovementSpeed <= 1.0f) { duration = (diag) / (myself.MovementSpeed); }
-        else { duration = (diag) / (2.0f); }
+        else if (myself.MovementSpeed <= 1.0f) { duration = (diag) / (myself.MovementSpeed * 2); }
+		else { duration = (diag) / (myself.MovementSpeed); }
     }
     public override void Action(AAnimal myself)
     {
@@ -484,7 +484,7 @@ public class PickUp : AAction
         }
         if (myself.tag == "Player")
         {
-            GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().PickUpPopUp(TargetItem);
+            GameObject.Find("PlayerCanvas").GetComponent<PlayerCanvasManager>().PickUpPopUp(TargetItem);
         }
         TargetItem.PickUp();
         TargetItem = null;

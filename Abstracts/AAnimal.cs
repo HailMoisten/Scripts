@@ -134,7 +134,7 @@ public abstract class AAnimal : MonoBehaviour {
             lv++;
             if (gameObject.tag == "Player")
             {
-                GameObject.Find("PlayerCanvas(Clone)").GetComponent<PlayerCanvasManager>().ShowInformationText(
+                GameObject.Find("PlayerCanvas").GetComponent<PlayerCanvasManager>().ShowInformationText(
                     "Level up to " + Lv + ". ");
             }
             int[] mains = GetMainStatus();
